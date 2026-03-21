@@ -9,13 +9,16 @@ variable "location" {
 }
 
 variable "vnet" {
-  description = "Virtual network address space for the Azure resources"
+  description = "Virtual network address space"
   type        = list(string)
-  default     = ["10.0.0.0/16"]
 }
 
-variable "subnet_database" {
-  description = "Database subnet address space for the Azure resources"
+variable "database_subnet" {
+  description = "Database subnet address space"
   type        = list(string)
-  default     = ["10.0.1.0/24"]
+}
+
+variable "jumpbox_subnet" {
+  description = "Jumpbox subnet address space"
+  type        = list(string)
 }
