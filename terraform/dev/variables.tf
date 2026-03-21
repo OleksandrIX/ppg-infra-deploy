@@ -39,3 +39,8 @@ variable "ssh_pub_key_path" {
   type        = string
   default     = "~/.ssh/azure-ppg-cluster.pub"
 }
+
+variable "admin_ip" {
+  description = "My public IP address for SSH access to Jumpbox"
+  type        = string
+}

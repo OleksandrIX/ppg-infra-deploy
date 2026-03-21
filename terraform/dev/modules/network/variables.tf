@@ -22,3 +22,8 @@ variable "jumpbox_subnet" {
   description = "Jumpbox subnet address space"
   type        = list(string)
 }
+
+variable "admin_ip" {
+  description = "Allowed IP address for SSH access"
+  type        = string
+}

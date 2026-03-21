@@ -10,6 +10,7 @@ module "network" {
   vnet                = var.vnet
   database_subnet     = var.database_subnet
   jumpbox_subnet      = var.jumpbox_subnet
+  admin_ip            = var.admin_ip
 }
 
 module "jumpbox" {
