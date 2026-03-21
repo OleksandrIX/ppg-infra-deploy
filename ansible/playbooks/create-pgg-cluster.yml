@@ -4,3 +4,4 @@
   become: yes
   roles:
     - { role: "etcd", tags: ["etcd"] }
+    - { role: "percona_postgresql", tags: ["postgresql"] }
