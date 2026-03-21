@@ -1,0 +1,10 @@
+/var/log/etcd/etcd.log {
+        daily
+        rotate 30
+        compress
+        missingok
+        notifempty
+        copytruncate
+        delaycompress
+        create 0640 etcd adm
+}

@@ -1,0 +1,86 @@
+---
+- name: Download etcd
+  ansible.builtin.get_url:
+    url: "https://github.com/etcd-io/etcd/releases/download/{{ etcd_version }}/etcd-{{ etcd_version }}-linux-amd64.tar.gz"
+    dest: "/tmp/etcd-{{ etcd_version }}-linux-amd64.tar.gz"
+    mode: "0644"
+
+- name: Extract etcd archive
+  ansible.builtin.unarchive:
+    src: "/tmp/etcd-{{ etcd_version }}-linux-amd64.tar.gz"
+    dest: "/tmp/"
+    remote_src: yes
+
+- name: Move bin files
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/usr/local/bin"
+    remote_src: yes
+    mode: "0755"
+  loop:
+    - "/tmp/etcd-{{ etcd_version }}-linux-amd64/etcd"
+    - "/tmp/etcd-{{ etcd_version }}-linux-amd64/etcdctl"
+    - "/tmp/etcd-{{ etcd_version }}-linux-amd64/etcdutl"
+
+- name: Created etcd user
+  ansible.builtin.user:
+    name: etcd
+    system: yes
+    home: /var/lib/etcd
+    shell: /bin/false
+
+- name: Created etcd config dir
+  ansible.builtin.file:
+    state: directory
+    path: "{{ item.path }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - {path: "/etc/etcd", owner: "etcd", group: "etcd", mode: "0755"}
+    - {path: "/var/lib/etcd", owner: "etcd", group: "etcd", mode: "0755"}
+    - {path: "/var/log/etcd", owner: "etcd", group: "adm", mode: "2755"}
+
+- name: Check if etcd cluster already initialized
+  ansible.builtin.stat:
+    path: "{{ etcd_data_dir }}/member"
+  register: etcd_data_check
+
+- name: Created etcd config
+  ansible.builtin.template:
+    src: "etcd.yaml.j2"
+    dest: /etc/etcd/config.yaml
+  vars:
+    cluster_state: "{{ 'existing' if etcd_data_check.stat.exists else 'new' }}"
+  notify: "restart etcd"
+
+- name: Created etcd service
+  ansible.builtin.copy:
+    src: etcd.service
+    dest: /etc/systemd/system/etcd.service
+
+- name: Created etcd logrotate config
+  ansible.builtin.copy:
+    src: etcd.logrotate
+    dest: /etc/logrotate.d/etcd
+
+- name: Enable and start etcd service
+  ansible.builtin.systemd:
+    name: etcd
+    enabled: yes
+    state: started
+    daemon_reload: yes
+
+- name: Update etcd initial-cluster-state to 'existing'
+  ansible.builtin.replace:
+    path: /etc/etcd/config.yaml
+    regexp: 'initial-cluster-state: "new"'
+    replace: 'initial-cluster-state: "existing"'
+
+- name: Remove etcd files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "/tmp/etcd-{{ etcd_version }}-linux-amd64.tar.gz"
+    - "/tmp/etcd-{{ etcd_version }}-linux-amd64"
