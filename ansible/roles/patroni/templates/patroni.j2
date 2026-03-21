@@ -1,0 +1,112 @@
+scope: {{ patroni_scope }}
+namespace: {{ patroni_namespace }}
+name: {{ inventory_hostname }}
+
+tags:
+  nofailover: false
+  noloadbalance: false
+  clonefrom: false
+
+watchdog:
+  mode: off
+
+restapi:
+  listen: 0.0.0.0:8008
+  connect_address: {{ ansible_default_ipv4.address }}:8008
+  authentication:
+    username: {{ patroni_restapi_user }}
+    password: {{ patroni_restapi_password }}
+
+log:
+  type: json
+  dir: /var/log/patroni
+  mode: 0644
+  level: INFO
+  traceback_level: ERROR
+  file_num: 30
+  file_size: 100000000
+  dateformat: "%Y-%m-%d %H:%M:%S"
+  format:
+    - asctime: 'timestamp'
+    - levelname: level
+    - module: module
+    - message: msg
+
+etcd3:
+  protocol: http
+  hosts: {% for host in etcd_hosts %}{{ hostvars[host]['ansible_default_ipv4']['address'] }}:2379{% if not loop.last %},{% endif %}{% endfor %}
+
+
+postgresql:
+  listen: {{ ansible_default_ipv4.address }}:5432
+  connect_address: {{ ansible_default_ipv4.address }}:5432
+  data_dir: {{ psql_data_dir }}
+  bin_dir: {{ psql_bin_dir }}
+  authentication:
+    superuser:
+      username: postgres
+      password: {{ psql_superuser_password }}
+    replication:
+      username: replicator
+      password: {{ psql_replication_password }}
+  parameters:
+    max_connections: 1000
+    shared_buffers: 256MB
+    unix_socket_directories: "/var/run/postgresql/"
+
+bootstrap:
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+    maximum_lag_on_failover: 1048576
+    postgresql:
+      use_pg_rewind: true
+      use_slots: true
+      parameters:
+        archive_command: cp %p {{ psql_wal_dir }}/%f
+        archive_mode: 'on'
+        archive_timeout: 600s
+        hot_standby: 'on'
+        log_connections: 'on'
+        log_destination: jsonlog, stderr, syslog
+        log_directory: /var/log/postgresql
+        log_disconnections: 'on'
+        log_duration: 'on'
+        log_error_verbosity: verbose
+        log_file_mode: 416
+        log_line_prefix: 'sql_state=%e transaction_id=%v %quser=%u database=%d host=%r app=%a session_id=%c '
+        log_min_messages: info
+        log_rotation_age: 1d
+        log_rotation_size: 0
+        log_statement: all
+        log_timezone: Europe/Kyiv
+        log_truncate_on_rotation: 'on'
+        logging_collector: 'on'
+        max_prepared_transactions: 100
+        max_replication_slots: 10
+        max_wal_senders: 5
+        max_wal_size: 10GB
+        password_encryption: md5
+        restore_command: cp {{ psql_wal_dir }}/%f %p
+        wal_keep_segments: 10
+        wal_level: replica
+        wal_log_hints: 'on'
+
+      pg_hba:
+    {% for host in postgres_hosts %}
+    - host all all {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 md5
+    - host replication replicator {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 md5
+    {% endfor %}
+
+        - local all all md5
+        - host all all 127.0.0.1/32 md5
+        - host all postgres 0.0.0.0/0 reject
+
+    {% for host in allow_connection_hosts %}
+    - host all all {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 md5
+    {% endfor %}
+
+  initdb:
+    - encoding: UTF8
+    - data-checksums

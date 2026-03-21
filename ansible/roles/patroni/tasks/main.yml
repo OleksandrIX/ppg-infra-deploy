@@ -1,0 +1,52 @@
+---
+- name: Check if PSQL passwords are defined
+  ansible.builtin.fail:
+    msg: "Error: PSQL superuser or replication passwords are not defined!"
+  when: >
+    psql_superuser_password | default('') | length == 0 or
+    psql_replication_password | default('') | length == 0
+  no_log: true
+
+- name: Stop and Disable default PostgreSQL service
+  ansible.builtin.systemd:
+    name: postgresql
+    enabled: no
+    state: stopped
+  ignore_errors: yes
+
+- name: Install dependencies for Patroni logging and etcd
+  ansible.builtin.apt:
+    name:
+      - python3-json-logger
+      - python3-etcd
+      - python3-requests
+      - python3-yaml
+    state: present
+
+- name: Create Patroni and PostgreSQL directories
+  ansible.builtin.file:
+    state: directory
+    path: "{{ item.path }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - { path: /etc/patroni/, mode: "0755", owner: root, group: root }
+    - { path: /var/log/patroni/, mode: "2755", owner: postgres, group: adm }
+    - { path: /var/log/postgresql/, mode: "2755", owner: postgres, group: adm }
+    - { path: "{{ psql_wal_dir }}", mode: "0700", owner: postgres, group: postgres }
+    - { path: "{{ psql_data_dir }}", mode: "0700", owner: postgres, group: postgres }
+
+- name: Create or update Patroni config
+  ansible.builtin.template:
+    src: patroni.j2
+    dest: /etc/patroni/config.yml
+    backup: yes
+  notify: "restart patroni"
+
+- name: Enable and start Patroni service
+  ansible.builtin.systemd:
+    name: patroni
+    enabled: yes
+    state: started
+    daemon_reload: yes
