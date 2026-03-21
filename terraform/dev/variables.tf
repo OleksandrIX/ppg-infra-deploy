@@ -27,3 +27,15 @@ variable "jumpbox_subnet" {
   type        = list(string)
   default     = ["10.0.2.0/24"]
 }
+
+variable "admin_username" {
+  description = "Administrator username for all virtual machines"
+  type        = string
+  default     = "oleksandrix"
+}
+
+variable "ssh_pub_key_path" {
+  description = "Path to the public SSH key for VM access"
+  type        = string
+  default     = "~/.ssh/azure-ppg-cluster.pub"
+}

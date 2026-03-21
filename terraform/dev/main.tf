@@ -21,8 +21,8 @@ module "jumpbox" {
 
   vm_count         = 1
   vm_name_prefix   = "jumpbox"
-  admin_username   = "adminuser"
-  ssh_public_key   = file("~/.ssh/id_rsa.pub")
+  admin_username   = var.admin_username
+  ssh_public_key   = file(var.ssh_pub_key_path)
   assign_public_ip = true
   vm_size          = "Standard_B1s"
 
@@ -41,8 +41,8 @@ module "database_cluster" {
 
   vm_count         = 3
   vm_name_prefix   = "percona-node"
-  admin_username   = "adminuser"
-  ssh_public_key   = file("~/.ssh/id_rsa.pub")
+  admin_username   = var.admin_username
+  ssh_public_key   = file(var.ssh_pub_key_path)
   assign_public_ip = false
   vm_size          = "Standard_D2s_v5"
 
