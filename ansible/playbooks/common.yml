@@ -1,0 +1,6 @@
+---
+- name: "Common setup for PostgreSQL cluster nodes"
+  hosts: db_cluster
+  become: yes
+  roles:
+    - common
