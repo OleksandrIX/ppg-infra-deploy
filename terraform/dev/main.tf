@@ -7,6 +7,50 @@ module "network" {
   source              = "./modules/network"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  vnet                = ["10.0.0.0/16"]
-  subnet_database     = ["10.0.1.0/24"]
+  vnet                = var.vnet
+  database_subnet     = var.database_subnet
+  jumpbox_subnet      = var.jumpbox_subnet
+}
+
+module "jumpbox" {
+  source              = "./modules/compute"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  subnet_id           = module.network.jumpbox_subnet_id
+  subnet_prefix       = var.jumpbox_subnet[0]
+
+  vm_count         = 1
+  vm_name_prefix   = "jumpbox"
+  admin_username   = "adminuser"
+  ssh_public_key   = file("~/.ssh/id_rsa.pub")
+  assign_public_ip = true
+  vm_size          = "Standard_B1s"
+
+  tags = {
+    AnsibleGroup = "jumpbox"
+    Environment  = "dev"
+  }
+}
+
+module "database_cluster" {
+  source              = "./modules/compute"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  subnet_id           = module.network.database_subnet_id
+  subnet_prefix       = var.database_subnet[0]
+
+  vm_count         = 3
+  vm_name_prefix   = "percona-node"
+  admin_username   = "adminuser"
+  ssh_public_key   = file("~/.ssh/id_rsa.pub")
+  assign_public_ip = false
+  vm_size          = "Standard_D2s_v5"
+
+  create_data_disk  = true
+  data_disk_size_gb = 128
+
+  tags = {
+    AnsibleGroup = "db_cluster"
+    Environment  = "dev"
+  }
 }
