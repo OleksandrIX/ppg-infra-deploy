@@ -1,1 +1,1 @@
-ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q oleksandrix@{{ lookup("env", "JUMPBOX_IP") }}"'
+ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q oleksandrix@{{ hostvars[groups["jumpbox"][0]]["ansible_host"] }}"'
