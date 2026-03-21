@@ -3,16 +3,10 @@ resource "azurerm_resource_group" "rg" {
   location = var.location
 }
 
-resource "azurerm_virtual_network" "vnet" {
-  name                = "vnet-ppg-cluster-dev"
-  location            = azurerm_resource_group.rg.location
+module "network" {
+  source              = "./modules/network"
   resource_group_name = azurerm_resource_group.rg.name
-  address_space       = var.vnet
-}
-
-resource "azurerm_subnet" "db_subnet" {
-  name                 = "snet-database-dev"
-  resource_group_name  = azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = var.subnet_database
+  location            = azurerm_resource_group.rg.location
+  vnet                = ["10.0.0.0/16"]
+  subnet_database     = ["10.0.1.0/24"]
 }
