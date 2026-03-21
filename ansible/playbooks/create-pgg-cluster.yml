@@ -1,0 +1,6 @@
+---
+- name: "Create PostgreSQL Cluster"
+  hosts: db_cluster
+  become: yes
+  roles:
+    - { role: "etcd", tags: ["etcd"] }
