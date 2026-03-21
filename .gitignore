@@ -4,3 +4,10 @@ __pycache__/
 .vault_pass.txt
 *.log
 *.tmp
+
+# Ignore Terraform state files
+terraform/*/.terraform/
+terraform/*/*.tfstate
+terraform/*/*.tfstate.backup
+terraform/*/*.tfvars
+terraform/*/.terraform.lock.hcl
