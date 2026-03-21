@@ -24,7 +24,7 @@ module "jumpbox" {
   admin_username   = var.admin_username
   ssh_public_key   = file(var.ssh_pub_key_path)
   assign_public_ip = true
-  vm_size          = "Standard_B1s"
+  vm_size          = "Standard_D2s_v4"
 
   tags = {
     AnsibleGroup = "jumpbox"
@@ -44,7 +44,7 @@ module "database_cluster" {
   admin_username   = var.admin_username
   ssh_public_key   = file(var.ssh_pub_key_path)
   assign_public_ip = false
-  vm_size          = "Standard_D2s_v5"
+  vm_size          = "Standard_D2s_v4"
 
   create_data_disk  = true
   data_disk_size_gb = 128
