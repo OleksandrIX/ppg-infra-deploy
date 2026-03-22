@@ -1,0 +1,32 @@
+---
+- name: Install PgBouncer
+  ansible.builtin.apt:
+    name: pgbouncer
+    state: present
+
+- name: Create PgBouncer directories
+  ansible.builtin.file:
+    state: directory
+    path: "{{ item.path }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - { path: "/var/log/pgbouncer/", mode: "2755", owner: postgres, group: adm }
+
+- name: Copy PgBouncer config
+  ansible.builtin.template:
+    src: pgbouncer.j2
+    dest: /etc/pgbouncer/pgbouncer.ini
+    owner: postgres
+    group: postgres
+    mode: "0644"
+    backup: yes
+  notify: "reload pgbouncer"
+
+- name: Enable and start PgBouncer service
+  ansible.builtin.systemd:
+    name: pgbouncer
+    enabled: yes
+    state: started
+    daemon_reload: yes
