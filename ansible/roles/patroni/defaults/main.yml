@@ -1,6 +1,6 @@
 ---
 psql_version: "17"
-allow_connection_hosts: "local"
+allow_connection_hosts: []
 patroni_scope: "postgresql-cluster-example"
 patroni_namespace: "/example/"
 psql_data_dir: "/var/lib/postgresql/data"
