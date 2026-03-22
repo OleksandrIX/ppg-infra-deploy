@@ -17,11 +17,15 @@
 - name: Install dependencies for Patroni logging and etcd
   ansible.builtin.apt:
     name:
-      - python3-json-logger
+      - patroni
+      - python3-pythonjsonlogger
       - python3-etcd
       - python3-requests
       - python3-yaml
+      - python3-psycopg2
+      - python3-six
     state: present
+    update_cache: yes
 
 - name: Create Patroni and PostgreSQL directories
   ansible.builtin.file:

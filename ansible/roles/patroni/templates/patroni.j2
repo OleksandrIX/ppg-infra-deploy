@@ -26,11 +26,7 @@ log:
   file_num: 30
   file_size: 100000000
   dateformat: "%Y-%m-%d %H:%M:%S"
-  format:
-    - asctime: 'timestamp'
-    - levelname: level
-    - module: module
-    - message: msg
+  format: '%(asctime)s %(levelname)s %(module)s %(message)s'
 
 etcd3:
   protocol: http
@@ -94,18 +90,16 @@ bootstrap:
         wal_log_hints: 'on'
 
       pg_hba:
-    {% for host in postgres_hosts %}
-    - host all all {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 md5
-    - host replication replicator {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 md5
-    {% endfor %}
-
+{% for host in postgres_hosts %}
+        - host all all {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 md5
+        - host replication replicator {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 md5
+{% endfor %}
         - local all all md5
         - host all all 127.0.0.1/32 md5
         - host all postgres 0.0.0.0/0 reject
-
-    {% for host in allow_connection_hosts %}
-    - host all all {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 md5
-    {% endfor %}
+{% for host in allow_connection_hosts %}
+        - host all all {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 md5
+{% endfor %}
 
   initdb:
     - encoding: UTF8
