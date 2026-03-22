@@ -6,3 +6,4 @@
     - { role: "etcd", tags: ["etcd"] }
     - { role: "percona_postgresql", tags: ["postgresql"] }
     - { role: "patroni", tags: ["patroni"] }
+    - { role: "pgbouncer", tags: ["pgbouncer"] }
