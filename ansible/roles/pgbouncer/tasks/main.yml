@@ -30,3 +30,8 @@
     enabled: yes
     state: started
     daemon_reload: yes
+
+- name: Clean up default Ubuntu PgBouncer log file
+  ansible.builtin.file:
+    path: /var/log/postgresql/pgbouncer.log
+    state: absent
