@@ -7,7 +7,7 @@
   notifempty
   compress
   delaycompress
-	copytruncate
-	create 0640 postgres adm
+  copytruncate
+  create 0640 postgres adm
   sharedscripts
 }
