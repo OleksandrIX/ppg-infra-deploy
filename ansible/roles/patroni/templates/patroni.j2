@@ -17,16 +17,16 @@ restapi:
     username: {{ patroni_restapi_user }}
     password: {{ patroni_restapi_password }}
 
-log:
-  type: json
-  dir: /var/log/patroni
-  mode: 0644
-  level: INFO
-  traceback_level: ERROR
-  file_num: 30
-  file_size: 100000000
-  dateformat: "%Y-%m-%d %H:%M:%S"
-  format: '%(asctime)s %(levelname)s %(module)s %(message)s'
+# log:
+#   type: json
+#   dir: /var/log/patroni
+#   mode: 0644
+#   level: INFO
+#   traceback_level: ERROR
+#   file_num: 30
+#   file_size: 100000000
+#   dateformat: "%Y-%m-%d %H:%M:%S"
+#   format: '%(asctime)s %(levelname)s %(module)s %(message)s'
 
 etcd3:
   protocol: http
