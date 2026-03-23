@@ -9,6 +9,6 @@ __pycache__/
 terraform/*/.terraform/
 terraform/*/*.tfstate
 terraform/*/*.tfstate.backup
-terraform/*/*.tfstate.lock
+terraform/*/*.tfstate.lock.info
 terraform/*/*.tfvars
 terraform/*/.terraform.lock.hcl
