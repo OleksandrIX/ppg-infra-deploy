@@ -1,2 +1,4 @@
 ---
 postgres_monitoring_user: "exporter"
+pgbouncer_auth_user: "pgbouncer_auth"
+pgbouncer_auth_password: "pgbouncer_auth_password"

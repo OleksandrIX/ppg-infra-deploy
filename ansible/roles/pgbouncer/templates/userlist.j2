@@ -1,0 +1,4 @@
+# Automatically generated file by Ansible (DO NOT EDIT MANUALLY)
+# Format: "username" "md5_hashed_password"
+
+"{{ pgbouncer_auth_user }}" "md5{{ (pgbouncer_auth_password ~ pgbouncer_auth_user) | hash('md5') }}"

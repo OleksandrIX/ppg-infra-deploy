@@ -1,0 +1,46 @@
+- name: Get leader PostgreSQL cluster
+  ansible.builtin.command: psql -U postgres -tAc "SELECT pg_is_in_recovery();"
+  environment:
+    PGPASSWORD: "{{ psql_superuser_password }}"
+  register: pg_role
+  failed_when: false
+  changed_when: false
+
+- name: Set up PgBouncer authentication function and user
+  when: pg_role.stdout == 'f'
+  block:
+    - name: Generate SQL script for PgBouncer authentication setup
+      ansible.builtin.copy:
+        dest: /tmp/pgbouncer_auth_setup.sql
+        owner: postgres
+        mode: '0600'
+        content: |
+          DO $$
+          BEGIN
+            IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '{{ pgbouncer_auth_user }}') THEN
+              CREATE ROLE {{ pgbouncer_auth_user }} LOGIN PASSWORD '{{ pgbouncer_auth_password }}';
+            ELSE
+              ALTER ROLE {{ pgbouncer_auth_user }} PASSWORD '{{ pgbouncer_auth_password }}';
+            END IF;
+          END
+          $$;
+
+          CREATE OR REPLACE FUNCTION public.lookup_role_password(IN p_usename text, OUT usename text, OUT passwd text)
+          RETURNS record
+          LANGUAGE sql SECURITY DEFINER
+          AS $func$
+            SELECT usename, passwd FROM pg_catalog.pg_shadow WHERE usename = p_usename;
+          $func$;
+
+          REVOKE EXECUTE ON FUNCTION public.lookup_role_password(text) FROM PUBLIC;
+          GRANT EXECUTE ON FUNCTION public.lookup_role_password(text) TO {{ pgbouncer_auth_user }};
+
+    - name: Execute PgBouncer authentication setup SQL script
+      ansible.builtin.command: psql -U postgres -f /tmp/pgbouncer_auth_setup.sql
+      environment:
+        PGPASSWORD: "{{ psql_superuser_password }}"
+
+    - name: Remove temporary SQL script
+      ansible.builtin.file:
+        path: /tmp/pgbouncer_auth_setup.sql
+        state: absent

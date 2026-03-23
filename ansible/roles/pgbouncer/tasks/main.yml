@@ -24,6 +24,9 @@
   loop:
     - { src: "pgbouncer.logrotate", dest: "/etc/logrotate.d/pgbouncer", owner: "root", group: "root", mode: "0644" }
 
+- name: Set up PgBouncer authentication
+  include_tasks: pgbouncer_auth.yml
+
 - name: Copy PgBouncer config
   ansible.builtin.template:
     src: pgbouncer.j2
@@ -32,6 +35,15 @@
     group: postgres
     mode: "0644"
     backup: yes
+  notify: "reload pgbouncer"
+
+- name: Generate PgBouncer userlist.txt from variables
+  ansible.builtin.template:
+    src: userlist.j2
+    dest: /etc/pgbouncer/userlist.txt
+    owner: postgres
+    group: postgres
+    mode: '0640'
   notify: "reload pgbouncer"
 
 - name: Enable and start PgBouncer service
