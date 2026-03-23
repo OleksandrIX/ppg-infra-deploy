@@ -1,0 +1,13 @@
+/var/log/pgbouncer/*.log {
+  daily
+  rotate 14
+  missingok
+  notifempty
+  compress
+  delaycompress
+  create 0640 postgres adm
+  sharedscripts
+  postrotate
+    /bin/systemctl reload pgbouncer > /dev/null 2>&1 || true
+  endscript
+}

@@ -14,6 +14,16 @@
   loop:
     - { path: "/var/log/pgbouncer/", mode: "2755", owner: postgres, group: adm }
 
+- name: Copy PgBouncer configuration files
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - { src: "pgbouncer.logrotate", dest: "/etc/logrotate.d/pgbouncer", owner: "root", group: "root", mode: "0644" }
+
 - name: Copy PgBouncer config
   ansible.builtin.template:
     src: pgbouncer.j2
