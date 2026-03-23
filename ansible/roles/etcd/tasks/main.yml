@@ -28,6 +28,7 @@
     system: yes
     home: /var/lib/etcd
     shell: /bin/false
+    create_home: no
 
 - name: Created etcd config dir
   ansible.builtin.file:

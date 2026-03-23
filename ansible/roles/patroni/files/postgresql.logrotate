@@ -1,0 +1,13 @@
+/var/log/postgresql/*.log {
+  su postgres adm
+  rotate 7
+  daily
+  maxsize 2G
+  missingok
+  notifempty
+  compress
+  delaycompress
+	copytruncate
+	create 0640 postgres adm
+  sharedscripts
+}
