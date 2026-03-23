@@ -4,7 +4,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 module "network" {
-  source              = "./modules/network"
+  source = "../../modules/network"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   vnet                = var.vnet
@@ -14,7 +14,7 @@ module "network" {
 }
 
 module "jumpbox" {
-  source              = "./modules/compute"
+  source              = "../../modules/compute"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   subnet_id           = module.network.jumpbox_subnet_id
@@ -34,7 +34,7 @@ module "jumpbox" {
 }
 
 module "database_cluster" {
-  source              = "./modules/compute"
+  source              = "../../modules/compute"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   subnet_id           = module.network.database_subnet_id
@@ -57,7 +57,7 @@ module "database_cluster" {
 }
 
 module "pgbackrest_storage" {
-  source               = "./modules/storage"
+  source               = "../../modules/storage"
   resource_group_name  = azurerm_resource_group.rg.name
   location             = azurerm_resource_group.rg.location
   storage_account_name = "ppgclusterpgbackrest"
