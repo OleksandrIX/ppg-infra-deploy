@@ -1,0 +1,8 @@
+---
+postgres_hosts: []
+pgbackrest_stanza: "test-stanza"
+pgbackrest_azure_account: "testaccount"
+pgbackrest_azure_key: "testkey"
+pgbackrest_azure_container: "testcontainer"
+pgbackrest_cipher_pass: 'cipher pass'
+psql_data_dir: "/var/lib/postgresql/data"

@@ -1,0 +1,46 @@
+#================================================================================
+# GLOBAL CONFIG FOR AZURE BLOB STORAGE
+#================================================================================
+[global]
+# --- REPO SETTINGS (AZURE) -----------------------------------------------------
+repo1-type=azure
+repo1-path=/{{ pgbackrest_stanza }}-backups
+
+repo1-azure-account={{ pgbackrest_azure_account }}
+repo1-azure-key={{ pgbackrest_azure_key }}
+repo1-azure-container={{ pgbackrest_azure_container }}
+
+repo1-cipher-pass={{ pgbackrest_cipher_pass }}
+repo1-cipher-type=aes-256-cbc
+
+repo1-retention-full=3
+repo1-retention-diff=1
+repo1-bundle=y
+repo1-block=y
+
+# --- OTHER SETTINGS -----------------------------------------------------------
+backup-standby=prefer
+process-max=4
+compress-type=zst
+start-fast=y
+stop-auto=y
+
+# --- LOGGING SETTINGS ----------------------------------------------------------
+log-level-file=debug
+log-level-console=info
+
+#================================================================================
+# STANZA CONFIGURATION
+#================================================================================
+[{{ pgbackrest_stanza }}]
+pg1-path={{ psql_data_dir }}
+
+{% set index = 2 -%}
+{% for host in postgres_hosts %}
+{% if host != inventory_hostname %}
+pg{{ index }}-path={{ psql_data_dir }}
+pg{{ index }}-host={{ hostvars[host]['ansible_default_ipv4']['address'] }}
+pg{{ index }}-host-user=postgres
+{% set index = index + 1 %}
+{% endif %}
+{% endfor %}

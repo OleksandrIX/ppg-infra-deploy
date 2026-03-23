@@ -1,0 +1,65 @@
+---
+- name: "Install pgBackRest"
+  block:
+    - name: "Install pgBackRest"
+      ansible.builtin.apt:
+        name: "pgbackrest"
+        state: present
+        update_cache: true
+    - name: "Remove default pgbackrest config if exists"
+      ansible.builtin.file:
+        path: /etc/pgbackrest.conf
+        state: absent
+
+- name: "Configure SSH key-based authentication for postgres user"
+  when: is_install | default(false)
+  block:
+    - name: "Create .ssh directory for postgres user"
+      ansible.builtin.file:
+        path: "/var/lib/postgresql/.ssh"
+        state: directory
+        owner: "postgres"
+        group: "postgres"
+        mode: "0700"
+
+    - name: "Generate ed25519 key pair using native ssh-keygen"
+      ansible.builtin.command:
+        cmd: ssh-keygen -t ed25519 -f /var/lib/postgresql/.ssh/id_ed25519 -N "" -q -C "postgres@{{ inventory_hostname }}"
+      args:
+        creates: "/var/lib/postgresql/.ssh/id_ed25519"
+      become_user: postgres
+
+    - name: "Read the generated public key"
+      ansible.builtin.slurp:
+        src: "/var/lib/postgresql/.ssh/id_ed25519.pub"
+      register: slurped_pub_key
+
+    - name: "Set public key as a fact for other hosts to use"
+      ansible.builtin.set_fact:
+        postgres_public_key: "{{ slurped_pub_key.content | b64decode | trim }}"
+
+    - name: "Add public keys from all other hosts to authorized_keys"
+      ansible.posix.authorized_key:
+        user: "postgres"
+        state: present
+        key: "{{ hostvars[item]['postgres_public_key'] }}"
+        comment: "Key from {{ item }}"
+      loop: "{{ ansible_play_hosts }}"
+      when: item != inventory_hostname
+
+- name: "Create pgBackRest configuration directory"
+  ansible.builtin.file:
+    path: "/etc/pgbackrest"
+    state: directory
+    owner: "postgres"
+    group: "postgres"
+    mode: "0750"
+
+- name: "Copy pgBackRest config for PostgreSQL hosts"
+  ansible.builtin.template:
+    src: psql-server.pgbackrest.conf.j2
+    dest: /etc/pgbackrest/pgbackrest.conf
+    owner: "postgres"
+    group: "postgres"
+    mode: "0640"
+    backup: yes
