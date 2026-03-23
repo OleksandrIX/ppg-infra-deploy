@@ -55,3 +55,16 @@ module "database_cluster" {
     Environment  = "dev"
   }
 }
+
+module "pgbackrest_storage" {
+  source               = "./modules/storage"
+  resource_group_name  = azurerm_resource_group.rg.name
+  location             = azurerm_resource_group.rg.location
+  storage_account_name = "ppgclusterpgbackrest"
+  container_name       = "pgbackrest-repo"
+
+  tags = {
+    AnsibleGroup = "pgbackrest"
+    Environment  = "dev"
+  }
+}
