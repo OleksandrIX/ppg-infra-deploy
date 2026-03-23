@@ -51,6 +51,7 @@ auth_type = md5
 auth_file = /etc/pgbouncer/userlist.txt
 auth_user = {{ pgbouncer_auth_user }}
 auth_query = SELECT usename, passwd FROM public.lookup_role_password($1)
+auth_dbname = postgres
 
 ;;;
 ;;; Users allowed into database 'pgbouncer'
@@ -71,7 +72,7 @@ pool_mode = transaction
 
 ;; Number of prepared statements to cache on a server connection (zero value
 ;; disables support of prepared statements).
-; max_prepared_statements = 100
+max_prepared_statements = 100
 
 ;; Query for cleaning connection immediately after releasing from
 ;; client.  No need to put ROLLBACK here, pgbouncer does not reuse
