@@ -1,0 +1,87 @@
+---
+- name: Uninstall Database Cluster and Clean Up
+  hosts: db_cluster
+  become: yes
+  vars:
+    psql_version: "17"
+  tasks:
+    - name: Stop and disable all cluster services
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: stopped
+        enabled: no
+      loop:
+        - pgbouncer
+        - patroni
+        - postgresql
+        - etcd
+      ignore_errors: yes
+
+    - name: Uninstall packages (PgBouncer, Percona, Patroni dependencies)
+      ansible.builtin.apt:
+        name:
+          - pgbouncer
+          - percona-postgresql-{{ psql_version }}
+          - percona-postgresql-server-dev-{{ psql_version }}
+          - percona-release
+          - python3-pythonjsonlogger
+          - python3-etcd
+          - python3-requests
+          - python3-yaml
+        state: absent
+        autoremove: yes
+        purge: yes
+
+    - name: Remove etcd binaries
+      ansible.builtin.file:
+        path: "/usr/local/bin/{{ item }}"
+        state: absent
+      loop:
+        - etcd
+        - etcdctl
+        - etcdutl
+
+    - name: Remove all cluster directories and files (Data, Logs, Configs)
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        # --- Postgres & Patroni ---
+        - /etc/patroni
+        - /var/log/patroni
+        - /var/log/postgresql
+        - /var/lib/postgresql/data
+        - /var/lib/postgresql/wal_archive
+        # --- etcd ---
+        - /etc/etcd
+        - /var/lib/etcd
+        - /var/log/etcd
+        - /etc/systemd/system/etcd.service
+        - /etc/logrotate.d/etcd
+        # --- PgBouncer ---
+        - /etc/pgbouncer
+        - /var/log/pgbouncer
+        # --- Percona apt lists ---
+        - /etc/apt/sources.list.d/percona-ppg-{{ psql_version }}-release.list
+        - /etc/apt/sources.list.d/percona-prel-release.list
+        - /etc/apt/sources.list.d/percona-telemetry-release.list
+        - /etc/apt/sources.list.d/percona-pmm2-client-release.list.bak
+
+    - name: Remove system users (etcd, postgres)
+      ansible.builtin.user:
+        name: "{{ item }}"
+        state: absent
+        remove: yes
+      loop:
+        - etcd
+        - postgres
+      ignore_errors: yes
+
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: yes
+
+    - name: Clean up APT cache
+      ansible.builtin.apt:
+        autoclean: yes
+        clean: yes
