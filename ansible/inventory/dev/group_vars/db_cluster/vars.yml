@@ -20,3 +20,8 @@ patroni_namespace: "/service/"
 psql_data_dir: "/var/lib/postgresql/data"
 psql_wal_dir: "/var/lib/postgresql/wal_archive"
 psql_bin_dir: "/usr/lib/postgresql/{{ psql_version }}/bin"
+
+# pgBackRest configuration
+pgbackrest_stanza: "ppg-cluster"
+pgbackrest_azure_account: "ppgclusterpgbackrest"
+pgbackrest_azure_container: "pgbackrest-repo"

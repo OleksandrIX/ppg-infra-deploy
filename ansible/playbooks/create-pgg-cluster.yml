@@ -7,3 +7,4 @@
     - { role: "percona_postgresql", tags: ["postgresql"] }
     - { role: "patroni", tags: ["patroni"] }
     - { role: "pgbouncer", tags: ["pgbouncer"] }
+    - { role: "pgbackrest", tags: ["pgbackrest"] }
