@@ -30,3 +30,8 @@
     state: stopped
     enabled: no
   ignore_errors: yes
+
+- name: Clean up PostgreSQL log file
+  ansible.builtin.file:
+    path: "/var/log/postgresql/postgresql-{{ psql_version }}-main.log"
+    state: absent
