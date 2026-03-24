@@ -100,8 +100,8 @@ bootstrap:
         - host replication replicator {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 md5
 {% endfor %}
         - local all all md5
+        - local all postgres peer
         - host all all 127.0.0.1/32 md5
-        - host all postgres peer
         - host all postgres 0.0.0.0/0 reject
 {% for host in allow_connection_hosts %}
         - host all all {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 md5
