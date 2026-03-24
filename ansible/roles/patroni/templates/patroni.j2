@@ -64,7 +64,7 @@ bootstrap:
         effective_cache_size: 6GB
         maintenance_work_mem: 512MB
         work_mem: 16MB
-        archive_command: cp %p {{ psql_wal_dir }}/%f
+        archive_command: 'pgbackrest --stanza={{ pgbackrest_stanza }} archive-push %p'
         archive_mode: 'on'
         archive_timeout: 600s
         hot_standby: 'on'
@@ -89,7 +89,7 @@ bootstrap:
         max_wal_senders: 5
         max_wal_size: 10GB
         password_encryption: md5
-        restore_command: cp {{ psql_wal_dir }}/%f %p
+        restore_command: 'pgbackrest --stanza={{ pgbackrest_stanza }} archive-get %f %p'
         wal_keep_size: 160MB
         wal_level: replica
         wal_log_hints: 'on'
@@ -99,8 +99,8 @@ bootstrap:
         - host all all {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 md5
         - host replication replicator {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 md5
 {% endfor %}
-        - local all all md5
         - local all postgres peer
+        - local all all md5
         - host all all 127.0.0.1/32 md5
         - host all postgres 0.0.0.0/0 reject
 {% for host in allow_connection_hosts %}
