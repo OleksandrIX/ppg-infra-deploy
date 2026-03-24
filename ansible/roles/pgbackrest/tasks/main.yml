@@ -77,7 +77,7 @@
 
 - name: "Copy pgBackRest config for PostgreSQL hosts"
   ansible.builtin.template:
-    src: psql-server.pgbackrest.conf.j2
+    src: pgbackrest.conf.j2
     dest: /etc/pgbackrest/pgbackrest.conf
     owner: "postgres"
     group: "postgres"
