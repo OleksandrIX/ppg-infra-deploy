@@ -28,16 +28,6 @@
       args:
         creates: "/var/lib/postgresql/.ssh/id_ed25519"
 
-    - name: "Set ownership and permissions for SSH keys"
-      ansible.builtin.file:
-        path: "/var/lib/postgresql/.ssh/{{ item.name }}"
-        owner: "postgres"
-        group: "postgres"
-        mode: "{{ item.mode }}"
-      loop:
-        - { name: "id_ed25519", mode: "0600" }
-        - { name: "id_ed25519.pub", mode: "0644" }
-
     - name: "Read the generated public key"
       ansible.builtin.slurp:
         src: "/var/lib/postgresql/.ssh/id_ed25519.pub"
@@ -55,6 +45,27 @@
         comment: "Key from {{ item }}"
       loop: "{{ ansible_play_hosts }}"
       when: item != inventory_hostname
+
+    - name: "Set ownership and permissions for SSH keys"
+      ansible.builtin.file:
+        path: "/var/lib/postgresql/.ssh/{{ item.name }}"
+        owner: "postgres"
+        group: "postgres"
+        mode: "{{ item.mode }}"
+      loop:
+        - { name: "id_ed25519", mode: "0600" }
+        - { name: "id_ed25519.pub", mode: "0644" }
+
+    - name: "Configure SSH to skip strict host key checking"
+      ansible.builtin.copy:
+        dest: "/var/lib/postgresql/.ssh/config"
+        content: |
+          Host *
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+        owner: "postgres"
+        group: "postgres"
+        mode: "0600"
 
 - name: "Create pgBackRest configuration directory"
   ansible.builtin.file:
