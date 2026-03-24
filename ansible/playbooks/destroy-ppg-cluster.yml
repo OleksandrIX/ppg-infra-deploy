@@ -28,6 +28,7 @@
           - python3-etcd
           - python3-requests
           - python3-yaml
+          - pgbackrest
         state: absent
         autoremove: yes
         purge: yes
@@ -50,8 +51,9 @@
         - /etc/patroni
         - /var/log/patroni
         - /var/log/postgresql
-        - /var/lib/postgresql/data
-        - /var/lib/postgresql/wal_archive
+        - /var/lib/postgresql/*
+        - /var/lib/postgresql/.ssh
+        - /etc/logrotate.d/postgresql-common
         # --- etcd ---
         - /etc/etcd
         - /var/lib/etcd
@@ -61,6 +63,11 @@
         # --- PgBouncer ---
         - /etc/pgbouncer
         - /var/log/pgbouncer
+        - /etc/logrotate.d/pgbouncer
+        # --- PgBackRest ---
+        - /etc/pgbackrest
+        - /var/log/pgbackrest
+        - /etc/logrotate.d/pgbackrest
         # --- Percona apt lists ---
         - /etc/apt/sources.list.d/percona-ppg-{{ psql_version }}-release.list
         - /etc/apt/sources.list.d/percona-prel-release.list
