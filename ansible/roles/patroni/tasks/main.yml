@@ -29,11 +29,26 @@
     group: "{{ item.group }}"
     mode: "{{ item.mode }}"
   loop:
-    - { path: /etc/patroni/, mode: "0755", owner: root, group: root }
-    - { path: /var/log/patroni/, mode: "2755", owner: postgres, group: adm }
-    - { path: /var/log/postgresql/, mode: "2755", owner: postgres, group: adm }
-    - { path: "{{ psql_wal_dir }}", mode: "0700", owner: postgres, group: postgres }
-    - { path: "{{ psql_data_dir }}", mode: "0700", owner: postgres, group: postgres }
+    - { path: "/etc/patroni/", mode: "0755", owner: root, group: root }
+    - { path: "/var/log/patroni/", mode: "2755", owner: postgres, group: adm }
+    - {
+        path: "/var/log/postgresql/",
+        mode: "2755",
+        owner: postgres,
+        group: adm,
+      }
+    - {
+        path: "{{ psql_wal_dir }}",
+        mode: "0700",
+        owner: postgres,
+        group: postgres,
+      }
+    - {
+        path: "{{ psql_data_dir }}",
+        mode: "0700",
+        owner: postgres,
+        group: postgres,
+      }
 
 - name: Copy PostgreSQL configuration files
   ansible.builtin.copy:
@@ -43,7 +58,13 @@
     group: "{{ item.group }}"
     mode: "{{ item.mode }}"
   loop:
-    - { src: "postgresql.logrotate", dest: "/etc/logrotate.d/postgresql-common", owner: "root", group: "root", mode: "0644" }
+    - {
+        src: "postgresql.logrotate",
+        dest: "/etc/logrotate.d/postgresql-common",
+        owner: "root",
+        group: "root",
+        mode: "0644",
+      }
 
 - name: Create or update Patroni config
   ansible.builtin.template:
@@ -58,3 +79,33 @@
     enabled: yes
     state: started
     daemon_reload: yes
+
+- name: "Wait for Patroni REST API to become available"
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:8008/health"
+    status_code: 200
+  register: patroni_health
+  until: patroni_health.status == 200
+  retries: 6
+  delay: 5
+  ignore_errors: yes
+
+- name: "Apply DCS configuration to the running cluster via REST API"
+  when: patroni_health.status == 200
+  block:
+    - name: "Read generated Patroni config"
+      ansible.builtin.slurp: { src: /etc/patroni/config.yml }
+      register: patroni_config_raw
+
+    - name: Apply DCS configuration to the running cluster via REST API
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:8008/config"
+        method: PATCH
+        user: "{{ patroni_restapi_user }}"
+        password: "{{ patroni_restapi_password }}"
+        force_basic_auth: yes
+        body_format: json
+        body: "{{ (patroni_config_raw['content'] | b64decode | from_yaml).bootstrap.dcs }}"
+        status_code: [200, 201]
+      run_once: true
+      changed_when: false
