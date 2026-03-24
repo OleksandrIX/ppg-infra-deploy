@@ -27,7 +27,16 @@
         cmd: ssh-keygen -t ed25519 -f /var/lib/postgresql/.ssh/id_ed25519 -N "" -q -C "postgres@{{ inventory_hostname }}"
       args:
         creates: "/var/lib/postgresql/.ssh/id_ed25519"
-      become_user: postgres
+
+    - name: "Set ownership and permissions for SSH keys"
+      ansible.builtin.file:
+        path: "/var/lib/postgresql/.ssh/{{ item.name }}"
+        owner: "postgres"
+        group: "postgres"
+        mode: "{{ item.mode }}"
+      loop:
+        - { name: "id_ed25519", mode: "0600" }
+        - { name: "id_ed25519.pub", mode: "0644" }
 
     - name: "Read the generated public key"
       ansible.builtin.slurp:

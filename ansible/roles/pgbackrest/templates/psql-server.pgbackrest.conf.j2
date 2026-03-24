@@ -35,12 +35,8 @@ log-level-console=info
 [{{ pgbackrest_stanza }}]
 pg1-path={{ psql_data_dir }}
 
-{% set index = 2 -%}
-{% for host in postgres_hosts %}
-{% if host != inventory_hostname %}
-pg{{ index }}-path={{ psql_data_dir }}
-pg{{ index }}-host={{ hostvars[host]['ansible_default_ipv4']['address'] }}
-pg{{ index }}-host-user=postgres
-{% set index = index + 1 %}
-{% endif %}
+{% for host in postgres_hosts | reject('equalto', inventory_hostname) %}
+pg{{ loop.index + 1 }}-path={{ psql_data_dir }}
+pg{{ loop.index + 1 }}-host={{ hostvars[host]['ansible_default_ipv4']['address'] }}
+pg{{ loop.index + 1 }}-host-user=postgres
 {% endfor %}
