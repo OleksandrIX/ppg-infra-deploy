@@ -67,11 +67,12 @@
       }
 
 - name: Create or update Patroni config
+  tags: ["update_dcs"]
   ansible.builtin.template:
     src: patroni.j2
     dest: /etc/patroni/config.yml
     backup: yes
-  notify: "restart patroni"
+  notify: "reload_patroni"
 
 - name: Enable and start Patroni service
   ansible.builtin.systemd:
@@ -81,6 +82,7 @@
     daemon_reload: yes
 
 - name: "Wait for Patroni REST API to become available"
+  tags: ["update_dcs"]
   ansible.builtin.uri:
     url: "http://127.0.0.1:8008/health"
     status_code: 200
@@ -92,6 +94,7 @@
 
 - name: "Apply DCS configuration to the running cluster via REST API"
   when: patroni_health.status == 200
+  tags: ["update_dcs"]
   block:
     - name: "Read generated Patroni config"
       ansible.builtin.slurp: { src: /etc/patroni/config.yml }
