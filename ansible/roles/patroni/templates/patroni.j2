@@ -46,8 +46,6 @@ postgresql:
       username: replicator
       password: {{ psql_replication_password }}
   parameters:
-    max_connections: 1000
-    shared_buffers: 256MB
     unix_socket_directories: "/var/run/postgresql/"
 
 bootstrap:
