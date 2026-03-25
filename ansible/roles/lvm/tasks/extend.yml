@@ -1,5 +1,5 @@
 ---
-- name: "Create partition on disk ({{ item }})"
+- name: "Create partition on disks for LVM"
   ansible.builtin.parted:
     device: "{{ item }}"
     number: 1
@@ -18,6 +18,6 @@
   community.general.lvol:
     vg: "{{ vg_name }}"
     lv: "{{ lv_name }}"
-    size: "100%FREE"
+    size: "+100%FREE"
     resizefs: true
     state: "present"

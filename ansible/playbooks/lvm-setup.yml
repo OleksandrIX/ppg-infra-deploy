@@ -3,11 +3,11 @@
   hosts: "db_cluster"
   become: true
   vars:
-    lvm_state: "create"
-    device_name: ["/dev/sdb"]
+    lvm_state: "extend"
+    pv_devices: ["/dev/sdb", "/dev/sdc"]
     vg_name: "vg_pgdata"
     lv_name: "lv_pgdata"
     fs_type: "xfs"
     mount_path: "/var/lib/postgresql"
   roles:
-    - { name: "lvm" }
+    - { role: "lvm" }

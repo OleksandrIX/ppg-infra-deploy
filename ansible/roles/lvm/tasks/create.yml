@@ -1,5 +1,5 @@
 ---
-- name: "Create partition on disk ({{ item }})"
+- name: "Create partition on disks for LVM"
   ansible.builtin.parted:
     device: "{{ item }}"
     number: 1
