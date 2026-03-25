@@ -80,7 +80,8 @@ bootstrap:
         log_destination: 'stderr'
         log_directory: '/var/log/postgresql'
         log_disconnections: 'on'
-        log_duration: 'on'
+        log_duration: 'off'
+        log_min_duration_statement: '1000ms'
         log_error_verbosity: 'verbose'
         log_file_mode: '0640'
         log_filename: 'postgresql.log'
@@ -88,7 +89,7 @@ bootstrap:
         log_min_messages: 'info'
         log_rotation_age: '1d'
         log_rotation_size: 0
-        log_statement: 'all'
+        log_statement: 'ddl'
         log_truncate_on_rotation: 'off'
         logging_collector: 'on'
         max_connections: 1000
