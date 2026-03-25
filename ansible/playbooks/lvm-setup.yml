@@ -9,6 +9,5 @@
     lv_name: "lv_pgdata"
     fs_type: "xfs"
     mount_path: "/var/lib/postgresql"
-    lv_size: "100%FREE"
   roles:
     - { name: "lvm" }
