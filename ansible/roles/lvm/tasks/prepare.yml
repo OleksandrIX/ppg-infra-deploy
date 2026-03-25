@@ -1,0 +1,13 @@
+---
+- name: "Install necessary packages for PostgreSQL and disk management"
+  ansible.builtin.apt:
+    name:
+      - xfsprogs
+      - lvm2
+      - parted
+      - acl
+      - curl
+      - jq
+      - vim
+    state: "present"
+    update_cache: true

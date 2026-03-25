@@ -1,0 +1,7 @@
+---
+- name: "Prepare system for LVM setup"
+  ansible.builtin.include_tasks: "prepare.yml"
+
+- name: "Create LVM setup for PostgreSQL data storage"
+  ansible.builtin.include_tasks: "create.yml"
+  when: lvm_state == "create"

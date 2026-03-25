@@ -1,0 +1,23 @@
+---
+- name: "Create partition on disk ({{ item }})"
+  ansible.builtin.parted:
+    device: "{{ item }}"
+    number: 1
+    flags: ["lvm"]
+    state: "present"
+    label: "gpt"
+  loop: "{{ pv_devices }}"
+
+- name: "Extend Volume Group (VG) with new partition"
+  community.general.lvg:
+    vg: "{{ vg_name }}"
+    pvs: "{{ pv_devices | map('regex_replace', '$', '1') | list }}"
+    state: "present"
+
+- name: "Extend Logical Volume (LV) to use all available space"
+  community.general.lvol:
+    vg: "{{ vg_name }}"
+    lv: "{{ lv_name }}"
+    size: "100%FREE"
+    resizefs: true
+    state: "present"

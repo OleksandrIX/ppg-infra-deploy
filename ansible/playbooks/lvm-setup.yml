@@ -1,0 +1,14 @@
+---
+- name: "Common setup for PostgreSQL cluster nodes"
+  hosts: "db_cluster"
+  become: true
+  vars:
+    lvm_state: "create"
+    device_name: ["/dev/sdb"]
+    vg_name: "vg_pgdata"
+    lv_name: "lv_pgdata"
+    fs_type: "xfs"
+    mount_path: "/var/lib/postgresql"
+    lv_size: "100%FREE"
+  roles:
+    - { name: "lvm" }

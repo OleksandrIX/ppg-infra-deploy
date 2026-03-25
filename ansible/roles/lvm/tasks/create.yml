@@ -1,0 +1,41 @@
+---
+- name: "Create partition on disk ({{ item }})"
+  ansible.builtin.parted:
+    device: "{{ item }}"
+    number: 1
+    flags: ["lvm"]
+    state: "present"
+    label: "gpt"
+  loop: "{{ pv_devices }}"
+
+- name: "Create Volume Group (VG)"
+  community.general.lvg:
+    vg: "{{ vg_name }}"
+    pvs: "{{ pv_devices | map('regex_replace', '$', '1') | list }}"
+    state: "present"
+
+- name: "Create Logical Volume (LV)"
+  community.general.lvol:
+    vg: "{{ vg_name }}"
+    lv: "{{ lv_name }}"
+    size: "100%FREE"
+    state: "present"
+
+- name: "Format the Logical Volume with a filesystem"
+  community.general.filesystem:
+    fstype: "{{ fs_type }}"
+    dev: "/dev/mapper/{{ vg_name }}-{{ lv_name }}"
+    state: "present"
+
+- name: "Create the mount point directory"
+  ansible.builtin.file:
+    path: "{{ mount_path }}"
+    state: "directory"
+    mode: "0755"
+
+- name: "Mount the filesystem and add to fstab for persistence"
+  ansible.posix.mount:
+    path: "{{ mount_path }}"
+    src: "/dev/mapper/{{ vg_name }}-{{ lv_name }}"
+    fstype: "{{ fs_type }}"
+    state: "mounted"
