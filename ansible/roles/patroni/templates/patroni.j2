@@ -99,19 +99,19 @@ bootstrap:
         wal_keep_size: '160MB'
         wal_level: 'replica'
         wal_log_hints: 'on'
-        password_encryption: 'md5'
+        password_encryption: 'scram-sha-256'
 
       pg_hba:
 {% for host in postgres_hosts %}
-        - host all all {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 md5
-        - host replication replicator {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 md5
+        - host all all {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 scram-sha-256
+        - host replication replicator {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 scram-sha-256
 {% endfor %}
         - local all postgres peer
-        - local all all md5
-        - host all all 127.0.0.1/32 md5
+        - local all all scram-sha-256
+        - host all all 127.0.0.1/32 scram-sha-256
         - host all postgres 0.0.0.0/0 reject
 {% for host in allow_connection_hosts %}
-        - host all all {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 md5
+        - host all all {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 scram-sha-256
 {% endfor %}
 
   initdb:
