@@ -1,1 +1,1 @@
-"{{ pgbouncer_auth_user }}" "{{ pgbouncer_auth_password | community.postgresql.postgres_password(pgbouncer_auth_user, method='scram-sha-256') }}"
+"{{ pgbouncer_auth_user }}" "{{ pgbouncer_hashed_pass }}"

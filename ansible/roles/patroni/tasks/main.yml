@@ -90,7 +90,8 @@
   until: patroni_health.status == 200
   retries: 6
   delay: 5
-  ignore_errors: yes
+  ignore_errors: true
+  no_log: true
 
 - name: "Apply DCS configuration to the running cluster via REST API"
   when: patroni_health.status == 200

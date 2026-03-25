@@ -13,7 +13,7 @@
       ansible.builtin.copy:
         dest: /tmp/pgbouncer_auth_setup.sql
         owner: postgres
-        mode: '0600'
+        mode: "0600"
         content: |
           DO $$
           BEGIN
@@ -39,6 +39,18 @@
       ansible.builtin.command: psql -U postgres -f /tmp/pgbouncer_auth_setup.sql
       environment:
         PGPASSWORD: "{{ psql_superuser_password }}"
+
+    - name: Get hashed password from PostgreSQL for PgBouncer user
+      ansible.builtin.command: psql -U postgres -tAc "SELECT passwd FROM pg_catalog.pg_shadow WHERE usename = '{{ pgbouncer_auth_user }}';"
+      environment:
+        PGPASSWORD: "{{ psql_superuser_password }}"
+      register: pg_hash_result
+      changed_when: false
+
+    - name: Set pgbouncer_hashed_pass fact
+      ansible.builtin.set_fact:
+        pgbouncer_hashed_pass: "{{ pg_hash_result.stdout }}"
+      when: pg_hash_result.stdout != ""
 
     - name: Remove temporary SQL script
       ansible.builtin.file:
