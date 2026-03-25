@@ -18,20 +18,20 @@ restapi:
     password: {{ patroni_restapi_password }}
 
 log:
-  # type: json
   dir: /var/log/patroni
   mode: 0644
   level: INFO
   traceback_level: ERROR
-  file_num: 30
+  file_num: 10
   file_size: 100000000
   dateformat: "%Y-%m-%d %H:%M:%S"
-  # format: '%(asctime)s %(levelname)s %(module)s %(message)s'
 
 etcd3:
   protocol: http
-  hosts: {% for host in etcd_hosts %}{{ hostvars[host]['ansible_default_ipv4']['address'] }}:2379{% if not loop.last %},{% endif %}{% endfor %}
-
+  hosts:
+  {% for host in etcd_hosts %}
+    - {{ hostvars[host]['ansible_default_ipv4']['address'] }}:2379
+  {% endfor %}
 
 postgresql:
   listen: {{ ansible_default_ipv4.address }}:5432
