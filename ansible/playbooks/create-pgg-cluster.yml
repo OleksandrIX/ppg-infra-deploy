@@ -15,7 +15,7 @@
   roles:
     - { role: "lvm", tags: ["lvm"] }
     - { role: "etcd", tags: ["etcd"] }
-    - { role: "percona_postgresql", tags: ["postgresql"] }
+    - { role: "postgresql", tags: ["postgresql"] }
     - { role: "pgbackrest", tags: ["pgbackrest"] }
     - { role: "patroni", tags: ["patroni"] }
     - { role: "pgbouncer", tags: ["pgbouncer"] }
