@@ -1,5 +1,14 @@
 db_cluster:
+  children:
+    pg_nodes:
+    pgbackrest_repo:
+
+pg_nodes:
   hosts:
     dev-pg1:
     dev-pg2:
     dev-pg3:
+
+pgbackrest_repo:
+  hosts:
+    dev-gis-s3:

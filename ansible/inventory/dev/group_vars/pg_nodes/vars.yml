@@ -1,0 +1,31 @@
+# LVM configuration for PostgreSQL data storage
+lvm_state: "create"
+pv_devices: ["/dev/sdb"]
+vg_name: "vg_pgdata"
+lv_name: "lv_pgdata"
+fs_type: "xfs"
+mount_path: "/var/lib/postgresql"
+
+# General configuration
+postgres_monitoring_user: "exporter"
+
+# Hosts
+etcd_hosts: "{{ groups['pg_nodes'] }}"
+postgres_hosts: "{{ groups['pg_nodes'] }}"
+allow_connection_hosts: []
+
+# etcd configuration
+etcd_version: "v3.6.9"
+etcd_cluster_token: "ppg-cluster-dev-token"
+etcd_data_dir: "/var/lib/etcd/postgresql"
+
+# Patroni configuration
+patroni_scope: "postgresql-cluster"
+patroni_namespace: "/service/"
+psql_data_dir: "/var/lib/postgresql/data"
+psql_bin_dir: "/usr/lib/postgresql/{{ psql_version }}/bin"
+
+# pgBackRest configuration
+pgbackrest_stanza: "ppg-cluster"
+pgbackrest_repo_type: "posix"
+pgbackrest_repo_host: "dev-gis-s3"
