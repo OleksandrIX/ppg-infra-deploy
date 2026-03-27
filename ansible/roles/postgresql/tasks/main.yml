@@ -35,3 +35,9 @@
   ansible.builtin.file:
     path: "/var/log/postgresql/postgresql-{{ psql_version }}-main.log"
     state: absent
+
+- name: "Add pgBackRest user to postgres group"
+  ansible.builtin.user:
+    name: "{{ pgbackrest_user }}"
+    groups: postgres
+    append: true

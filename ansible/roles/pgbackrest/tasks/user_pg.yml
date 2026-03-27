@@ -14,12 +14,6 @@
     group: "{{ pgbackrest_user }}"
     mode: "0700"
 
-- name: "Add pgBackRest user to postgres group"
-  ansible.builtin.user:
-    name: "{{ pgbackrest_user }}"
-    groups: postgres
-    append: true
-
 - name: "Configure SSH key-based authentication for pgBackRest user"
   block:
     - name: "Generate ed25519 key pair using native ssh-keygen"
