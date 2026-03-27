@@ -4,7 +4,6 @@ allow_connection_hosts: []
 patroni_scope: "postgresql-cluster-example"
 patroni_namespace: "/example/"
 psql_data_dir: "/var/lib/postgresql/data"
-psql_wal_dir: "/var/lib/postgresql/wal_archive"
 psql_bin_dir: "/usr/lib/postgresql/{{ psql_version }}/bin"
 psql_superuser_password: "SuperSecretPassword123!"
 psql_replication_password: "ReplicationPassword456!"

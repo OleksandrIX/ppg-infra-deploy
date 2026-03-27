@@ -38,12 +38,6 @@
         group: adm,
       }
     - {
-        path: "{{ psql_wal_dir }}",
-        mode: "0700",
-        owner: postgres,
-        group: postgres,
-      }
-    - {
         path: "{{ psql_data_dir }}",
         mode: "0700",
         owner: postgres,

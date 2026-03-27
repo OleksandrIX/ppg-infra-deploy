@@ -1,3 +1,11 @@
+# LVM configuration for PostgreSQL data storage
+lvm_state: "create"
+pv_devices: ["/dev/sdb"]
+vg_name: "vg_pgdata"
+lv_name: "lv_pgdata"
+fs_type: "xfs"
+mount_path: "/var/lib/postgresql"
+
 # General configuration
 postgres_monitoring_user: "exporter"
 
@@ -15,7 +23,6 @@ etcd_data_dir: "/var/lib/etcd/postgresql"
 patroni_scope: "postgresql-cluster"
 patroni_namespace: "/service/"
 psql_data_dir: "/var/lib/postgresql/data"
-psql_wal_dir: "/var/lib/postgresql/wal_archive"
 psql_bin_dir: "/usr/lib/postgresql/{{ psql_version }}/bin"
 
 # pgBackRest configuration
