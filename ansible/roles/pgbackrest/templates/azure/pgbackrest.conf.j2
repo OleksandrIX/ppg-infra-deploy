@@ -10,9 +10,11 @@ repo1-azure-account={{ pgbackrest_azure_account }}
 repo1-azure-key={{ pgbackrest_azure_key }}
 repo1-azure-container={{ pgbackrest_azure_container }}
 
+# --- ENCRYPTION SETTINGS --------------------------------------------------------
 repo1-cipher-pass={{ pgbackrest_cipher_pass }}
 repo1-cipher-type=aes-256-cbc
 
+# --- RETENTION SETTINGS --------------------------------------------------------
 repo1-retention-full=3
 repo1-retention-diff=1
 repo1-bundle=y
