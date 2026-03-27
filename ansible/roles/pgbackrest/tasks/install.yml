@@ -4,6 +4,14 @@
     name: "pgbackrest"
     state: "present"
     update_cache: true
+  when: ansible_os_family == "Debian"
+
+- name: "Install pgBackRest"
+  ansible.builtin.dnf:
+    name: "pgbackrest"
+    state: "present"
+    update_cache: true
+  when: ansible_os_family == "RedHat" 
 
 - name: "Remove default pgbackrest config if exists"
   ansible.builtin.file:
