@@ -32,6 +32,7 @@
         state: absent
         autoremove: yes
         purge: yes
+      when: ansible_os_family == "Debian"
 
     - name: Remove etcd binaries
       ansible.builtin.file:
@@ -82,6 +83,7 @@
       loop:
         - etcd
         - postgres
+        - pgbackrest
       ignore_errors: yes
 
     - name: Reload systemd daemon
@@ -92,3 +94,4 @@
       ansible.builtin.apt:
         autoclean: yes
         clean: yes
+      when: ansible_os_family == "Debian"
