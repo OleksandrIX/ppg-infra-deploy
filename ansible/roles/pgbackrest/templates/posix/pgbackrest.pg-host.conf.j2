@@ -8,7 +8,7 @@
 [global]
 # --- REPO SETTINGS (POSIX) -----------------------------------------------------
 repo1-type=posix
-repo1-host={{ pgbackrest_repo_host }}
+repo1-host={{ hostvars[pgbackrest_repo_host]['ansible_default_ipv4']['address'] }}
 repo1-host-user={{ pgbackrest_user }}
 repo1-path={{ pgbackrest_repo_path }}
 

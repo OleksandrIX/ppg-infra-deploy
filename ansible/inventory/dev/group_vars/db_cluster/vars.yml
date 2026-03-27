@@ -1,2 +1,3 @@
 pgbackrest_user: "pgbackrest"
 pgbackrest_repo_path: "/mnt/pgbackrest/ppg-cluster"
+pgbackrest_repo_host: "dev-gis-s3"

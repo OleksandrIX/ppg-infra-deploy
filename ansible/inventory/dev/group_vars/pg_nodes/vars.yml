@@ -28,4 +28,3 @@ psql_bin_dir: "/usr/lib/postgresql/{{ psql_version }}/bin"
 # pgBackRest configuration
 pgbackrest_stanza: "ppg-cluster"
 pgbackrest_repo_type: "posix"
-pgbackrest_repo_host: "dev-gis-s3"
