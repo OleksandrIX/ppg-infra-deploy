@@ -1,7 +1,6 @@
 - name: Get leader PostgreSQL cluster
   ansible.builtin.command: psql -U postgres -tAc "SELECT pg_is_in_recovery();"
-  environment:
-    PGPASSWORD: "{{ psql_superuser_password }}"
+  become_user: postgres
   register: pg_role
   failed_when: false
   changed_when: false
@@ -15,25 +14,25 @@
         dest: /tmp/pgbouncer_auth_setup.sql
         owner: postgres
         mode: "0600"
+      register: pgbouncer_setup_script
 
     - name: Execute PgBouncer authentication setup SQL script
       ansible.builtin.command: psql -U postgres -f /tmp/pgbouncer_auth_setup.sql
-      environment:
-        PGPASSWORD: "{{ psql_superuser_password }}"
-
-    - name: Get hashed password from PostgreSQL for PgBouncer user
-      ansible.builtin.command: psql -U postgres -tAc "SELECT passwd FROM pg_catalog.pg_shadow WHERE usename = '{{ pgbouncer_auth_user }}';"
-      environment:
-        PGPASSWORD: "{{ psql_superuser_password }}"
-      register: pg_hash_result
-      changed_when: false
-
-    - name: Set pgbouncer_hashed_pass fact
-      ansible.builtin.set_fact:
-        pgbouncer_hashed_pass: "{{ pg_hash_result.stdout }}"
-      when: pg_hash_result.stdout != ""
+      become_user: postgres
+      when: pgbouncer_setup_script.changed
 
     - name: Remove temporary SQL script
       ansible.builtin.file:
         path: /tmp/pgbouncer_auth_setup.sql
         state: absent
+
+- name: Get hashed password from PostgreSQL for PgBouncer user
+  ansible.builtin.command: psql -U postgres -tAc "SELECT passwd FROM pg_catalog.pg_shadow WHERE usename = '{{ pgbouncer_auth_user }}';"
+  become_user: postgres
+  register: pg_hash_result
+  changed_when: false
+
+- name: Set pgbouncer_hashed_pass fact
+  ansible.builtin.set_fact:
+    pgbouncer_hashed_pass: "{{ pg_hash_result.stdout | trim }}"
+  when: pg_hash_result.stdout | trim != ""
