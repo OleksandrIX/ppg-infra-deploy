@@ -13,7 +13,7 @@
         upgrade: "dist"
         force_apt_get: true
   roles:
-    - { role: "lvm", tags: ["lvm"] }
+    - { role: "lvm", tags: ["lvm"], when: lvm_state is defined }
     - { role: "etcd", tags: ["etcd"] }
     - { role: "postgresql", tags: ["postgresql"] }
     - { role: "pgbackrest", tags: ["pgbackrest"] }
