@@ -61,15 +61,15 @@ bootstrap:
         - "pgbackrest"
         - "basebackup"
       pgbackrest:
-        command: 'pgbackrest --stanza={{ pgbackrest_stanza }} --delta restore'
+        command: 'sudo -u {{ pgbackrest_user }} pgbackrest --stanza={{ pgbackrest_stanza }} --delta restore'
         keep_data: true
         no_params: true
       recovery_conf:
-        restore_command: 'pgbackrest --stanza={{ pgbackrest_stanza }} archive-get %f %p'
+        restore_command: 'sudo -u {{ pgbackrest_user }} pgbackrest --stanza={{ pgbackrest_stanza }} archive-get %f %p'
       parameters:
         archive_mode: 'on'
-        archive_command: 'pgbackrest --stanza={{ pgbackrest_stanza }} archive-push %p'
-        restore_command: 'pgbackrest --stanza={{ pgbackrest_stanza }} archive-get %f %p'
+        archive_command: 'sudo -u {{ pgbackrest_user }} pgbackrest --stanza={{ pgbackrest_stanza }} archive-push %p'
+        restore_command: 'sudo -u {{ pgbackrest_user }} pgbackrest --stanza={{ pgbackrest_stanza }} archive-get %f %p'
         archive_timeout: '600s'
         shared_buffers: '2GB'
         effective_cache_size: '6GB'

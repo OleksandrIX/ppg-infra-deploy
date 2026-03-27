@@ -41,3 +41,24 @@
     group: "{{ pgbackrest_user }}"
     mode: "0640"
   when: pgbackrest_repo_type == "posix" and inventory_hostname in postgres_hosts
+
+- name: "Create pgBackRest directories"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ pgbackrest_user }}"
+    group: pgbackrest
+    mode: '0750'
+  loop:
+    - "/var/log/pgbackrest"
+    - "/var/lib/pgbackrest"
+    - "/var/spool/pgbackrest"
+
+- name: "Create sudoers file for pgBackRest"
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/pgbackrest"
+    content: "postgres ALL=({{ pgbackrest_user }}) NOPASSWD: /usr/bin/pgbackrest *"
+    owner: "root"
+    group: "root"
+    mode: '0640'
+    validate: '/usr/sbin/visudo -cf %s'
