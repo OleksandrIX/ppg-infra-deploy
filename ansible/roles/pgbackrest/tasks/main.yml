@@ -12,7 +12,6 @@
         state: absent
 
 - name: "Configure SSH key-based authentication for postgres user"
-  when: is_install | default(false)
   block:
     - name: "Create .ssh directory for postgres user"
       ansible.builtin.file:
@@ -66,6 +65,22 @@
         owner: "postgres"
         group: "postgres"
         mode: "0600"
+
+- name: "Copy pgBackRest configuration files"
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - {
+        src: "pgbackrest.logrotate",
+        dest: "/etc/logrotate.d/pgbackrest",
+        owner: "root",
+        group: "root",
+        mode: "0644",
+      }
 
 - name: "Create pgBackRest configuration directory"
   ansible.builtin.file:
