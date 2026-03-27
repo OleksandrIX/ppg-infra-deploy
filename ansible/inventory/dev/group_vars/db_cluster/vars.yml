@@ -1,0 +1,24 @@
+# General configuration
+postgres_monitoring_user: "exporter"
+
+# Hosts
+etcd_hosts: "{{ groups['db_cluster'] }}"
+postgres_hosts: "{{ groups['db_cluster'] }}"
+allow_connection_hosts: []
+
+# etcd configuration
+etcd_version: "v3.5.18"
+etcd_cluster_token: "ppg-cluster-dev-token"
+etcd_data_dir: "/var/lib/etcd/postgresql"
+
+# Patroni configuration
+patroni_scope: "postgresql-cluster"
+patroni_namespace: "/service/"
+psql_data_dir: "/var/lib/postgresql/data"
+psql_wal_dir: "/var/lib/postgresql/wal_archive"
+psql_bin_dir: "/usr/lib/postgresql/{{ psql_version }}/bin"
+
+# pgBackRest configuration
+pgbackrest_stanza: "ppg-cluster"
+pgbackrest_azure_account: "ppgclusterpgbackrest"
+pgbackrest_azure_container: "pgbackrest-repo"
