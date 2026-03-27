@@ -18,7 +18,7 @@
   community.general.lvol:
     vg: "{{ vg_name }}"
     lv: "{{ lv_name }}"
-    size: "100%FREE"
+    size: "100%VG"
     state: "present"
 
 - name: "Format the Logical Volume with a filesystem"

@@ -21,8 +21,11 @@
         upgrade: "dist"
         force_apt_get: true
       when: ansible_os_family == "Debian"
-  roles:
-    - { role: "lvm", tags: ["lvm"], when: lvm_state is defined }
+    - name: "Run LVM setup"
+      include_role:
+        name: "lvm"
+      when: lvm_state is defined
+      tags: ["lvm"]
 
 - name: "Configure pgBackRest Repository"
   hosts: "db_cluster"
