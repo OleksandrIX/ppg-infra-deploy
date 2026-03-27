@@ -35,7 +35,7 @@
     - { role: "pgbackrest", tags: ["pgbackrest"] }
 
 - name: "Create PostgreSQL Cluster"
-  hosts: "db_cluster"
+  hosts: "pg_nodes"
   become: true
   tags: ["cluster"]
   roles:
