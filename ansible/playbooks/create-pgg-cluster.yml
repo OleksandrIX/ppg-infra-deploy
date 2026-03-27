@@ -13,6 +13,7 @@
         upgrade: "dist"
         force_apt_get: true
   roles:
+    - { role: "lvm", tags: ["lvm"] }
     - { role: "etcd", tags: ["etcd"] }
     - { role: "percona_postgresql", tags: ["postgresql"] }
     - { role: "pgbackrest", tags: ["pgbackrest"] }
