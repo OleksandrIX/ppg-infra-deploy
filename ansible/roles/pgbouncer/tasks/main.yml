@@ -1,28 +1,8 @@
 ---
 - name: Install PgBouncer
-  block:
-    - name: Install prerequisite packages for PGDG repo
-      ansible.builtin.apt:
-        name:
-          - curl
-          - ca-certificates
-          - gnupg
-        state: present
-    - name: Download PostgreSQL repository key
-      ansible.builtin.get_url:
-        url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
-        dest: /etc/apt/trusted.gpg.d/postgresql.asc
-        mode: "0644"
-    - name: Add official PostgreSQL repository (PGDG)
-      ansible.builtin.apt_repository:
-        repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/postgresql.asc] http://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main"
-        state: present
-        filename: pgdg
-        update_cache: yes
-    - name: Install PgBouncer
-      ansible.builtin.apt:
-        name: pgbouncer
-        state: latest
+  ansible.builtin.apt:
+    name: pgbouncer
+    state: latest
 
 - name: Create PgBouncer directories
   ansible.builtin.file:
