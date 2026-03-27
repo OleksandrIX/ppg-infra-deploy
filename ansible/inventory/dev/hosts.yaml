@@ -1,0 +1,5 @@
+db_cluster:
+  hosts:
+    dev-pg1:
+    dev-pg2:
+    dev-pg3:
