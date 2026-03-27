@@ -38,4 +38,5 @@
     path: "{{ mount_path }}"
     src: "/dev/mapper/{{ vg_name }}-{{ lv_name }}"
     fstype: "{{ fs_type }}"
+    opts: "defaults"
     state: "mounted"
