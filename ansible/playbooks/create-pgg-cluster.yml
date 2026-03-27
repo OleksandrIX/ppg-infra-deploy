@@ -2,6 +2,7 @@
 - name: "Prepare PostgreSQL Cluster Nodes"
   hosts: "db_cluster"
   become: true
+  tags: ["preparation"]
   tasks:
     - name: "Update cache and upgrade packages (RedHat family)"
       ansible.builtin.dnf:
@@ -20,18 +21,21 @@
         upgrade: "dist"
         force_apt_get: true
       when: ansible_os_family == "Debian"
+  roles:
+    - { role: "lvm", tags: ["lvm"], when: lvm_state is defined }
 
 - name: "Configure pgBackRest Repository"
   hosts: "db_cluster"
   become: true
+  tags: ["backup"]
   roles:
     - { role: "pgbackrest", tags: ["pgbackrest"] }
 
 - name: "Create PostgreSQL Cluster"
   hosts: "db_cluster"
   become: true
+  tags: ["cluster"]
   roles:
-    - { role: "lvm", tags: ["lvm"], when: lvm_state is defined }
     - { role: "etcd", tags: ["etcd"] }
     - { role: "postgresql", tags: ["postgresql"] }
     - { role: "patroni", tags: ["patroni"] }
