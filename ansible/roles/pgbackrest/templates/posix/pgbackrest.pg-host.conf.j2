@@ -9,7 +9,7 @@
 # --- REPO SETTINGS (POSIX) -----------------------------------------------------
 repo1-type=posix
 repo1-host={{ pgbackrest_repo_host }}
-repo1-host-user={{ pgbackrest_repo_user }}
+repo1-host-user={{ pgbackrest_user }}
 repo1-path={{ pgbackrest_repo_path }}
 
 # --- ENCRYPTION SETTINGS --------------------------------------------------------
@@ -41,5 +41,5 @@ pg1-path={{ psql_data_dir }}
 {% for host in postgres_hosts | reject('equalto', inventory_hostname) %}
 pg{{ loop.index + 1 }}-path={{ psql_data_dir }}
 pg{{ loop.index + 1 }}-host={{ hostvars[host]['ansible_default_ipv4']['address'] }}
-pg{{ loop.index + 1 }}-host-user=postgres
+pg{{ loop.index + 1 }}-host-user={{ pgbackrest_user }}
 {% endfor %}

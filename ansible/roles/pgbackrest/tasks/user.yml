@@ -1,0 +1,8 @@
+---
+- name: "Create user for pgBackRest backups and configure SSH access on repo host"
+  include_tasks: user_repo.yml
+  when: inventory_hostname == pgbackrest_repo_host
+
+- name: "Create user for pgBackRest backups and configure SSH access on PostgreSQL hosts"
+  include_tasks: user_pg.yml
+  when: inventory_hostname in postgres_hosts

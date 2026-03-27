@@ -1,0 +1,43 @@
+---
+- name: "Create pgBackRest configuration directory"
+  ansible.builtin.file:
+    path: "/etc/pgbackrest"
+    state: directory
+    owner: "{{ pgbackrest_user }}"
+    group: "{{ pgbackrest_user }}"
+    mode: "0750"
+
+- name: "Copy pgBackRest logrotate configuration"
+  ansible.builtin.template:
+    src: "pgbackrest.logrotate.j2"
+    dest: "/etc/logrotate.d/pgbackrest"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: "Copy pgBackRest configuration file for Azure repository"
+  ansible.builtin.template:
+    src: "azure/pgbackrest.conf.j2"
+    dest: "/etc/pgbackrest/pgbackrest.conf"
+    owner: "{{ pgbackrest_user }}"
+    group: "{{ pgbackrest_user }}"
+    mode: "0640"
+  when: pgbackrest_repo_type == "azure"
+
+- name: "Copy pgBackRest configuration file for POSIX repo-host"
+  ansible.builtin.template:
+    src: "posix/pgbackrest.repo-host.conf.j2"
+    dest: "/etc/pgbackrest/pgbackrest.conf"
+    owner: "{{ pgbackrest_user }}"
+    group: "{{ pgbackrest_user }}"
+    mode: "0640"
+  when: pgbackrest_repo_type == "posix" and inventory_hostname == pgbackrest_repo_host
+
+- name: "Copy pgBackRest configuration file for POSIX PostgreSQL hosts"
+  ansible.builtin.template:
+    src: "posix/pgbackrest.pg-host.conf.j2"
+    dest: "/etc/pgbackrest/pgbackrest.conf"
+    owner: "{{ pgbackrest_user }}"
+    group: "{{ pgbackrest_user }}"
+    mode: "0640"
+  when: pgbackrest_repo_type == "posix" and inventory_hostname in postgres_hosts

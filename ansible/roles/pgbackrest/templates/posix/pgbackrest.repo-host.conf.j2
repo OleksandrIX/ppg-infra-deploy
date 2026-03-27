@@ -38,5 +38,5 @@ log-level-console=info
 {% for host in postgres_hosts | reject('equalto', inventory_hostname) %}
 pg{{ loop.index }}-path={{ psql_data_dir }}
 pg{{ loop.index }}-host={{ hostvars[host]['ansible_default_ipv4']['address'] }}
-pg{{ loop.index }}-host-user=postgres
+pg{{ loop.index }}-host-user={{ pgbackrest_user }}
 {% endfor %}

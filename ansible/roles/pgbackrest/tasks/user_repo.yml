@@ -1,0 +1,23 @@
+---
+- name: "Create user for pgBackRest backups"
+  ansible.builtin.user:
+    name: "{{ pgbackrest_user }}"
+    shell: "/bin/bash"
+    system: true
+    comment: "User for pgBackRest backups"
+
+- name: "Create .ssh directory"
+  ansible.builtin.file:
+    path: "/home/{{ pgbackrest_user }}/.ssh"
+    state: directory
+    owner: "{{ pgbackrest_user }}"
+    group: "{{ pgbackrest_user }}"
+    mode: "0700"
+
+- name: "Create backup directory"
+  ansible.builtin.file:
+    path: "{{ pgbackrest_repo_path }}"
+    state: directory
+    owner: "{{ pgbackrest_user }}"
+    group: "{{ pgbackrest_user }}"
+    mode: "0750"

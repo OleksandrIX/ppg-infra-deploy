@@ -1,0 +1,11 @@
+---
+- name: "Install pgBackRest"
+  ansible.builtin.apt:
+    name: "pgbackrest"
+    state: "present"
+    update_cache: true
+
+- name: "Remove default pgbackrest config if exists"
+  ansible.builtin.file:
+    path: "/etc/pgbackrest.conf"
+    state: "absent"

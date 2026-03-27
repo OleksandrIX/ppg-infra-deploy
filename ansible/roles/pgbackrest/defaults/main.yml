@@ -1,13 +1,16 @@
 ---
 # Common configuration
 postgres_hosts: []
+pgbackrest_repo_type: "posix" # Options: "posix", "azure"
 pgbackrest_stanza: "test-stanza"
 pgbackrest_cipher_pass: 'cipher pass'
 psql_data_dir: "/var/lib/postgresql/data"
 
+# pgBackRest user configuration
+pgbackrest_user: "pgbackrest"
+
 # For POSIX storage configuration
 pgbackrest_repo_host: "pgbackrest-repo-host"
-pgbackrest_repo_user: "pgbackrest"
 pgbackrest_repo_path: "/var/lib/pgbackrest"
 
 # For Azure storage configuration

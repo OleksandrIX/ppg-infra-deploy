@@ -1,0 +1,77 @@
+---
+- name: "Create user for pgBackRest backups"
+  ansible.builtin.user:
+    name: "{{ pgbackrest_user }}"
+    shell: "/bin/bash"
+    system: true
+    comment: "User for pgBackRest backups"
+
+- name: "Create .ssh directory"
+  ansible.builtin.file:
+    path: "/home/{{ pgbackrest_user }}/.ssh"
+    state: directory
+    owner: "{{ pgbackrest_user }}"
+    group: "{{ pgbackrest_user }}"
+    mode: "0700"
+
+- name: "Add pgBackRest user to postgres group"
+  ansible.builtin.user:
+    name: "{{ pgbackrest_user }}"
+    groups: postgres
+    append: true
+
+- name: "Configure SSH key-based authentication for pgBackRest user"
+  block:
+    - name: "Generate ed25519 key pair using native ssh-keygen"
+      ansible.builtin.command:
+        cmd: 'ssh-keygen -t ed25519 -f /home/{{ pgbackrest_user }}/.ssh/id_ed25519 -N "" -q -C "{{ pgbackrest_user }}@{{ inventory_hostname }}"'
+      args:
+        creates: "/home/{{ pgbackrest_user }}/.ssh/id_ed25519"
+
+    - name: "Read the generated public key"
+      ansible.builtin.slurp:
+        src: "/home/{{ pgbackrest_user }}/.ssh/id_ed25519.pub"
+      register: slurped_pub_key
+
+    - name: "Set public key as a fact for other hosts to use"
+      ansible.builtin.set_fact:
+        pgbackrest_public_key: "{{ slurped_pub_key.content | b64decode | trim }}"
+
+    - name: "Add public keys from all other hosts to authorized_keys"
+      ansible.posix.authorized_key:
+        user: "{{ pgbackrest_user }}"
+        state: present
+        key: "{{ hostvars[item]['pgbackrest_public_key'] }}"
+        comment: "Key from {{ item }}"
+      loop: "{{ postgres_hosts }}"
+      when: item != inventory_hostname
+
+    - name: "Set ownership and permissions for SSH keys"
+      ansible.builtin.file:
+        path: "/home/{{ pgbackrest_user }}/.ssh/{{ item.filename }}"
+        owner: "{{ pgbackrest_user }}"
+        group: "{{ pgbackrest_user }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - { filename: "id_ed25519", mode: "0600" }
+        - { filename: "id_ed25519.pub", mode: "0644" }
+
+    - name: "Configure SSH to skip strict host key checking"
+      ansible.builtin.copy:
+        dest: "/home/{{ pgbackrest_user }}/.ssh/config"
+        content: |
+          Host *
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+        owner: "{{ pgbackrest_user }}"
+        group: "{{ pgbackrest_user }}"
+        mode: "0600"
+
+    - name: "Add public key to repo-host authorized_keys"
+      ansible.posix.authorized_key:
+        user: "{{ pgbackrest_user }}"
+        state: present
+        key: "{{ pgbackrest_public_key }}"
+        comment: "Key from {{ inventory_hostname }}"
+      delegate_to: "{{ pgbackrest_repo_host }}"
+      when: pgbackrest_repo_type == "posix"
