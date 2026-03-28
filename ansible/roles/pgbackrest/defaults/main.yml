@@ -6,9 +6,6 @@ pgbackrest_stanza: "test-stanza"
 pgbackrest_cipher_pass: 'cipher pass'
 psql_data_dir: "/var/lib/postgresql/data"
 
-# pgBackRest user configuration
-pgbackrest_user: "pgbackrest"
-
 # For POSIX storage configuration
 pgbackrest_repo_host: "pgbackrest-repo-host"
 pgbackrest_repo_path: "/var/lib/pgbackrest"

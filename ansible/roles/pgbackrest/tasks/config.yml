@@ -3,8 +3,8 @@
   ansible.builtin.file:
     path: "/etc/pgbackrest"
     state: directory
-    owner: "{{ pgbackrest_user }}"
-    group: "{{ pgbackrest_user }}"
+    owner: "postgres"
+    group: "postgres"
     mode: "0750"
 
 - name: "Copy pgBackRest logrotate configuration"
@@ -19,8 +19,8 @@
   ansible.builtin.template:
     src: "pgbackrest.azure.conf.j2"
     dest: "/etc/pgbackrest/pgbackrest.conf"
-    owner: "{{ pgbackrest_user }}"
-    group: "{{ pgbackrest_user }}"
+    owner: "postgres"
+    group: "postgres"
     mode: "0640"
   when: pgbackrest_repo_type == "azure"
 
@@ -28,28 +28,7 @@
   ansible.builtin.template:
     src: "pgbackrest.posix.conf.j2"
     dest: "/etc/pgbackrest/pgbackrest.conf"
-    owner: "{{ pgbackrest_user }}"
-    group: "{{ pgbackrest_user }}"
+    owner: "postgres"
+    group: "postgres"
     mode: "0640"
   when: pgbackrest_repo_type == "posix"
-
-- name: "Create pgBackRest directories"
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    owner: "{{ pgbackrest_user }}"
-    group: pgbackrest
-    mode: '0750'
-  loop:
-    - "/var/log/pgbackrest"
-    - "/var/lib/pgbackrest"
-    - "/var/spool/pgbackrest"
-
-- name: "Create sudoers file for pgBackRest"
-  ansible.builtin.copy:
-    dest: "/etc/sudoers.d/pgbackrest"
-    content: "postgres ALL=({{ pgbackrest_user }}) NOPASSWD: /usr/bin/pgbackrest *"
-    owner: "root"
-    group: "root"
-    mode: '0640'
-    validate: '/usr/sbin/visudo -cf %s'
