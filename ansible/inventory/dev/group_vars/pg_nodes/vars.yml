@@ -20,6 +20,7 @@ etcd_data_dir: "/var/lib/etcd/postgresql"
 
 # PostgreSQL configuration
 psql_version: "17"
+psql_home_dir: "/var/lib/postgresql"
 psql_bin_dir: "/usr/lib/postgresql/{{ psql_version }}/bin"
 
 # Patroni configuration
