@@ -1,0 +1,28 @@
+---
+- name: "Update apt repo and cache (Debian family)"
+  ansible.builtin.apt:
+    update_cache: true
+    force_apt_get: true
+    cache_valid_time: 3600
+
+- name: "Upgrade all packages to the latest version (Debian family)"
+  ansible.builtin.apt:
+    upgrade: "dist"
+    force_apt_get: true
+
+- name: "Download percona-release repository package"
+  ansible.builtin.get_url:
+    url: "https://repo.percona.com/apt/percona-release_latest.generic_all.deb"
+    dest: "/tmp/percona-release_latest.generic_all.deb"
+    mode: "0644"
+
+- name: "Install percona-release package"
+  ansible.builtin.apt:
+    deb: "/tmp/percona-release_latest.generic_all.deb"
+    state: "present"
+
+- name: "Enable Percona PostgreSQL repository"
+  ansible.builtin.command:
+    cmd: "percona-release setup ppg-{{ psql_version }}"
+  args:
+    creates: "/etc/apt/sources.list.d/percona-ppg-{{ psql_version }}-release.list"

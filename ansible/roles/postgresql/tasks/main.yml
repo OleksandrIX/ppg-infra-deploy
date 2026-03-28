@@ -1,22 +1,5 @@
 ---
-- name: Download percona-release repository package
-  ansible.builtin.get_url:
-    url: https://repo.percona.com/apt/percona-release_latest.generic_all.deb
-    dest: /tmp/percona-release_latest.generic_all.deb
-    mode: "0644"
-
-- name: Install percona-release package
-  ansible.builtin.apt:
-    deb: /tmp/percona-release_latest.generic_all.deb
-    state: present
-
-- name: Enable Percona PostgreSQL repository
-  ansible.builtin.command:
-    cmd: "percona-release setup ppg-{{ psql_version }}"
-  args:
-    creates: "/etc/apt/sources.list.d/percona-ppg-{{ psql_version }}-release.list"
-
-- name: Update apt cache and install Percona PostgreSQL
+- name: "Іnstall Percona PostgreSQL"
   ansible.builtin.apt:
     name:
       - "percona-postgresql-{{ psql_version }}"
@@ -24,14 +7,14 @@
     state: present
     update_cache: yes
 
-- name: Stop and disable default PostgreSQL service
+- name: "Stop and disable default PostgreSQL service"
   ansible.builtin.systemd:
     name: "postgresql"
     state: stopped
     enabled: no
   ignore_errors: yes
 
-- name: Clean up PostgreSQL log file
+- name: "Clean up PostgreSQL log file"
   ansible.builtin.file:
     path: "/var/log/postgresql/postgresql-{{ psql_version }}-main.log"
     state: absent

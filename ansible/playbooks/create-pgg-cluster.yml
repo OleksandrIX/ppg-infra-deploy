@@ -4,23 +4,11 @@
   become: true
   tags: ["preparation"]
   tasks:
-    - name: "Update cache and upgrade packages (RedHat family)"
-      ansible.builtin.dnf:
-        name: "*"
-        state: latest
-        update_cache: yes
-      when: ansible_os_family == "RedHat"
-    - name: "Update apt repo and cache (Debian family)"
-      ansible.builtin.apt:
-        update_cache: true
-        force_apt_get: true
-        cache_valid_time: 3600
-      when: ansible_os_family == "Debian"
-    - name: "Upgrade all packages to the latest version (Debian family)"
-      ansible.builtin.apt:
-        upgrade: "dist"
-        force_apt_get: true
-      when: ansible_os_family == "Debian"
+    - name: "Run Percona setup"
+      include_role:
+        name: "percona_repo"
+      tags: ["percona_repo"]
+
     - name: "Run LVM setup"
       include_role:
         name: "lvm"

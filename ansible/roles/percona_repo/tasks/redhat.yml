@@ -1,0 +1,18 @@
+---
+- name: "Update cache and upgrade packages (RedHat family)"
+  ansible.builtin.dnf:
+    name: "*"
+    state: "latest"
+    update_cache: true
+
+- name: "Install percona-release package (RedHat)"
+  ansible.builtin.dnf:
+    name: "https://repo.percona.com/yum/percona-release-latest.noarch.rpm"
+    state: "present"
+    disable_gpg_check: true
+
+- name: "Enable Percona PostgreSQL repository"
+  ansible.builtin.command:
+    cmd: "percona-release setup ppg-{{ psql_version }}"
+  args:
+    creates: "/etc/yum.repos.d/percona-ppg-{{ psql_version }}-release.repo"

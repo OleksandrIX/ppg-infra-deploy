@@ -1,32 +1,7 @@
 ---
-- name: "Setup PGDG repo (Debian)"
-  block:
-    - name: "Add APT key (Debian)"
-      ansible.builtin.apt_key:
-        url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
-        state: present
-    - name: "Add APT repository (Debian)"
-      ansible.builtin.apt_repository:
-        repo: "deb http://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main"
-        state: present
-  when: ansible_os_family == "Debian"
-
-- name: "Setup PGDG repo (RedHat)"
-  block:
-    - name: "Install EPEL (RedHat)"
-      ansible.builtin.dnf:
-        name: epel-release
-        state: present
-    - name: "Install PGDG RPM (RedHat)"
-      ansible.builtin.dnf:
-        name: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-{{ ansible_distribution_major_version }}-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
-        state: present
-        disable_gpg_check: true
-  when: ansible_os_family == "RedHat"
-
 - name: "Install pgBackRest"
   ansible.builtin.package:
-    name: pgbackrest
+    name: percona-pgbackrest
     state: present
 
 - name: "Remove default pgbackrest config if exists"
