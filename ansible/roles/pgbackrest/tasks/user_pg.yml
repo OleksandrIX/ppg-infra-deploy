@@ -57,7 +57,7 @@
         dest: "{{ psql_home_dir }}/.ssh/config"
         content: |
           {% for host in postgres_hosts %}
-          Host {{ host }}
+          Host {{ hostvars[host]['ansible_default_ipv4']['address'] }}
             StrictHostKeyChecking no
             UserKnownHostsFile /dev/null
           {% endfor %}
