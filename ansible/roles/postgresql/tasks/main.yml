@@ -1,5 +1,5 @@
 ---
-- name: "Іnstall Percona PostgreSQL"
+- name: "Install Percona PostgreSQL"
   ansible.builtin.apt:
     name:
       - "percona-postgresql-{{ psql_version }}"
