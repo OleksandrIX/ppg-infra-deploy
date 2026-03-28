@@ -8,9 +8,12 @@
 [global]
 # --- REPO SETTINGS (POSIX) -----------------------------------------------------
 repo1-type=posix
+repo1-path={{ pgbackrest_repo_path }}
+
+{% if pgbackrest_repo_host != inventory_hostname %}
 repo1-host={{ hostvars[pgbackrest_repo_host]['ansible_default_ipv4']['address'] }}
 repo1-host-user={{ pgbackrest_user }}
-repo1-path={{ pgbackrest_repo_path }}
+{% endif %}
 
 # --- ENCRYPTION SETTINGS --------------------------------------------------------
 repo1-cipher-pass={{ pgbackrest_cipher_pass }}
@@ -36,10 +39,12 @@ log-level-console=info
 # STANZA CONFIGURATION
 #================================================================================
 [{{ pgbackrest_stanza }}]
-pg1-path={{ psql_data_dir }}
-
+{% if pgbackrest_repo_host == inventory_hostname %}
 {% for host in postgres_hosts | reject('equalto', inventory_hostname) %}
-pg{{ loop.index + 1 }}-path={{ psql_data_dir }}
-pg{{ loop.index + 1 }}-host={{ hostvars[host]['ansible_default_ipv4']['address'] }}
-pg{{ loop.index + 1 }}-host-user={{ pgbackrest_user }}
+pg{{ loop.index }}-path={{ psql_data_dir }}
+pg{{ loop.index }}-host={{ hostvars[host]['ansible_default_ipv4']['address'] }}
+pg{{ loop.index }}-host-user={{ pgbackrest_user }}
 {% endfor %}
+{% else %}
+pg1-path={{ psql_data_dir }}
+{% endif %}

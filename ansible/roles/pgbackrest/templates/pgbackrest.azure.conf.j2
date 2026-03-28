@@ -34,10 +34,8 @@ log-level-console=info
 # STANZA CONFIGURATION
 #================================================================================
 [{{ pgbackrest_stanza }}]
-pg1-path={{ psql_data_dir }}
-
 {% for host in postgres_hosts | reject('equalto', inventory_hostname) %}
-pg{{ loop.index + 1 }}-path={{ psql_data_dir }}
-pg{{ loop.index + 1 }}-host={{ hostvars[host]['ansible_default_ipv4']['address'] }}
-pg{{ loop.index + 1 }}-host-user=postgres
+pg{{ loop.index }}-path={{ psql_data_dir }}
+pg{{ loop.index }}-host={{ hostvars[host]['ansible_default_ipv4']['address'] }}
+pg{{ loop.index }}-host-user=postgres
 {% endfor %}
