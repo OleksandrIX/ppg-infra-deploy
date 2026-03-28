@@ -65,13 +65,13 @@ The main playbook applies roles in this order:
 
 Each role has its own README under `roles/<role>/README.md`:
 
-- `etcd`
-- `lvm`
-- `patroni`
-- `percona_repo`
-- `pgbackrest`
-- `pgbouncer`
-- `postgresql`
+- [etcd](roles/etcd/README.md)
+- [lvm](roles/lvm/README.md)
+- [patroni](roles/patroni/README.md)
+- [percona_repo](roles/percona_repo/README.md)
+- [pgbackrest](roles/pgbackrest/README.md)
+- [pgbouncer](roles/pgbouncer/README.md)
+- [postgresql](roles/postgresql/README.md)
 
 ## Requirements
 
