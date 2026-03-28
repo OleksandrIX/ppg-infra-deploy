@@ -1,0 +1,3 @@
+db_cluster:
+  children:
+    pg_nodes:

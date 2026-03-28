@@ -51,7 +51,7 @@ module "database_cluster" {
   data_disk_size_gb = 128
 
   tags = {
-    AnsibleGroup = "db_cluster"
+    AnsibleGroup = "pg_nodes"
     Environment  = "dev"
   }
 }
