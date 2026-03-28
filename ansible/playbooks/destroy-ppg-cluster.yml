@@ -72,8 +72,11 @@
         # --- Percona apt lists ---
         - /var/log/percona
         - /etc/apt/sources.list.d/percona-ppg-{{ psql_version }}-release.list
+        - /etc/apt/sources.list.d/percona-ppg-{{ psql_version }}-release.list.bak
         - /etc/apt/sources.list.d/percona-prel-release.list
+        - /etc/apt/sources.list.d/percona-prel-release.list.bak
         - /etc/apt/sources.list.d/percona-telemetry-release.list
+        - /etc/apt/sources.list.d/percona-telemetry-release.list.bak
         - /etc/apt/sources.list.d/percona-pmm2-client-release.list.bak
 
     - name: Remove system users (etcd, postgres)
