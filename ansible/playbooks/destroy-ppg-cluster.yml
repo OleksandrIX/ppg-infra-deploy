@@ -29,6 +29,7 @@
           - python3-requests
           - python3-yaml
           - pgbackrest
+          - percona-pgbackrest
         state: absent
         autoremove: yes
         purge: yes
