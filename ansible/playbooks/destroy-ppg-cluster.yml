@@ -70,6 +70,7 @@
         - /var/log/pgbackrest
         - /etc/logrotate.d/pgbackrest
         # --- Percona apt lists ---
+        - /var/log/percona
         - /etc/apt/sources.list.d/percona-ppg-{{ psql_version }}-release.list
         - /etc/apt/sources.list.d/percona-prel-release.list
         - /etc/apt/sources.list.d/percona-telemetry-release.list
