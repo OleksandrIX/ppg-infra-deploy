@@ -1,0 +1,18 @@
+---
+- name: Grant database privileges from user grants
+  community.postgresql.postgresql_privs:
+    type: "{{ grant_item.type | lower }}"
+    database: "{{ grant_item.database | default(grant_item.database_name | default(grant_item.db_name)) }}"
+    schema: "{{ grant_item.schema | default(omit) }}"
+    objs: "{{ grant_item.objs | default(omit) }}"
+    roles: "{{ grant_item.user }}"
+    privs: "{{ grant_item.privs }}"
+    grant_option: "{{ grant_item.grant_option | default(omit) }}"
+    state: present
+    login_unix_socket: "/var/run/postgresql"
+  become_user: postgres
+  loop: "{{ grant_entries | default([]) }}"
+  loop_control:
+    loop_var: grant_item
+    label: "{{ grant_item.db_name }} -> {{ grant_item.user }}"
+  when: is_primary | default(false)

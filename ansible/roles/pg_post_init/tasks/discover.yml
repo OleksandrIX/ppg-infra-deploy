@@ -1,0 +1,84 @@
+---
+- name: Discover database specs for environment
+  ansible.builtin.set_fact:
+    spec_files: "{{ query('fileglob', files_glob, wantlist=True) | sort }}"
+  run_once: true
+
+- name: Validate that at least one database spec exists
+  ansible.builtin.assert:
+    that:
+      - spec_files | length > 0
+    fail_msg: >-
+      No database spec files found by pattern {{ files_glob }}.
+      Add encrypted files under {{ inventory_dir }}/databases.
+  run_once: true
+
+- name: Initialize aggregated database specs
+  ansible.builtin.set_fact:
+    databases: []
+  run_once: true
+
+- name: Load each database spec file
+  ansible.builtin.include_vars:
+    file: "{{ item }}"
+    name: loaded_spec
+  loop: "{{ spec_files }}"
+  loop_control:
+    label: "{{ item | basename }}"
+  register: loaded_specs
+  run_once: true
+
+- name: Aggregate normalized specs
+  ansible.builtin.set_fact:
+    databases: "{{ databases + [spec] }}"
+  vars:
+    loaded: "{{ item.ansible_facts.loaded_spec.database_spec }}"
+    spec: >-
+      {{
+        {
+          'extensions': []
+        }
+        | combine(loaded, recursive=True)
+        | combine({'__source_file': item.item | basename})
+      }}
+  loop: "{{ loaded_specs.results }}"
+  loop_control:
+    label: "{{ item.item | basename }}"
+  run_once: true
+
+- name: Build flattened user list
+  ansible.builtin.set_fact:
+    all_users: "{{ (all_users | default([])) + (item.users | default([])) }}"
+  loop: "{{ databases }}"
+  loop_control:
+    label: "{{ item.name }}"
+  run_once: true
+
+- name: Initialize flattened grant entries
+  ansible.builtin.set_fact:
+    grant_entries: []
+  run_once: true
+
+- name: Build flattened grant entries
+  ansible.builtin.set_fact:
+    grant_entries: >-
+      {{
+        grant_entries
+        + (
+          db_user_item.1.grants
+          | default([])
+          | map('combine', {'db_name': db_user_item.0.name, 'source_file': db_user_item.0.__source_file, 'user': db_user_item.1.name}, recursive=True)
+          | list
+        )
+      }}
+  loop: "{{ databases | subelements('users', skip_missing=True) }}"
+  loop_control:
+    loop_var: db_user_item
+    label: "{{ db_user_item.0.name }} -> {{ db_user_item.1.name }}"
+  run_once: true
+
+- name: Propagate discovered facts to all hosts
+  ansible.builtin.set_fact:
+    databases: "{{ hostvars[ansible_play_hosts[0]].databases | default([]) }}"
+    all_users: "{{ hostvars[ansible_play_hosts[0]].all_users | default([]) }}"
+    grant_entries: "{{ hostvars[ansible_play_hosts[0]].grant_entries | default([]) }}"

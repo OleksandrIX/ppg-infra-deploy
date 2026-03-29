@@ -1,0 +1,13 @@
+---
+- name: Install extensions per database spec
+  community.postgresql.postgresql_ext:
+    name: "{{ db_ext.1 }}"
+    db: "{{ db_ext.0.name }}"
+    state: present
+    login_unix_socket: "/var/run/postgresql"
+  become_user: postgres
+  loop: "{{ databases | subelements('extensions', skip_missing=True) }}"
+  loop_control:
+    loop_var: db_ext
+    label: "{{ db_ext.0.name }} -> {{ db_ext.1 }}"
+  when: is_primary | default(false)

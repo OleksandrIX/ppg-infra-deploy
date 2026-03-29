@@ -1,0 +1,24 @@
+---
+- name: "Load database specs"
+  include_tasks: discover.yml
+
+- name: "Validate database specs"
+  include_tasks: validate.yml
+
+- name: "Install extension packages"
+  include_tasks: extension_packages.yml
+
+- name: "Detect primary node"
+  include_tasks: detect_primary.yml
+
+- name: "Ensure PostgreSQL users"
+  include_tasks: users.yml
+
+- name: "Ensure PostgreSQL databases"
+  include_tasks: databases.yml
+
+- name: "Ensure PostgreSQL grants"
+  include_tasks: grants.yml
+
+- name: "Ensure PostgreSQL extensions"
+  include_tasks: extensions.yml

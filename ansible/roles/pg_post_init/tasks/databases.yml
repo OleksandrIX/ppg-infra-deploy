@@ -1,0 +1,15 @@
+---
+- name: Create PostgreSQL databases from specs
+  community.postgresql.postgresql_db:
+    name: "{{ db_spec.name }}"
+    owner: "{{ db_spec.owner }}"
+    encoding: "{{ db_spec.encoding | default(omit) }}"
+    template: "{{ db_spec.template | default(omit) }}"
+    state: present
+    login_unix_socket: "/var/run/postgresql"
+  become_user: postgres
+  loop: "{{ databases }}"
+  loop_control:
+    loop_var: db_spec
+    label: "{{ db_spec.name }}"
+  when: is_primary | default(false)

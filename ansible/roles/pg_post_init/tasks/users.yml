@@ -1,0 +1,14 @@
+---
+- name: Create PostgreSQL users from specs
+  community.postgresql.postgresql_user:
+    name: "{{ db_user.name }}"
+    password: "{{ db_user.password }}"
+    role_attr_flags: "{{ db_user.role_attr_flags | default('LOGIN') }}"
+    state: present
+    login_unix_socket: "/var/run/postgresql"
+  become_user: postgres
+  loop: "{{ all_users | default([]) }}"
+  loop_control:
+    loop_var: db_user
+    label: "{{ db_user.name }}"
+  when: is_primary | default(false)

@@ -1,0 +1,39 @@
+---
+files_glob: "{{ inventory_dir }}/databases/*.yml"
+allowed_grant_types:
+  - "database"
+  - "schema"
+  - "table"
+  - "sequence"
+  - "function"
+
+allowed_grant_privileges:
+  database:
+    - "ALL"
+    - "CONNECT"
+    - "CREATE"
+    - "TEMPORARY"
+    - "TEMP"
+  schema:
+    - "ALL"
+    - "USAGE"
+    - "CREATE"
+  table:
+    - "ALL"
+    - "SELECT"
+    - "INSERT"
+    - "UPDATE"
+    - "DELETE"
+    - "TRUNCATE"
+    - "REFERENCES"
+    - "TRIGGER"
+  sequence:
+    - "ALL"
+    - "USAGE"
+    - "SELECT"
+    - "UPDATE"
+  function:
+    - "ALL"
+    - "EXECUTE"
+
+extension_package_map: {}

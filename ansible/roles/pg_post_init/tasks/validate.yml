@@ -1,0 +1,118 @@
+---
+- name: Validate database spec structure
+  ansible.builtin.assert:
+    that:
+      - item.name is defined
+      - item.name | length > 0
+      - item.owner is defined
+      - item.owner | length > 0
+      - item.users is defined
+      - item.users is iterable
+      - item.users | length > 0
+      - item.extensions is iterable
+    fail_msg: "Invalid database_spec in {{ item.__source_file }}"
+    quiet: true
+  loop: "{{ databases }}"
+  loop_control:
+    label: "{{ item.name | default(item.__source_file) }}"
+  run_once: true
+
+- name: Validate owner is declared in users list for each database
+  ansible.builtin.assert:
+    that:
+      - item.owner in (item.users | map(attribute='name') | list)
+    fail_msg: >-
+      Invalid database_spec in {{ item.__source_file }}: owner {{ item.owner }} must be defined in users list.
+    quiet: true
+  loop: "{{ databases }}"
+  loop_control:
+    label: "{{ item.name | default(item.__source_file) }}"
+  run_once: true
+
+- name: Validate user definitions in database specs
+  ansible.builtin.assert:
+    that:
+      - db_user.name is defined
+      - db_user.name | length > 0
+      - db_user.password is defined
+      - db_user.password | length > 0
+      - db_user.grants is defined
+      - db_user.grants is iterable
+      - db_user.grants | length > 0
+    fail_msg: "Invalid user definition in {{ item.0.__source_file }}"
+    quiet: true
+  loop: "{{ databases | subelements('users', skip_missing=True) }}"
+  loop_control:
+    loop_var: item
+    label: "{{ item.0.name }} -> {{ db_user.name | default('undefined') }}"
+  vars:
+    db_user: "{{ item.1 }}"
+  run_once: true
+
+- name: Validate database names are unique
+  ansible.builtin.assert:
+    that:
+      - (databases | map(attribute='name') | list | unique | length) == (databases | length)
+    fail_msg: "Database names must be unique across files in {{ inventory_dir }}/databases"
+    quiet: true
+  run_once: true
+
+- name: Validate user names are unique across all database files
+  ansible.builtin.assert:
+    that:
+      - (all_users | default([]) | map(attribute='name') | list | unique | length) == (all_users | default([]) | length)
+    fail_msg: "User names must be unique across all database files"
+    quiet: true
+  run_once: true
+
+- name: Validate grant structure in user definitions
+  ansible.builtin.assert:
+    that:
+      - grant_item.type is defined
+      - (grant_item.type | lower) in allowed_grant_types
+      - grant_item.privs is defined
+      - grant_item.privs | length > 0
+      - >-
+        (
+          grant_item.privs
+          | upper
+          | split(',')
+          | map('trim')
+          | reject('in', allowed_grant_privileges[grant_item.type | lower])
+          | list
+          | length
+        ) == 0
+    fail_msg: >-
+      Invalid grant in {{ grant_item.source_file }} for user {{ grant_item.user | default('undefined') }}.
+      Allowed types: {{ allowed_grant_types | join(', ') }}.
+    quiet: true
+  loop: "{{ grant_entries | default([]) }}"
+  loop_control:
+    loop_var: grant_item
+    label: "{{ grant_item.db_name }} -> {{ grant_item.user | default('undefined') }}"
+  run_once: true
+
+- name: Validate owner has explicit grant in each database spec
+  ansible.builtin.assert:
+    that:
+      - >-
+        (
+          item.users
+          | selectattr('name', 'equalto', item.owner)
+          | map(attribute='grants')
+          | list
+          | first
+          | default([])
+          | selectattr('type', 'equalto', 'database')
+          | map(attribute='privs')
+          | map('upper')
+          | list
+          | length
+        ) > 0
+    fail_msg: >-
+      Invalid database_spec in {{ item.__source_file }}: owner {{ item.owner }} must have at least one database grant in users[].grants.
+    quiet: true
+  loop: "{{ databases }}"
+  loop_control:
+    label: "{{ item.name | default(item.__source_file) }}"
+  run_once: true

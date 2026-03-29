@@ -1,0 +1,11 @@
+---
+- name: Detect whether current node is PostgreSQL primary
+  ansible.builtin.command: psql -U postgres -tAc "SELECT pg_is_in_recovery();"
+  become_user: postgres
+  register: role_check
+  changed_when: false
+  failed_when: false
+
+- name: Set node primary flag
+  ansible.builtin.set_fact:
+    is_primary: "{{ role_check.stdout | trim == 'f' }}"
