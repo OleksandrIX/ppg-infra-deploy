@@ -1,0 +1,30 @@
+---
+- name: "Copy pgBackRest backup script"
+  ansible.builtin.template:
+    src: "pgbackrest-backup.j2"
+    dest: "/usr/local/bin/pgbackrest-backup.sh"
+    owner: "postgres"
+    group: "postgres"
+    mode: "0750"
+
+- name: "Setup cron for full pgBackRest backup"
+  ansible.builtin.cron:
+    name: "pgbackrest full backup"
+    user: "postgres"
+    job: "/usr/local/bin/pgbackrest-backup.sh full"
+    minute: "{{ pgbackrest_backup_full_cron.minute }}"
+    hour: "{{ pgbackrest_backup_full_cron.hour }}"
+    day: "{{ pgbackrest_backup_full_cron.day }}"
+    month: "{{ pgbackrest_backup_full_cron.month }}"
+    weekday: "{{ pgbackrest_backup_full_cron.weekday }}"
+
+- name: "Setup cron for diff pgBackRest backup"
+  ansible.builtin.cron:
+    name: "pgbackrest diff backup"
+    user: "postgres"
+    job: "/usr/local/bin/pgbackrest-backup.sh diff"
+    minute: "{{ pgbackrest_backup_diff_cron.minute }}"
+    hour: "{{ pgbackrest_backup_diff_cron.hour }}"
+    day: "{{ pgbackrest_backup_diff_cron.day }}"
+    month: "{{ pgbackrest_backup_diff_cron.month }}"
+    weekday: "{{ pgbackrest_backup_diff_cron.weekday }}"

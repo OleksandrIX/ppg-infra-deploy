@@ -7,3 +7,7 @@
 
 - name: "Configure pgBackRest"
   include_tasks: config.yml
+
+- name: "Setup pgBackRest backup cron jobs"
+  include_tasks: cron.yml
+  when: inventory_hostname in postgres_hosts

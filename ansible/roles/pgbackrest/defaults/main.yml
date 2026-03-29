@@ -14,3 +14,18 @@ pgbackrest_repo_path: "/var/lib/pgbackrest"
 pgbackrest_azure_account: "testaccount"
 pgbackrest_azure_key: "testkey"
 pgbackrest_azure_container: "testcontainer"
+
+# Backup schedule (cron format fields)
+pgbackrest_backup_full_cron:
+  minute: "0"
+  hour: "2"
+  day: "*"
+  month: "*"
+  weekday: "0"
+
+pgbackrest_backup_diff_cron:
+  minute: "0"
+  hour: "2"
+  day: "*"
+  month: "*"
+  weekday: "1-6"
