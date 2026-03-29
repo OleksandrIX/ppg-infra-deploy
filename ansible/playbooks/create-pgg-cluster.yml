@@ -41,3 +41,10 @@
       include_role:
         name: "pgbackrest"
         tasks_from: "stanza.yml"
+
+- name: "PostgreSQL Post-Initialization"
+  hosts: "pg_nodes"
+  become: true
+  tags: ["post_init"]
+  roles:
+    - { role: "pg_post_init", tags: ["pg_post_init"] }
