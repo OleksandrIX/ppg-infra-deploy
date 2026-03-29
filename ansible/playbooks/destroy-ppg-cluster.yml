@@ -4,6 +4,7 @@
   become: yes
   vars:
     psql_version: "17"
+    pgbackrest_delete_stanza_on_destroy: true
   tasks:
     - name: Stop and disable all cluster services
       ansible.builtin.systemd:
@@ -16,6 +17,29 @@
         - postgresql
         - etcd
       ignore_errors: yes
+
+    - name: Check if pgBackRest stanza exists before destroy
+      ansible.builtin.command:
+        cmd: "pgbackrest --stanza={{ pgbackrest_stanza }} info"
+      become_user: "postgres"
+      register: pgbackrest_stanza_check
+      changed_when: false
+      failed_when: false
+      run_once: true
+      when:
+        - pgbackrest_delete_stanza_on_destroy | bool
+        - pgbackrest_stanza is defined
+
+    - name: Delete pgBackRest stanza on destroy
+      ansible.builtin.command:
+        cmd: "pgbackrest --stanza={{ pgbackrest_stanza }} stanza-delete --force"
+      become_user: "postgres"
+      run_once: true
+      when:
+        - pgbackrest_delete_stanza_on_destroy | bool
+        - pgbackrest_stanza is defined
+        - pgbackrest_stanza_check is defined
+        - pgbackrest_stanza_check.rc == 0
 
     - name: Uninstall packages (PgBouncer, Percona, Patroni dependencies)
       ansible.builtin.apt:
@@ -58,6 +82,7 @@
         - /var/lib/postgresql/*
         - /var/lib/postgresql/.ssh
         - /etc/logrotate.d/postgresql-common
+        - /etc/profile.d/patronictl.sh
         # --- etcd ---
         - /etc/etcd
         - /var/lib/etcd
@@ -72,15 +97,19 @@
         - /etc/pgbackrest
         - /var/log/pgbackrest
         - /etc/logrotate.d/pgbackrest
+        - /usr/local/bin/pgbackrest-backup.sh
         # --- Percona apt lists ---
         - /var/log/percona
+        - /tmp/percona-release_latest.generic_all.deb
         - /etc/apt/sources.list.d/percona-ppg-{{ psql_version }}-release.list
         - /etc/apt/sources.list.d/percona-ppg-{{ psql_version }}-release.list.bak
         - /etc/apt/sources.list.d/percona-prel-release.list
         - /etc/apt/sources.list.d/percona-prel-release.list.bak
         - /etc/apt/sources.list.d/percona-telemetry-release.list
         - /etc/apt/sources.list.d/percona-telemetry-release.list.bak
+        - /etc/apt/sources.list.d/percona-pmm2-client-release.list
         - /etc/apt/sources.list.d/percona-pmm2-client-release.list.bak
+      ignore_errors: yes
 
     - name: Remove system users (etcd, postgres)
       ansible.builtin.user:
