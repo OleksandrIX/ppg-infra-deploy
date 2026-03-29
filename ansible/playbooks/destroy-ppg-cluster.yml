@@ -21,6 +21,8 @@
       ansible.builtin.apt:
         name:
           - pgbouncer
+          - patroni
+          - percona-patroni
           - percona-postgresql-{{ psql_version }}
           - percona-postgresql-server-dev-{{ psql_version }}
           - percona-release

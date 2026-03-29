@@ -9,7 +9,7 @@
 - name: Install dependencies for Patroni logging and etcd
   ansible.builtin.apt:
     name:
-      - patroni
+      - percona-patroni
       - python3-pythonjsonlogger
       - python3-etcd
       - python3-requests
@@ -20,6 +20,15 @@
       - python3-sdnotify
     state: present
     update_cache: yes
+
+- name: Install patronictl shell alias
+  ansible.builtin.copy:
+    dest: /etc/profile.d/patronictl.sh
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      alias patronictl='patronictl -c /etc/patroni/patroni.yml'
 
 - name: Create Patroni and PostgreSQL directories
   ansible.builtin.file:
@@ -64,7 +73,7 @@
   tags: ["update_dcs"]
   ansible.builtin.template:
     src: patroni.j2
-    dest: /etc/patroni/config.yml
+    dest: /etc/patroni/patroni.yml
     backup: yes
   notify: "reload_patroni"
 
@@ -92,7 +101,7 @@
   tags: ["update_dcs"]
   block:
     - name: "Read generated Patroni config"
-      ansible.builtin.slurp: { src: /etc/patroni/config.yml }
+      ansible.builtin.slurp: { src: /etc/patroni/patroni.yml }
       register: patroni_config_raw
 
     - name: Apply DCS configuration to the running cluster via REST API

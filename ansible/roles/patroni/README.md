@@ -38,7 +38,7 @@ The role also expects the following variables to be defined in inventory or pare
 
 The role installs the following packages:
 
-- `patroni`
+- `percona-patroni`
 - `python3-pythonjsonlogger`
 - `python3-etcd`
 - `python3-requests`
@@ -52,7 +52,7 @@ The role installs the following packages:
 
 | Path | Description |
 |---|---|
-| `/etc/patroni/config.yml` | Patroni configuration file generated from template |
+| `/etc/patroni/patroni.yml` | Patroni configuration file generated from template |
 | `/etc/logrotate.d/postgresql-common` | Logrotate config for PostgreSQL logs |
 
 ## Directory Layout
