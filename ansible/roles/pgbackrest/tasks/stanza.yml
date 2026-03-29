@@ -1,0 +1,16 @@
+---
+- name: "Check if pgBackRest stanza already exists"
+  ansible.builtin.command:
+    cmd: "pgbackrest --stanza={{ pgbackrest_stanza }} info"
+  become_user: "postgres"
+  register: pgbackrest_stanza_check
+  changed_when: false
+  failed_when: false
+  run_once: true
+
+- name: "Create pgBackRest stanza"
+  ansible.builtin.command:
+    cmd: "pgbackrest --stanza={{ pgbackrest_stanza }} stanza-create"
+  become_user: "postgres"
+  run_once: true
+  when: pgbackrest_stanza_check.rc != 0

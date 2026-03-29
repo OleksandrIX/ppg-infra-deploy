@@ -31,3 +31,13 @@
     - { role: "postgresql", tags: ["postgresql"] }
     - { role: "patroni", tags: ["patroni"] }
     - { role: "pgbouncer", tags: ["pgbouncer"] }
+
+- name: "Initialize pgBackRest Stanza"
+  hosts: "pg_nodes"
+  become: true
+  tags: ["backup", "stanza"]
+  tasks:
+    - name: "Create pgBackRest stanza"
+      include_role:
+        name: "pgbackrest"
+        tasks_from: "stanza.yml"
