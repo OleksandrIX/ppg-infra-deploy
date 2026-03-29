@@ -58,8 +58,9 @@ bootstrap:
       use_pg_rewind: true
       use_slots: true
       create_replica_methods:
-        - "pgbackrest"
-        - "basebackup"
+{% for method in patroni_create_replica_methods %}
+        - "{{ method }}"
+{% endfor %}
       pgbackrest:
         command: 'pgbackrest --stanza={{ pgbackrest_stanza }} --delta restore'
         keep_data: true

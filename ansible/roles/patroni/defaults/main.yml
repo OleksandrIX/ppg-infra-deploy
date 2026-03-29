@@ -10,3 +10,6 @@ psql_replication_password: "ReplicationPassword456!"
 patroni_restapi_password: "RestApiPassword789!"
 patroni_restapi_user: "admin"
 pgbackrest_stanza: "ppg-cluster"
+patroni_create_replica_methods:
+  - "basebackup"
+  - "pgbackrest"
