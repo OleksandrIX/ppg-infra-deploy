@@ -13,4 +13,4 @@
     cmd: "pgbackrest --stanza={{ pgbackrest_stanza }} stanza-create"
   become_user: "postgres"
   run_once: true
-  when: pgbackrest_stanza_check.rc != 0
+  when: "pgbackrest_stanza_check.rc != 0 or ('status: error' in (pgbackrest_stanza_check.stdout | lower))"
