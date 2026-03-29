@@ -9,6 +9,7 @@ This directory contains the Ansible configuration used to prepare hosts and depl
 | `ansible.cfg` | Main Ansible configuration |
 | `inventory/dev/` | Static development inventory |
 | `inventory/azure/` | Azure dynamic inventory and Azure-specific variables |
+| `inventory/<environment>/databases/` | Vault-encrypted database spec files for post-initialization |
 | `playbooks/create-pgg-cluster.yml` | Main cluster deployment playbook |
 | `playbooks/destroy-ppg-cluster.yml` | Cluster cleanup playbook |
 | `playbooks/lvm-setup.yml` | Standalone LVM extension playbook |
@@ -29,6 +30,12 @@ Two inventory modes are present:
 
 ```bash
 ansible-playbook playbooks/create-pgg-cluster.yml
+```
+
+Run only PostgreSQL post-initialization (users/databases/grants/extensions):
+
+```bash
+ansible-playbook playbooks/create-pgg-cluster.yml -t post_init
 ```
 
 Static dev inventory example:
@@ -60,6 +67,7 @@ The main playbook applies roles in this order:
 5. `postgresql` on `pg_nodes`
 6. `patroni` on `pg_nodes`
 7. `pgbouncer` on `pg_nodes`
+8. `pg_post_init` on `pg_nodes`
 
 ## Roles
 
@@ -71,6 +79,7 @@ Each role has its own README under `roles/<role>/README.md`:
 - [percona_repo](roles/percona_repo/README.md)
 - [pgbackrest](roles/pgbackrest/README.md)
 - [pgbouncer](roles/pgbouncer/README.md)
+- [pg_post_init](roles/pg_post_init/README.md)
 - [postgresql](roles/postgresql/README.md)
 
 ## Requirements
@@ -85,3 +94,4 @@ Each role has its own README under `roles/<role>/README.md`:
 
 - Sensitive values are stored in Ansible vault files under the relevant inventory group directories.
 - The create playbook runs `pgbackrest` on `db_cluster`, so shared backup-topology variables should be visible to all participating hosts at the correct inventory level.
+- Database post-initialization is managed by specs in `inventory/<environment>/databases/*.yml` (one `database_spec` per file, intended to be encrypted with Ansible Vault).
