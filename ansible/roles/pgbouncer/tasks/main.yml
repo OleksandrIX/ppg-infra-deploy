@@ -48,7 +48,7 @@
 
 - name: Enable and start PgBouncer service
   ansible.builtin.systemd:
-    name: pgbouncer
+    name: percona-pgbouncer
     enabled: yes
     state: started
     daemon_reload: yes
