@@ -32,10 +32,22 @@
     - { role: "patroni", tags: ["patroni"] }
     - { role: "pgbouncer", tags: ["pgbouncer"] }
 
-- name: "Initialize pgBackRest Stanza"
+- name: "Initialize pgBackRest Stanza (Azure)"
   hosts: "pg_nodes"
   become: true
   tags: ["backup", "stanza"]
+  when: pgbackrest_repo_type == "azure"
+  tasks:
+    - name: "Create pgBackRest stanza"
+      include_role:
+        name: "pgbackrest"
+        tasks_from: "stanza.yml"
+
+- name: "Initialize pgBackRest Stanza (posix)"
+  hosts: "pgbackrest_repo"
+  become: true
+  tags: ["backup", "stanza"]
+  when: pgbackrest_repo_type == "posix"
   tasks:
     - name: "Create pgBackRest stanza"
       include_role:
