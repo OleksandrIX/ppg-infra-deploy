@@ -16,7 +16,7 @@ log() {
 
 ROLE=$(curl -sf "${PATRONI_API}" | python3 -c "import sys, json; print(json.load(sys.stdin).get('role', 'unknown'))" 2>/dev/null)
 
-if [ "$ROLE" != "master" ]; then
+if [ "$ROLE" != "primary" ]; then
   log "INFO" "Node is not primary (role: ${ROLE:-unavailable}). Skipping ${BACKUP_TYPE} backup."
   exit 0
 fi
