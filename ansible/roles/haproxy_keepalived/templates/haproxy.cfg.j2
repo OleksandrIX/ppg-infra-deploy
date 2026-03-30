@@ -41,7 +41,7 @@ backend primary_backend
   option httpchk GET /primary
   http-check expect status 200
 {% for host in postgres_hosts %}
-  server {{ host }} {{ hostvars[host]['ansible_default_ipv4']['address'] }}:{{ psql_port }} check port {{ haproxy_patroni_port }} inter 2s fastinter 1s rise 2 fall 2
+  server {{ host }} {{ hostvars[host]['ansible_default_ipv4']['address'] }}:{{ pgbouncer_port }} check port {{ haproxy_patroni_port }} inter 2s fastinter 1s rise 2 fall 2
 {% endfor %}
 
 # Frontend: replicas
@@ -55,5 +55,5 @@ backend replica_backend
   http-check expect status 200
   balance leastconn
 {% for host in postgres_hosts %}
-  server {{ host }} {{ hostvars[host]['ansible_default_ipv4']['address'] }}:{{ psql_port }} check port {{ haproxy_patroni_port }} inter 2s fastinter 1s rise 2 fall 2
+  server {{ host }} {{ hostvars[host]['ansible_default_ipv4']['address'] }}:{{ pgbouncer_port }} check port {{ haproxy_patroni_port }} inter 2s fastinter 1s rise 2 fall 2
 {% endfor %}

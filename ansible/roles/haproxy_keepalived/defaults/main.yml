@@ -9,7 +9,7 @@ haproxy_primary_port: 5000
 haproxy_replica_port: 5001
 haproxy_stats_port: 7000
 haproxy_patroni_port: 8008
-psql_port: 5432
+pgbouncer_port: 6432
 
 # HAProxy statistics credentials
 haproxy_stats_user: "stats"

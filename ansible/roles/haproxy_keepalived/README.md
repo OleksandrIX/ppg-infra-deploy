@@ -27,7 +27,7 @@ The role exposes a floating VIP and routes traffic using Patroni health endpoint
 | `haproxy_replica_port` | `5001` | Frontend port for replicas (RO) |
 | `haproxy_stats_port` | `7000` | HAProxy stats HTTP port |
 | `haproxy_patroni_port` | `8008` | Patroni REST API port used for checks |
-| `psql_port` | `5432` | PostgreSQL backend port |
+| `pgbouncer_port` | `6432` | PgBouncer backend port |
 | `haproxy_stats_user` | `stats` | HAProxy stats basic auth username |
 | `haproxy_stats_password` | `stats_password` | HAProxy stats basic auth password |
 | `postgres_hosts` | `[]` | List of PostgreSQL node hostnames |
@@ -77,6 +77,7 @@ The role expects these values to be provided in inventory/group vars:
 |---|---|---|
 | `5000` | TCP | Client traffic routed to Patroni primary |
 | `5001` | TCP | Client traffic routed to Patroni replicas |
+| `6432` | TCP | PgBouncer backend target on each PostgreSQL node |
 | `7000` | TCP | HAProxy stats page |
 | `8008` | TCP | Patroni REST API check target |
 
