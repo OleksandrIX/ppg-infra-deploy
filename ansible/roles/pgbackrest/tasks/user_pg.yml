@@ -23,40 +23,65 @@
     group: "postgres"
     mode: "0750"
 
-- name: "Configure SSH key-based authentication for pgBackRest"
-  when: pgbackrest_repo_type == "azure"
-  block:
-    - name: "Generate ed25519 key pair using native ssh-keygen"
-      ansible.builtin.command:
-        cmd: 'ssh-keygen -t ed25519 -f {{ psql_home_dir }}/.ssh/id_ed25519 -N "" -q -C "postgres@{{ inventory_hostname }}"'
-      args:
-        creates: "{{ psql_home_dir }}/.ssh/id_ed25519"
+- name: "Generate ed25519 key pair on PostgreSQL host"
+  ansible.builtin.command:
+    cmd: 'ssh-keygen -t ed25519 -f {{ psql_home_dir }}/.ssh/id_ed25519 -N "" -q -C "postgres@{{ inventory_hostname }}"'
+  args:
+    creates: "{{ psql_home_dir }}/.ssh/id_ed25519"
 
-    - name: "Set ownership and permissions for SSH keys"
-      ansible.builtin.file:
-        path: "{{ psql_home_dir }}/.ssh/{{ item.filename }}"
+- name: "Set ownership and permissions for SSH keys"
+  ansible.builtin.file:
+    path: "{{ psql_home_dir }}/.ssh/{{ item.filename }}"
+    owner: "postgres"
+    group: "postgres"
+    mode: "{{ item.mode }}"
+  loop:
+    - { filename: "id_ed25519", mode: "0600" }
+    - { filename: "id_ed25519.pub", mode: "0644" }
+
+- name: "Read PostgreSQL host public key"
+  ansible.builtin.slurp:
+    src: "{{ psql_home_dir }}/.ssh/id_ed25519.pub"
+  register: pg_host_public_key_raw
+
+- name: "Set PostgreSQL host public key fact"
+  ansible.builtin.set_fact:
+    pgbackrest_public_key: "{{ pg_host_public_key_raw.content | b64decode | trim }}"
+
+- name: "Configure SSH trust for POSIX repository"
+  when: pgbackrest_repo_type == "posix"
+  block:
+    - name: "Authorize PostgreSQL host key on repository host"
+      ansible.posix.authorized_key:
+        user: "postgres"
+        state: present
+        key: "{{ pgbackrest_public_key }}"
+        comment: "pgbackrest pg-host key from {{ inventory_hostname }}"
+        manage_dir: true
+      delegate_to: "{{ pgbackrest_repo_host }}"
+
+    - name: "Configure SSH client options for repository host on PostgreSQL host"
+      ansible.builtin.copy:
+        dest: "{{ psql_home_dir }}/.ssh/config"
+        content: |
+          {% for host in pgbackrest_repo_host %}
+          Host {{ hostvars[host]['ansible_default_ipv4']['address'] }}
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+          {% endfor %}
         owner: "postgres"
         group: "postgres"
-        mode: "{{ item.mode }}"
-      loop:
-        - { filename: "id_ed25519", mode: "0600" }
-        - { filename: "id_ed25519.pub", mode: "0644" }
+        mode: "0600"
 
-    - name: "Read the generated public key"
-      ansible.builtin.slurp:
-        src: "{{ psql_home_dir }}/.ssh/id_ed25519.pub"
-      register: slurped_pub_key
-
-    - name: "Set public key as a fact for other hosts to use"
-      ansible.builtin.set_fact:
-        pgbackrest_public_key: "{{ slurped_pub_key.content | b64decode | trim }}"
-
+- name: "Configure SSH trust for Azure repository"
+  when: pgbackrest_repo_type == "azure"
+  block:
     - name: "Add public keys from all other hosts to authorized_keys"
       ansible.posix.authorized_key:
         user: "postgres"
         state: present
         key: "{{ hostvars[item]['pgbackrest_public_key'] }}"
-        comment: "Key from {{ item }}"
+        comment: "pgbackrest pg-host key from {{ item }}"
       loop: "{{ postgres_hosts }}"
       when: item != inventory_hostname
 
