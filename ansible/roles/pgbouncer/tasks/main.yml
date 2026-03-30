@@ -1,7 +1,7 @@
 ---
 - name: Install PgBouncer
   ansible.builtin.apt:
-    name: pgbouncer
+    name: percona-pgbouncer
     state: latest
 
 - name: Create PgBouncer directories

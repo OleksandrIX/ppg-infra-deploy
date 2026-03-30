@@ -5,6 +5,7 @@ Ansible role for installing and configuring [PgBouncer](https://www.pgbouncer.or
 ## Requirements
 
 - Debian-based OS
+- Percona repository should already be configured on the host
 - PgBouncer package must be available from configured repositories
 - PostgreSQL must be installed and accessible locally as user `postgres`
 - Patroni or PostgreSQL should already be running so the role can query the local server

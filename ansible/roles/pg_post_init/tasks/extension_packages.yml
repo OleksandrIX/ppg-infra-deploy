@@ -7,7 +7,7 @@
   ansible.builtin.assert:
     that:
       - extension_package_map is mapping
-    fail_msg: "extension_package_map must be a mapping (dictionary), for example: {postgis: [postgresql-{{ psql_version }}-postgis-3]}"
+    fail_msg: "extension_package_map must be a mapping (dictionary), for example: {postgis: [percona-postgresql-{{ psql_version }}-postgis-3]}"
     quiet: true
 
 - name: Read currently available PostgreSQL extensions on node
