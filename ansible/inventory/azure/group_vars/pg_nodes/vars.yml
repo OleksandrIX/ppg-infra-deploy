@@ -11,7 +11,6 @@ postgres_monitoring_user: "exporter"
 
 # Hosts
 etcd_hosts: "{{ groups['pg_nodes'] }}"
-postgres_hosts: "{{ groups['pg_nodes'] }}"
 allow_connection_hosts: []
 
 # etcd configuration
@@ -21,7 +20,6 @@ etcd_data_dir: "/var/lib/etcd/postgresql"
 
 # PostgreSQL configuration
 psql_home_dir: "/var/lib/postgresql"
-psql_data_dir: "/var/lib/postgresql/data"
 psql_bin_dir: "/usr/lib/postgresql/{{ psql_version }}/bin"
 
 # Patroni configuration
@@ -29,7 +27,6 @@ patroni_scope: "postgresql-cluster"
 patroni_namespace: "/service/"
 
 # pgBackRest configuration
-pgbackrest_user: "pgbackrest"
 pgbackrest_repo_type: "azure"
 pgbackrest_stanza: "ppg-cluster"
 pgbackrest_azure_account: "ppgclusterpgbackrest"

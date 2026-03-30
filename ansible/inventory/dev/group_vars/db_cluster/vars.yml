@@ -2,10 +2,10 @@
 postgres_hosts: "{{ groups['pg_nodes'] }}"
 
 # PostgreSQL configuration
+psql_version: "17"
 psql_data_dir: "/var/lib/postgresql/data"
 
 # pgBackRest configuration
-pgbackrest_user: "pgbackrest"
 pgbackrest_stanza: "ppg-cluster"
 pgbackrest_repo_type: "posix"
 pgbackrest_repo_path: "/mnt/pgbackrest/ppg-cluster"
