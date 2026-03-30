@@ -25,3 +25,16 @@ psql_bin_dir: "/usr/lib/postgresql/{{ psql_version }}/bin"
 # Patroni configuration
 patroni_scope: "postgresql-cluster"
 patroni_namespace: "/service/"
+
+# HAProxy configuration
+haproxy_vip: "10.0.1.100"
+haproxy_vip_interface: "eth0"
+haproxy_vip_cidr: 24
+
+# Keepalived configuration
+keepalived_vrrp_id: 51
+keepalived_base_priority: 100
+keepalived_primary_weight: 20
+keepalived_check_interval: 2
+keepalived_check_fall: 2
+keepalived_check_rise: 2
