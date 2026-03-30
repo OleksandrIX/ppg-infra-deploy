@@ -30,7 +30,6 @@ The role also expects the following variables to be defined outside the role def
 
 | Variable | Description |
 |---|---|
-| `pgbackrest_user` | System user created on the repository host |
 | `psql_home_dir` | Home directory of the `postgres` user on PostgreSQL hosts |
 
 ## Included Task Files
@@ -55,8 +54,8 @@ The role also expects the following variables to be defined outside the role def
 | Path | Owner | Permissions | Description |
 |---|---|---|---|
 | `/etc/pgbackrest` | `postgres:postgres` | `0750` | Configuration directory |
-| `/home/{{ pgbackrest_user }}/.ssh` | `{{ pgbackrest_user }}:{{ pgbackrest_user }}` | `0700` | Repository user SSH directory |
-| `{{ pgbackrest_repo_path }}` | `{{ pgbackrest_user }}:{{ pgbackrest_user }}` | `0750` | POSIX backup repository path |
+| `{{ psql_home_dir }}/.ssh` | `postgres:postgres` | `0700` | PostgreSQL user SSH directory |
+| `{{ pgbackrest_repo_path }}` | `postgres:postgres` | `0750` | POSIX backup repository path |
 | `{{ psql_home_dir }}/.ssh` | `postgres:postgres` | `0700` | PostgreSQL host SSH directory |
 
 ## Example Playbook
@@ -67,7 +66,6 @@ The role also expects the following variables to be defined outside the role def
   become: true
   vars:
     postgres_hosts: "{{ groups['pg_nodes'] }}"
-    pgbackrest_user: "pgbackrest"
     psql_home_dir: "/var/lib/postgresql"
     pgbackrest_stanza: "ppg-cluster"
     pgbackrest_repo_type: "posix"
