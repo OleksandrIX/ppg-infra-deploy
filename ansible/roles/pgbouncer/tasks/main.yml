@@ -35,7 +35,7 @@
     group: postgres
     mode: "0644"
     backup: yes
-  notify: "reload pgbouncer"
+  notify: "restart pgbouncer"
 
 - name: Generate PgBouncer userlist.txt from variables
   ansible.builtin.template:
@@ -44,7 +44,7 @@
     owner: postgres
     group: postgres
     mode: "0640"
-  notify: "reload pgbouncer"
+  notify: "restart pgbouncer"
 
 - name: Enable and start PgBouncer service
   ansible.builtin.systemd:

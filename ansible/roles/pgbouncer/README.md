@@ -50,7 +50,7 @@ PgBouncer forwards traffic to the local PostgreSQL listener on port `5432`.
 
 | Handler | Trigger | Action |
 |---|---|---|
-| `reload pgbouncer` | PgBouncer config or userlist changed | Reloads the `pgbouncer` service |
+| `restart pgbouncer` | PgBouncer config or userlist changed | Restart the `pgbouncer` service |
 
 ## Example Playbook
 

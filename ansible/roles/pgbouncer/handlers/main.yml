@@ -1,5 +1,5 @@
 ---
-- name: reload pgbouncer
+- name: restart pgbouncer
   ansible.builtin.systemd:
     name: percona-pgbouncer
-    state: reloaded
+    state: restarted
