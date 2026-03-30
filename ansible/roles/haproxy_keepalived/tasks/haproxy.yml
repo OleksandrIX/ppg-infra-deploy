@@ -35,12 +35,12 @@
     owner: root
     group: haproxy
     mode: "0640"
-    validate: "percona-haproxy -c -f %s"
-  notify: "reload percona-haproxy"
+    validate: "haproxy -c -f %s"
+  notify: "reload haproxy"
 
-- name: Enable and start percona-haproxy service
+- name: Enable and start haproxy service
   ansible.builtin.systemd:
-    name: percona-haproxy
+    name: haproxy
     state: started
     enabled: true
     daemon_reload: true

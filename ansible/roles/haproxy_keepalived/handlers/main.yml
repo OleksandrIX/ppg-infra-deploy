@@ -1,7 +1,7 @@
 ---
-- name: "reload percona-haproxy"
+- name: "reload haproxy"
   ansible.builtin.systemd:
-    name: percona-haproxy
+    name: haproxy
     state: reloaded
 
 - name: "restart keepalived"

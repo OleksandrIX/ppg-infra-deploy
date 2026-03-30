@@ -85,7 +85,7 @@ The role expects these values to be provided in inventory/group vars:
 
 | Handler | Trigger | Action |
 |---|---|---|
-| `reload percona-haproxy` | HAProxy config changed | Reloads `percona-haproxy` service |
+| `reload haproxy` | HAProxy config changed | Reloads `haproxy` service |
 | `restart keepalived` | Keepalived config changed | Restarts `keepalived` service |
 
 ## Example Playbook

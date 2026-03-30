@@ -8,6 +8,6 @@
   create 0640 haproxy adm
   sharedscripts
   postrotate
-    systemctl reload percona-haproxy > /dev/null 2>&1 || true
+    systemctl reload haproxy > /dev/null 2>&1 || true
   endscript
 }
