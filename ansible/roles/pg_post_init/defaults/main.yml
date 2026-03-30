@@ -36,4 +36,5 @@ allowed_grant_privileges:
     - "ALL"
     - "EXECUTE"
 
-extension_package_map: {}
+extension_package_map:
+  postgis: "percona-postgresql-{{ psql_version }}-postgis-3"
