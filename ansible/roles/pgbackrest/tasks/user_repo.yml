@@ -14,3 +14,54 @@
     owner: "postgres"
     group: "postgres"
     mode: "0750"
+
+- name: "Configure SSH access from repository host to PostgreSQL hosts"
+  when: pgbackrest_repo_type == "posix"
+  block:
+    - name: "Generate ed25519 key pair on repository host"
+      ansible.builtin.command:
+        cmd: 'ssh-keygen -t ed25519 -f {{ psql_home_dir }}/.ssh/id_ed25519 -N "" -q -C "postgres@{{ inventory_hostname }}"'
+      args:
+        creates: "{{ psql_home_dir }}/.ssh/id_ed25519"
+
+    - name: "Set ownership and permissions for repository SSH keys"
+      ansible.builtin.file:
+        path: "{{ psql_home_dir }}/.ssh/{{ item.filename }}"
+        owner: "postgres"
+        group: "postgres"
+        mode: "{{ item.mode }}"
+      loop:
+        - { filename: "id_ed25519", mode: "0600" }
+        - { filename: "id_ed25519.pub", mode: "0644" }
+
+    - name: "Read repository host public key"
+      ansible.builtin.slurp:
+        src: "{{ psql_home_dir }}/.ssh/id_ed25519.pub"
+      register: repo_host_public_key_raw
+
+    - name: "Set repository host public key fact"
+      ansible.builtin.set_fact:
+        repo_host_public_key: "{{ repo_host_public_key_raw.content | b64decode | trim }}"
+
+    - name: "Authorize repository host key on PostgreSQL hosts"
+      ansible.posix.authorized_key:
+        user: "postgres"
+        state: present
+        key: "{{ repo_host_public_key }}"
+        comment: "pgbackrest repo-host key"
+        manage_dir: true
+      loop: "{{ postgres_hosts }}"
+      delegate_to: "{{ item }}"
+
+    - name: "Configure SSH client options for PostgreSQL hosts on repository host"
+      ansible.builtin.copy:
+        dest: "{{ psql_home_dir }}/.ssh/config"
+        content: |
+          {% for host in postgres_hosts %}
+          Host {{ hostvars[host]['ansible_default_ipv4']['address'] }}
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+          {% endfor %}
+        owner: "postgres"
+        group: "postgres"
+        mode: "0600"

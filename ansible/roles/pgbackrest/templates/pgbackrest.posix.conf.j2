@@ -40,7 +40,7 @@ log-level-console=info
 #================================================================================
 [{{ pgbackrest_stanza }}]
 {% if pgbackrest_repo_host == inventory_hostname %}
-{% for host in postgres_hosts | reject('equalto', inventory_hostname) %}
+{% for host in postgres_hosts %}
 pg{{ loop.index }}-path={{ psql_data_dir }}
 pg{{ loop.index }}-host={{ hostvars[host]['ansible_default_ipv4']['address'] }}
 pg{{ loop.index }}-host-user=postgres

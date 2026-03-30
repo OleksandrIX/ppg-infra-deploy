@@ -38,8 +38,8 @@ The role also expects the following variables to be defined outside the role def
 |---|---|
 | `install.yml` | Installs `percona-pgbackrest` and removes the default config |
 | `user.yml` | Dispatches SSH/user setup for repository and PostgreSQL hosts |
-| `user_repo.yml` | Creates the repository system user and repository directories |
-| `user_pg.yml` | Prepares SSH keys and trust on PostgreSQL hosts |
+| `user_repo.yml` | Prepares repository directories and configures SSH trust from repo host to PostgreSQL hosts in POSIX mode |
+| `user_pg.yml` | Prepares SSH directories on PostgreSQL hosts and configures peer trust for Azure mode |
 | `config.yml` | Generates pgBackRest configuration and logrotate files |
 
 ## Installed Files
@@ -54,9 +54,10 @@ The role also expects the following variables to be defined outside the role def
 | Path | Owner | Permissions | Description |
 |---|---|---|---|
 | `/etc/pgbackrest` | `postgres:postgres` | `0750` | Configuration directory |
-| `{{ psql_home_dir }}/.ssh` | `postgres:postgres` | `0700` | PostgreSQL user SSH directory |
+| `{{ psql_home_dir }}/.ssh` | `postgres:postgres` | `0700` | SSH directory for `postgres` user |
 | `{{ pgbackrest_repo_path }}` | `postgres:postgres` | `0750` | POSIX backup repository path |
-| `{{ psql_home_dir }}/.ssh` | `postgres:postgres` | `0700` | PostgreSQL host SSH directory |
+| `{{ psql_home_dir }}/.ssh/id_ed25519` | `postgres:postgres` | `0600` | Repository SSH private key in POSIX mode |
+| `{{ psql_home_dir }}/.ssh/id_ed25519.pub` | `postgres:postgres` | `0644` | Repository SSH public key in POSIX mode |
 
 ## Example Playbook
 
@@ -78,6 +79,8 @@ The role also expects the following variables to be defined outside the role def
 ## Notes
 
 - In POSIX mode the repository host is addressed via `hostvars[pgbackrest_repo_host]['ansible_default_ipv4']['address']`.
+- In POSIX mode SSH keys are generated on the repository host and the repository public key is installed on all PostgreSQL hosts.
+- In POSIX mode stanza on the repository host includes all hosts from `postgres_hosts`, while each PostgreSQL host keeps only `pg1-path` in stanza.
 - In Azure mode the role configures peer SSH trust between PostgreSQL hosts using generated ed25519 keys.
 - Both configuration templates enable AES-256-CBC repository encryption and a fixed retention policy of 3 full and 1 differential backup.
 - The role assumes PostgreSQL hosts are reachable by the IP addresses available in `hostvars`.
