@@ -1,0 +1,13 @@
+---
+- name: Assert haproxy_vip is defined
+  ansible.builtin.assert:
+    that:
+      - haproxy_vip | length > 0
+    fail_msg: "haproxy_vip must be set (e.g. in group_vars/pg_nodes/vars.yml)"
+    quiet: true
+
+- name: Install and configure HAProxy
+  include_tasks: haproxy.yml
+
+- name: Install and configure Keepalived
+  include_tasks: keepalived.yml

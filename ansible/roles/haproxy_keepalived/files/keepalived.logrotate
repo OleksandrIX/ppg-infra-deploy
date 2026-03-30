@@ -1,0 +1,13 @@
+/var/log/keepalived/*.log {
+  daily
+  missingok
+  rotate 7
+  compress
+  delaycompress
+  notifempty
+  create 0640 root adm
+  sharedscripts
+  postrotate
+      systemctl kill -s HUP keepalived > /dev/null 2>&1 || true
+  endscript
+}

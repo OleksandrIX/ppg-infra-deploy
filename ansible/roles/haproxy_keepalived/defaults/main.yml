@@ -1,0 +1,28 @@
+---
+# HAProxy VIP
+haproxy_vip: ""
+haproxy_vip_interface: "{{ ansible_default_ipv4.interface }}"
+haproxy_vip_cidr: 24
+
+# HAProxy ports
+haproxy_primary_port: 5000
+haproxy_replica_port: 5001
+haproxy_stats_port: 7000
+haproxy_patroni_port: 8008
+psql_port: 5432
+
+# HAProxy statistics credentials
+haproxy_stats_user: "stats"
+haproxy_stats_password: "stats_password"
+
+# PostgreSQL nodes
+postgres_hosts: []
+
+# Keepalived VRRP settings
+keepalived_vrrp_id: 51
+keepalived_vrrp_password: "vrrp_secret"
+keepalived_base_priority: 100
+keepalived_primary_weight: 20
+keepalived_check_interval: 2
+keepalived_check_fall: 2
+keepalived_check_rise: 2

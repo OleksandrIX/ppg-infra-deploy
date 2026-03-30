@@ -1,0 +1,38 @@
+global_defs {
+  router_id {{ inventory_hostname }}
+  script_user root
+  enable_script_security
+}
+
+# Health check: succeeds when this node is the Patroni primary.
+# On success, the vrrp_instance weight gets a +{{ keepalived_primary_weight }} boost,
+# which makes the primary PG node win the VRRP election and hold the VIP.
+vrrp_script chk_patroni_primary {
+  script "/usr/bin/curl -sf http://127.0.0.1:{{ haproxy_patroni_port }}/primary"
+  interval {{ keepalived_check_interval }}
+  fall     {{ keepalived_check_fall }}
+  rise     {{ keepalived_check_rise }}
+  weight   {{ keepalived_primary_weight }}
+}
+
+vrrp_instance VI_1 {
+  state BACKUP
+  interface {{ haproxy_vip_interface }}
+  virtual_router_id {{ keepalived_vrrp_id }}
+  priority {{ keepalived_base_priority }}
+  advert_int 1
+  nopreempt
+
+  authentication {
+    auth_type PASS
+    auth_pass {{ keepalived_vrrp_password }}
+  }
+
+  virtual_ipaddress {
+    {{ haproxy_vip }}/{{ haproxy_vip_cidr }} dev {{ haproxy_vip_interface }}
+  }
+
+  track_script {
+    chk_patroni_primary
+  }
+}
