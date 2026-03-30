@@ -67,12 +67,10 @@ The main playbook applies roles in this order:
 5. `postgresql` on `pg_nodes`
 6. `patroni` on `pg_nodes`
 7. `pgbouncer` on `pg_nodes`
-8. `haproxy_keepalived` on `pg_nodes`
+8. `haproxy_keepalived` on `pg_nodes` (only when `pgbackrest_repo_type != "azure"`)
 9. `pg_post_init` on `pg_nodes`
 
-Optional role (if included in playbook):
-
-9. `haproxy_keepalived` on `pg_nodes`## Roles
+## Roles
 
 Each role has its own README under `roles/<role>/README.md`:
 
