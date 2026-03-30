@@ -36,23 +36,23 @@
   hosts: "pg_nodes"
   become: true
   tags: ["backup", "stanza"]
-  when: pgbackrest_repo_type == "azure"
   tasks:
     - name: "Create pgBackRest stanza"
       include_role:
         name: "pgbackrest"
         tasks_from: "stanza.yml"
+      when: pgbackrest_repo_type == "azure"
 
 - name: "Initialize pgBackRest Stanza (posix)"
   hosts: "pgbackrest_repo"
   become: true
   tags: ["backup", "stanza"]
-  when: pgbackrest_repo_type == "posix"
   tasks:
     - name: "Create pgBackRest stanza"
       include_role:
         name: "pgbackrest"
         tasks_from: "stanza.yml"
+      when: pgbackrest_repo_type == "posix"
 
 - name: "PostgreSQL Post-Initialization"
   hosts: "pg_nodes"
