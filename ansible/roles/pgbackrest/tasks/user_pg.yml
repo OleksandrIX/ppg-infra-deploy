@@ -64,11 +64,9 @@
       ansible.builtin.copy:
         dest: "{{ psql_home_dir }}/.ssh/config"
         content: |
-          {% for host in pgbackrest_repo_host %}
-          Host {{ hostvars[host]['ansible_default_ipv4']['address'] }}
+          Host {{ hostvars[pgbackrest_repo_host]['ansible_default_ipv4']['address'] }}
             StrictHostKeyChecking no
             UserKnownHostsFile /dev/null
-          {% endfor %}
         owner: "postgres"
         group: "postgres"
         mode: "0600"
