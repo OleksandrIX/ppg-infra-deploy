@@ -2,7 +2,7 @@
 - name: "Copy pgBackRest backup script for Azure"
   when: pgbackrest_repo_type == "azure" and inventory_hostname in postgres_hosts
   ansible.builtin.template:
-    src: "pgbackrest-backup.j2"
+    src: "pgbackrest-backup.azure.j2"
     dest: "/usr/local/bin/pgbackrest-backup.sh"
     owner: "postgres"
     group: "postgres"
@@ -11,7 +11,7 @@
 - name: "Copy pgBackRest backup script for POSIX"
   when: pgbackrest_repo_type == "posix" and inventory_hostname == pgbackrest_repo_host
   ansible.builtin.template:
-    src: "pgbackrest-backup-posix.j2"
+    src: "pgbackrest-backup.posix.j2"
     dest: "/usr/local/bin/pgbackrest-backup.sh"
     owner: "postgres"
     group: "postgres"
