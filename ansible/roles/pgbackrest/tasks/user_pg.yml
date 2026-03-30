@@ -15,6 +15,14 @@
     group: "postgres"
     mode: "0600"
 
+- name: "Ensure pgBackRest lock directory is owned by postgres"
+  ansible.builtin.file:
+    path: "/tmp/pgbackrest"
+    state: directory
+    owner: "postgres"
+    group: "postgres"
+    mode: "0750"
+
 - name: "Configure SSH key-based authentication for pgBackRest"
   when: pgbackrest_repo_type == "azure"
   block:

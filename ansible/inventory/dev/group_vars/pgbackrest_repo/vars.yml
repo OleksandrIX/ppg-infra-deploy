@@ -1,4 +1,4 @@
 ansible_user: devgis
 
 # For pgbackrest ssh configuration
-psql_data_dir: "/var/lib/pgsql"
+psql_home_dir: "/var/lib/pgsql"

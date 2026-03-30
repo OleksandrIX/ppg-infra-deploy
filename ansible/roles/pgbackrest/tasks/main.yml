@@ -10,4 +10,3 @@
 
 - name: "Setup pgBackRest backup cron jobs"
   include_tasks: cron.yml
-  when: inventory_hostname in postgres_hosts and pgbackrest_repo_type == "azure"
