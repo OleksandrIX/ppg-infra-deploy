@@ -18,6 +18,7 @@ Ansible role for installing and configuring [Patroni](https://patroni.readthedoc
 | `psql_bin_dir` | `/usr/lib/postgresql/{{ psql_version }}/bin` | Path to PostgreSQL binaries |
 | `psql_superuser_password` | `SuperSecretPassword123!` | Password for PostgreSQL superuser `postgres` |
 | `psql_replication_password` | `ReplicationPassword456!` | Password for replication user `replicator` |
+| `psql_password_encryption` | `scram-sha-256` | Password encryption and `pg_hba` auth method used in generated Patroni config |
 | `patroni_scope` | `postgresql-cluster-example` | Patroni cluster scope name |
 | `patroni_namespace` | `/example/` | Key prefix used in etcd DCS |
 | `patroni_restapi_user` | `admin` | HTTP basic auth user for the Patroni REST API |
@@ -109,4 +110,5 @@ The generated configuration also connects to etcd over HTTP on port `2379` using
 - The role stops and disables the default `postgresql` systemd service before enabling Patroni.
 - Patroni is configured to use `pgbackrest` as the preferred replica restore method and `basebackup` as fallback.
 - After the service starts, the role waits for the local Patroni health endpoint and, if available, patches the running DCS configuration via `http://127.0.0.1:8008/config`.
+- `psql_password_encryption` is rendered into both PostgreSQL `password_encryption` and generated `pg_hba` rules, so values such as `scram-sha-256` and `md5` affect cluster authentication behavior.
 - The generated `pg_hba` includes all hosts from `postgres_hosts` plus any extra hosts from `allow_connection_hosts`.
