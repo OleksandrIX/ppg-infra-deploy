@@ -40,7 +40,7 @@ module "database_cluster" {
   subnet_id           = module.network.database_subnet_id
   subnet_prefix       = var.database_subnet[0]
 
-  vm_count         = 3
+  vm_count         = var.vm_count
   vm_name_prefix   = "percona-node"
   admin_username   = var.admin_username
   ssh_public_key   = file(var.ssh_pub_key_path)

@@ -40,6 +40,12 @@ variable "ssh_pub_key_path" {
   default     = "~/.ssh/azure-ppg-cluster.pub"
 }
 
+variable "vm_count" {
+  description = "Number of VMs to create in the database cluster"
+  type        = number
+  default     = 3
+}
+
 variable "admin_ip" {
   description = "My public IP address for SSH access to Jumpbox"
   type        = string
