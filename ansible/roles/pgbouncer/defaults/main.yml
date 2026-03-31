@@ -1,4 +1,8 @@
 ---
+# PostgreSQL settings
 postgres_monitoring_user: "exporter"
+psql_password_encryption: "scram-sha-256"
+
+# PgBouncer settings
 pgbouncer_auth_user: "pgbouncer_auth"
 pgbouncer_auth_password: "pgbouncer_auth_password"

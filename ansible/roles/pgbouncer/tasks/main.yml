@@ -27,6 +27,10 @@
 - name: Set up PgBouncer authentication
   include_tasks: pgbouncer_auth.yml
 
+- name: Set PgBouncer userlist password value
+  ansible.builtin.set_fact:
+    pgbouncer_userlist_password: "{{ 'md5' ~ ((pgbouncer_auth_password ~ pgbouncer_auth_user) | hash('md5')) if (psql_password_encryption | lower) == 'md5' else pgbouncer_auth_password }}"
+
 - name: Copy PgBouncer config
   ansible.builtin.template:
     src: pgbouncer.j2
