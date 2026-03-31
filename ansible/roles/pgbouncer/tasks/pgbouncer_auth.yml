@@ -25,14 +25,3 @@
       ansible.builtin.file:
         path: /tmp/pgbouncer_auth_setup.sql
         state: absent
-
-- name: Get hashed password from PostgreSQL for PgBouncer user
-  ansible.builtin.command: psql -U postgres -tAc "SELECT passwd FROM pg_catalog.pg_shadow WHERE usename = '{{ pgbouncer_auth_user }}';"
-  become_user: postgres
-  register: pg_hash_result
-  changed_when: false
-
-- name: Set pgbouncer_hashed_pass fact
-  ansible.builtin.set_fact:
-    pgbouncer_hashed_pass: "{{ pg_hash_result.stdout | trim }}"
-  when: pg_hash_result.stdout | trim != ""

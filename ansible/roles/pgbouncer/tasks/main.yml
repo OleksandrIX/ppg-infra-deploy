@@ -43,7 +43,7 @@
     dest: /etc/pgbouncer/userlist.txt
     owner: postgres
     group: postgres
-    mode: "0640"
+    mode: "0600"
   notify: "restart pgbouncer"
 
 - name: Enable and start PgBouncer service
