@@ -15,6 +15,14 @@ vrrp_script chk_patroni_primary {
   weight   {{ keepalived_primary_weight }}
 }
 
+# Service check: VIP must not stay on a node where HAProxy is down.
+vrrp_script chk_haproxy {
+  script "/usr/bin/systemctl is-active --quiet haproxy"
+  interval {{ keepalived_check_interval }}
+  fall     {{ keepalived_check_fall }}
+  rise     {{ keepalived_check_rise }}
+}
+
 vrrp_instance VI_1 {
   state BACKUP
   interface {{ haproxy_vip_interface }}
@@ -34,5 +42,6 @@ vrrp_instance VI_1 {
 
   track_script {
     chk_patroni_primary
+    chk_haproxy
   }
 }
