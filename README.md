@@ -4,27 +4,28 @@ Infrastructure and configuration repository for provisioning a Percona PostgreSQ
 
 ## Overview
 
-The repository is split into two main parts:
+The repository is split into two layers:
 
-- `terraform/` provisions Azure infrastructure such as the resource group, virtual network, jumpbox, database VMs, and backup storage.
-- `ansible/` configures the hosts into a working PostgreSQL HA stack built from Percona PostgreSQL, etcd, Patroni, pgBackRest, and PgBouncer.
+- `src/` contains reusable source code (Ansible roles/playbooks/config and Terraform modules).
+- `envs/` contains environment entrypoints (variables, inventories, and Terraform root modules) that consume code from `src/`.
 
 ## Repository Layout
 
 | Path | Description |
 |---|---|
-| `ansible/` | Ansible configuration, inventories, playbooks, and roles |
-| `terraform/environments/dev/` | Azure development environment entrypoint |
-| `terraform/modules/` | Reusable Terraform modules for compute, network, and storage |
+| `src/ansible/` | Shared Ansible code: `ansible.cfg`, playbooks, and roles |
+| `src/terraform/modules/` | Shared Terraform modules: `network`, `compute`, `storage` |
+| `envs/test-azure/` | Azure-backed environment entrypoint (Terraform + Ansible inventory/group vars) |
+| `envs/test-selfh/` | Self-hosted/testing environment entrypoint |
 
 ## Documentation
 
-- Ansible documentation: [ansible/README.md](ansible/README.md)
-- Terraform entrypoint: `terraform/environments/dev/`
+- Ansible documentation: [src/ansible/README.md](src/ansible/README.md)
+- Terraform modules: [src/terraform/modules](src/terraform/modules)
 
 ## Terraform
 
-The development environment in `terraform/environments/dev/` creates:
+The Azure environment in `envs/test-azure/terraform/` creates:
 
 - one Azure resource group
 - one virtual network with database and jumpbox subnets
@@ -35,14 +36,27 @@ The development environment in `terraform/environments/dev/` creates:
 Typical workflow:
 
 ```bash
-cd terraform/environments/dev
+cd envs/test-azure/terraform
 terraform init
 terraform plan -var "admin_ip=<your-public-ip>"
 terraform apply -var "admin_ip=<your-public-ip>"
 ```
 
+Module sources in environment Terraform files point to `src/terraform/modules/*`.
+
+## Ansible
+
+Environment-specific Ansible data is stored under `envs/<environment>/ansible/` (inventory/group vars/databases), while shared automation logic remains in `src/ansible/`.
+
+Typical workflow after infrastructure is ready:
+
+```bash
+cd src/ansible
+ansible-playbook -i ../../envs/test-azure/ansible/inventory_azure_rm.yml playbooks/create-pgg-cluster.yml
+```
+
 ## Notes
 
-- Ansible-specific setup, inventories, playbooks, and role documentation are described in [ansible/README.md](ansible/README.md).
-- The repository currently contains a checked-in `terraform.tfstate` under `terraform/environments/dev/`; if that is intentional, keep it controlled carefully.
+- Ansible role/playbook details are described in [src/ansible/README.md](src/ansible/README.md).
+- Keep environment secrets in Vault files under `envs/<environment>/ansible/group_vars/**/vault.yml`.
 
