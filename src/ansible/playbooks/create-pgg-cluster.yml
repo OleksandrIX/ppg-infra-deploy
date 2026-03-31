@@ -32,7 +32,7 @@
     - { role: "patroni", tags: ["patroni"] }
     - { role: "pgbouncer", tags: ["pgbouncer"] }
     - role: "haproxy_keepalived"
-      when: pgbackrest_repo_type | default("posix") != "azure"
+      when: haproxy_keepalived_enabled | default(false)
       tags: ["haproxy_keepalived"]
 
 - name: "Initialize pgBackRest Stanza (Azure)"
