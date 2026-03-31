@@ -21,7 +21,7 @@ defaults
   retries 3
 
 # Stats page
-frontend stats
+listen stats
   bind *:{{ haproxy_stats_port }}
   mode http
   stats enable
@@ -31,29 +31,23 @@ frontend stats
   stats show-node
   stats auth {{ haproxy_stats_user }}:{{ haproxy_stats_password }}
 
-# Frontend: primary
-frontend primary
+# Listen: primary
+listen primary
   bind {{ haproxy_vip }}:{{ haproxy_primary_port }}
-  default_backend primary_backend
-
-# Backend: primary
-backend primary_backend
   option httpchk GET /primary
   http-check expect status 200
+  default-server inter 2s fastinter 1s rise 2 fall 2 on-marked-down shutdown-sessions
 {% for host in postgres_hosts %}
-  server {{ host }} {{ hostvars[host]['ansible_default_ipv4']['address'] }}:{{ pgbouncer_port }} check port {{ haproxy_patroni_port }} inter 2s fastinter 1s rise 2 fall 2
+  server {{ host }} {{ hostvars[host]['ansible_default_ipv4']['address'] }}:{{ pgbouncer_port }} check port {{ haproxy_patroni_port }}
 {% endfor %}
 
-# Frontend: replicas
-frontend replicas
+# Listen: replicas
+listen replicas
   bind {{ haproxy_vip }}:{{ haproxy_replica_port }}
-  default_backend replica_backend
-
-# Backend: replicas
-backend replica_backend
   option httpchk GET /replica
   http-check expect status 200
   balance leastconn
+  default-server inter 2s fastinter 1s rise 2 fall 2 on-marked-down shutdown-sessions
 {% for host in postgres_hosts %}
-  server {{ host }} {{ hostvars[host]['ansible_default_ipv4']['address'] }}:{{ pgbouncer_port }} check port {{ haproxy_patroni_port }} inter 2s fastinter 1s rise 2 fall 2
+  server {{ host }} {{ hostvars[host]['ansible_default_ipv4']['address'] }}:{{ pgbouncer_port }} check port {{ haproxy_patroni_port }}
 {% endfor %}
