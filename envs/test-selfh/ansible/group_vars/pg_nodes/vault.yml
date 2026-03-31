@@ -1,0 +1,19 @@
+# PostgreSQL secrets
+psql_superuser_password: "x9RW5SNP7ST449wbMuUwaVpZSvyKEsK4Y7SShz5QSs"
+psql_replication_password: "eqUz5FJiZuktJUdA7vhkLqKx2yVuF5btsZYmrPPHMb"
+
+# PgBouncer secrets
+pgbouncer_auth_user: "pgbouncer_auth"
+pgbouncer_auth_password: "KU5uhdbkZREtdDHJP3xYZXAL7FVxY3ZKj2m5QuDEzY"
+
+# Patroni secrets
+patroni_restapi_password: "EbAqf5T7dpjrAd3rz7mbZ4zPpZYwzoCp3vgRswiEWQ"
+patroni_restapi_user: "admin"
+
+# pgBackRest secrets
+pgbackrest_cipher_pass: "i37dwFTiqcF75QKqCXJyqZSNr7XukfrgFnNv7sk4yp"
+
+# HAProxy + Keepalived secrets
+haproxy_stats_user: "stats"
+haproxy_stats_password: "9ZkpRzP7WSxDYYEENDb3RtZAtXtjEnCu"
+keepalived_vrrp_password: "V49ToyZk"

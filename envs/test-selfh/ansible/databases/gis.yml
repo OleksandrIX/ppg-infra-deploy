@@ -1,0 +1,16 @@
+database_spec:
+  name: "gis"
+  owner: "gis_user"
+  encoding: "UTF8"
+
+  users:
+    - name: "gis_user"
+      password: "superpassword"
+      role_attr_flags: "LOGIN"
+      grants:
+        - type: "database"
+          privs: "ALL"
+          grant_option: true
+
+  extensions:
+    - "postgis"
