@@ -8,8 +8,8 @@ resource "ansible_group" "pg_nodes" {
 }
 
 resource "ansible_host" "pg_node" {
-  count = module.database_cluster.vm_count
-  name  = "${module.database_cluster.vm_name_prefix}-vm-${count.index}"
+  count = var.vm_count
+  name  = "percona-node-vm-${count.index}"
   groups = [
     ansible_group.pg_nodes.name
   ]
