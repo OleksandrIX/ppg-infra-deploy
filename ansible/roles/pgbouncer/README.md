@@ -22,7 +22,7 @@ Ansible role for installing and configuring [PgBouncer](https://www.pgbouncer.or
 
 | File | Description |
 |---|---|
-| `pgbouncer_auth.yml` | Creates the auth role and lookup function on the leader node and reads the password hash |
+| `pgbouncer_auth.yml` | Creates the auth role and lookup function on the leader node |
 
 ## Installed Files
 
@@ -69,5 +69,4 @@ PgBouncer forwards traffic to the local PostgreSQL listener on port `5432`.
 ## Notes
 
 - The role determines whether the local node is the PostgreSQL leader using `SELECT pg_is_in_recovery();` and only creates the auth function on the leader.
-- `userlist.txt` is generated from the password hash fetched from PostgreSQL, not from the clear-text password variable.
 - The default database mapping sends all PgBouncer traffic to the local PostgreSQL instance on `{{ ansible_default_ipv4.address }}:5432`.
