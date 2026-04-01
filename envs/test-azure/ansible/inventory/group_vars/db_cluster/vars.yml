@@ -1,5 +1,5 @@
 # Ansible variables
-ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q oleksandrix@{{ hostvars[groups["jumpbox"][0]]["ansible_host"] }}"'
+# ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q oleksandrix@{{ hostvars[groups["jumpbox"][0]]["ansible_host"] }}"'
 
 # Hosts
 postgres_hosts: "{{ groups['pg_nodes'] }}"
