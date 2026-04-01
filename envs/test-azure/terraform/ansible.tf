@@ -1,4 +1,3 @@
-
 locals {
   environment       = "test-azure"
   jumpbox_ip        = one(values(module.jumpbox.vm_details)).public_ip
