@@ -1,5 +1,4 @@
 locals {
-  environment       = "test-azure"
   jumpbox_ip        = one(values(module.jumpbox.vm_details)).public_ip
   ssh_priv_key_path = pathexpand("~/.ssh/azure-ppg-cluster")
   proxy_common_args = "-o ProxyCommand=\"ssh -W %h:%p -q ${var.admin_username}@${local.jumpbox_ip}\" -o StrictHostKeyChecking=no"
@@ -35,7 +34,7 @@ resource "terraform_data" "create_cluster" {
     command = <<-EOT
       set -eu
       "${path.module}/../../../scripts/run-create-cluster.sh" \
-        "${local.environment}" \
+        "${var.environment}" \
         "${var.admin_username}" \
         "${local.jumpbox_ip}" \
         "${local.ssh_priv_key_path}" \

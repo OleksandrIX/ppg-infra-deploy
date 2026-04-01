@@ -50,3 +50,9 @@ variable "admin_ip" {
   description = "My public IP address for SSH access to Jumpbox"
   type        = string
 }
+
+variable "environment" {
+  description = "Environment name"
+  type        = string
+  default     = "test-azure"
+}
