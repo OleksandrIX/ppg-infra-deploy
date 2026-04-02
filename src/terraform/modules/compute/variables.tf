@@ -67,3 +67,8 @@ variable "data_disk_size_gb" {
   type    = number
   default = 64
 }
+
+variable "storage_container_id" {
+  description = "ID of the Azure Storage container for role assignment scope"
+  type        = string
+}

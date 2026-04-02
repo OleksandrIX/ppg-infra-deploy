@@ -78,3 +78,12 @@ resource "azurerm_virtual_machine_data_disk_attachment" "data_attach" {
   lun                = 10
   caching            = "ReadOnly"
 }
+
+resource "azurerm_role_assignment" "pgbackrest_blob_data_contributor" {
+  count                            = var.vm_count
+  scope                            = var.storage_container_id
+  role_definition_name             = "Storage Blob Data Contributor"
+  principal_id                     = azurerm_linux_virtual_machine.vm[count.index].identity[0].principal_id
+  principal_type                   = "ServicePrincipal"
+  skip_service_principal_aad_check = true
+}
