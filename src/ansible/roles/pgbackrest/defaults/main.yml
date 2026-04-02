@@ -13,6 +13,7 @@ pgbackrest_repo_path: "/var/lib/pgbackrest"
 # For Azure storage configuration
 pgbackrest_azure_account: "testaccount"
 pgbackrest_azure_key: "testkey"
+pgbackrest_azure_key_type: "auto" # Options: "auto", "shared", "sas"
 pgbackrest_azure_container: "testcontainer"
 
 # Backup schedule (cron format fields)

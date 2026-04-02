@@ -12,5 +12,9 @@
   ansible.builtin.command:
     cmd: "pgbackrest --stanza={{ pgbackrest_stanza }} stanza-create"
   become_user: "postgres"
+  register: pgbackrest_stanza_create
+  retries: 10
+  delay: 15
+  until: pgbackrest_stanza_create.rc == 0
   run_once: true
   when: "pgbackrest_stanza_check.rc != 0 or ('status: error' in (pgbackrest_stanza_check.stdout | lower))"

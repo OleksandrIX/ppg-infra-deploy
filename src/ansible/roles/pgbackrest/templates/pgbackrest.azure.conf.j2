@@ -7,8 +7,11 @@ repo1-type=azure
 repo1-path=/{{ pgbackrest_stanza }}-backups
 
 repo1-azure-account={{ pgbackrest_azure_account }}
-repo1-azure-key={{ pgbackrest_azure_key }}
 repo1-azure-container={{ pgbackrest_azure_container }}
+repo1-azure-key-type={{ pgbackrest_azure_key_type }}
+{% if pgbackrest_azure_key_type != 'auto' and (pgbackrest_azure_key | default('') | length > 0) %}
+repo1-azure-key={{ pgbackrest_azure_key }}
+{% endif %}
 
 # --- ENCRYPTION SETTINGS --------------------------------------------------------
 repo1-cipher-pass={{ pgbackrest_cipher_pass }}
