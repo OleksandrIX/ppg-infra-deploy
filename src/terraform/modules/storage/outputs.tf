@@ -13,3 +13,8 @@ output "storage_container_name" {
   value       = azurerm_storage_container.pgbackrest_repo.name
   description = "Storage Container name"
 }
+
+output "storage_container_id" {
+  value       = azurerm_storage_container.pgbackrest_repo.id
+  description = "Storage Container resource ID"
+}
