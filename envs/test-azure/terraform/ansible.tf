@@ -45,6 +45,7 @@ resource "terraform_data" "create_cluster" {
     working_dir = path.module
 
     environment = {
+      VAULT_PASSWORD_FILES       = pathexpand("~/.secrets/.ppg_cluster_vault_pass")
       PGBACKREST_AZURE_ACCOUNT   = module.pgbackrest_storage.storage_account_name
       PGBACKREST_AZURE_CONTAINER = module.pgbackrest_storage.storage_container_name
     }
@@ -56,7 +57,6 @@ resource "terraform_data" "create_cluster" {
         "${var.admin_username}" \
         "${local.jumpbox_ip}" \
         "${local.ssh_priv_key_path}" \
-        "${pathexpand("~/.secrets/.ppg_cluster_vault_pass")}" \
         "${join(",", local.db_node_private_ips)}"
     EOT
   }

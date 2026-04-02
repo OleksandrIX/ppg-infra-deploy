@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ "$#" -ne 6 ]]; then
-  echo "Usage: $0 <environment> <admin_user> <jumpbox_public_ip> <ssh_private_key_path> <vault_password_file> <db_node_private_ips_csv>" >&2
+if [[ "$#" -ne 5 ]]; then
+  echo "Usage: $0 <environment> <admin_user> <jumpbox_public_ip> <ssh_private_key_path> <db_node_private_ips_csv>" >&2
   exit 2
 fi
 
@@ -18,8 +18,7 @@ readonly environment="$1"
 readonly admin_user="$2"
 readonly jumpbox_ip="$3"
 readonly ssh_priv_key_path="$4"
-readonly vault_password_file="$5"
-readonly db_node_private_ips_csv="$6"
+readonly db_node_private_ips_csv="$5"
 readonly ssh_dir="$HOME/.ssh"
 mkdir -p "$ssh_dir"
 
@@ -85,7 +84,6 @@ ansible_args=(
   "$repo_root/src/ansible/playbooks/create-pgg-cluster.yml"
   -e "files_glob=$repo_root/envs/$environment/ansible/databases/*.yml"
   -e "ansible_ssh_common_args=-F$tmp_ssh_config"
-  --vault-password-file "$vault_password_file"
 )
 
 if [[ -n "$tmp_extra_vars" ]]; then
