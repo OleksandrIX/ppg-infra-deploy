@@ -1,6 +1,7 @@
 locals {
   jumpbox_ip        = one(values(module.jumpbox.vm_details)).public_ip
   ssh_priv_key_path = pathexpand("~/.ssh/azure-ppg-cluster")
+  vault_password_file = pathexpand("~/.secrets/.ppg_cluster_vault_pass")
 
   db_node_private_ips = [
     for vm_name in sort(keys(module.database_cluster.vm_details)) :
@@ -45,7 +46,6 @@ resource "terraform_data" "create_cluster" {
     working_dir = path.module
 
     environment = {
-      VAULT_PASSWORD_FILES       = pathexpand("~/.secrets/.ppg_cluster_vault_pass")
       PGBACKREST_AZURE_ACCOUNT   = module.pgbackrest_storage.storage_account_name
       PGBACKREST_AZURE_CONTAINER = module.pgbackrest_storage.storage_container_name
     }
@@ -57,7 +57,10 @@ resource "terraform_data" "create_cluster" {
         "${var.admin_username}" \
         "${local.jumpbox_ip}" \
         "${local.ssh_priv_key_path}" \
-        "${join(",", local.db_node_private_ips)}"
+        "${join(",", local.db_node_private_ips)}" \
+        "${var.vm_name_prefix}" \
+        "${local.vault_password_file}" \
+        "inventory_azure_rm.yml,topology.yml"
     EOT
   }
 }
