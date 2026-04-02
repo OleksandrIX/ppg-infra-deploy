@@ -1,6 +1,6 @@
 locals {
-  jumpbox_ip        = one(values(module.jumpbox.vm_details)).public_ip
-  ssh_priv_key_path = pathexpand("~/.ssh/azure-ppg-cluster")
+  jumpbox_ip          = one(values(module.jumpbox.vm_details)).public_ip
+  ssh_priv_key_path   = pathexpand("~/.ssh/azure-ppg-cluster")
   vault_password_file = pathexpand("~/.secrets/.ppg_cluster_vault_pass")
 
   db_node_private_ips = [
