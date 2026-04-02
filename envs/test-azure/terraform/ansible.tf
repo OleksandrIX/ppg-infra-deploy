@@ -7,21 +7,28 @@ locals {
     module.database_cluster.vm_details[vm_name].private_ip
   ]
 
-  inventory_hash = sha1(join("", [
-    for f in sort(fileset("${path.module}/../ansible/inventory", "**")) :
-    filemd5("${path.module}/../ansible/inventory/${f}")
-  ]))
-
-  playbooks_hash = sha1(join("", [
-    for f in sort(fileset("${path.module}/../../../src/ansible/playbooks", "**")) :
-    filemd5("${path.module}/../../../src/ansible/playbooks/${f}")
-  ]))
+  ansible_hash = sha1(join("", concat(
+    [
+      for f in sort(fileset("${path.module}/../ansible/inventory", "**")) :
+      filemd5("${path.module}/../ansible/inventory/${f}")
+    ],
+    [
+      for f in sort(fileset("${path.module}/../../../src/ansible/playbooks", "**")) :
+      filemd5("${path.module}/../../../src/ansible/playbooks/${f}")
+    ],
+    [
+      for f in sort(fileset("${path.module}/../../../src/ansible/roles", "**")) :
+      filemd5("${path.module}/../../../src/ansible/roles/${f}")
+    ],
+    [
+      filemd5("${path.module}/../../../src/ansible/ansible.cfg")
+    ]
+  )))
 
   create_cluster_triggers = {
     cluster_vms = sha1(jsonencode(module.database_cluster.vm_details))
     jumpbox_vms = sha1(jsonencode(module.jumpbox.vm_details))
-    inventory   = local.inventory_hash
-    playbooks   = local.playbooks_hash
+    ansible     = local.ansible_hash
     run_script  = filemd5("${path.module}/../../../scripts/run-create-cluster.sh")
   }
 }
