@@ -13,6 +13,19 @@ module "network" {
   admin_ip            = var.admin_ip
 }
 
+module "pgbackrest_storage" {
+  source               = "../../../src/terraform/modules/storage"
+  resource_group_name  = azurerm_resource_group.rg.name
+  location             = azurerm_resource_group.rg.location
+  storage_account_name = "ppgclusterpgbackrest"
+  container_name       = "pgbackrest-repo"
+
+  tags = {
+    AnsibleGroup = "pgbackrest"
+    Environment  = "dev"
+  }
+}
+
 module "jumpbox" {
   source              = "../../../src/terraform/modules/compute"
   resource_group_name = azurerm_resource_group.rg.name
@@ -26,6 +39,8 @@ module "jumpbox" {
   ssh_public_key   = file(var.ssh_pub_key_path)
   assign_public_ip = true
   vm_size          = "Standard_D2s_v4"
+
+  storage_container_id = module.pgbackrest_storage.storage_container_id
 
   tags = {
     AnsibleGroup = "jumpbox"
@@ -50,35 +65,12 @@ module "database_cluster" {
   create_data_disk  = true
   data_disk_size_gb = 128
 
+  storage_container_id = module.pgbackrest_storage.storage_container_id
+
+  depends_on = [module.pgbackrest_storage]
+
   tags = {
     AnsibleGroup = "pg_nodes"
     Environment  = "dev"
   }
-}
-
-module "pgbackrest_storage" {
-  source               = "../../../src/terraform/modules/storage"
-  resource_group_name  = azurerm_resource_group.rg.name
-  location             = azurerm_resource_group.rg.location
-  storage_account_name = "ppgclusterpgbackrest"
-  container_name       = "pgbackrest-repo"
-
-  tags = {
-    AnsibleGroup = "pgbackrest"
-    Environment  = "dev"
-  }
-}
-
-resource "azurerm_role_assignment" "pgbackrest_blob_data_contributor" {
-  for_each = {
-    for vm_name, principal_id in module.database_cluster.vm_identity_principal_ids :
-    vm_name => principal_id
-    if principal_id != null
-  }
-
-  scope                            = module.pgbackrest_storage.storage_container_id
-  role_definition_name             = "Storage Blob Data Contributor"
-  principal_id                     = each.value
-  principal_type                   = "ServicePrincipal"
-  skip_service_principal_aad_check = true
 }

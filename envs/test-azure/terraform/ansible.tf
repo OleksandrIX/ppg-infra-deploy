@@ -30,7 +30,6 @@ resource "terraform_data" "create_cluster" {
   depends_on = [
     module.database_cluster,
     module.pgbackrest_storage,
-    azurerm_role_assignment.pgbackrest_blob_data_contributor,
   ]
 
   triggers_replace = values(local.create_cluster_triggers)
