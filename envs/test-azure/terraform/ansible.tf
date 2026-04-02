@@ -12,14 +12,17 @@ locals {
     [
       for f in sort(fileset("${path.module}/../ansible/inventory", "**")) :
       filemd5("${path.module}/../ansible/inventory/${f}")
+      if !endswith(lower(f), ".md")
     ],
     [
       for f in sort(fileset("${path.module}/../../../src/ansible/playbooks", "**")) :
       filemd5("${path.module}/../../../src/ansible/playbooks/${f}")
+      if !endswith(lower(f), ".md")
     ],
     [
       for f in sort(fileset("${path.module}/../../../src/ansible/roles", "**")) :
       filemd5("${path.module}/../../../src/ansible/roles/${f}")
+      if !endswith(lower(f), ".md")
     ],
     [
       filemd5("${path.module}/../../../src/ansible/ansible.cfg")
