@@ -30,6 +30,7 @@ resource "terraform_data" "create_cluster" {
   depends_on = [
     module.database_cluster,
     module.pgbackrest_storage,
+    azurerm_role_assignment.pgbackrest_blob_data_contributor,
   ]
 
   triggers_replace = values(local.create_cluster_triggers)
@@ -38,7 +39,6 @@ resource "terraform_data" "create_cluster" {
     working_dir = path.module
 
     environment = {
-      PGBACKREST_AZURE_KEY       = module.pgbackrest_storage.storage_account_primary_key
       PGBACKREST_AZURE_ACCOUNT   = module.pgbackrest_storage.storage_account_name
       PGBACKREST_AZURE_CONTAINER = module.pgbackrest_storage.storage_container_name
     }

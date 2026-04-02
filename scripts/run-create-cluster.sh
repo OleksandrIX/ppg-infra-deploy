@@ -62,12 +62,9 @@ done
 
 chmod 600 "$tmp_ssh_config"
 
-if [ -n "${PGBACKREST_AZURE_KEY:-}" ] || [ -n "${PGBACKREST_AZURE_ACCOUNT:-}" ] || [ -n "${PGBACKREST_AZURE_CONTAINER:-}" ]; then
+if [ -n "${PGBACKREST_AZURE_ACCOUNT:-}" ] || [ -n "${PGBACKREST_AZURE_CONTAINER:-}" ]; then
   tmp_extra_vars="$(mktemp /tmp/ppg-extra-vars.XXXXXX.yml)"
   : > "$tmp_extra_vars"
-  if [ -n "${PGBACKREST_AZURE_KEY:-}" ]; then
-    printf "pgbackrest_azure_key: '%s'\n" "$PGBACKREST_AZURE_KEY" >> "$tmp_extra_vars"
-  fi
   if [ -n "${PGBACKREST_AZURE_ACCOUNT:-}" ]; then
     printf "pgbackrest_azure_account: '%s'\n" "$PGBACKREST_AZURE_ACCOUNT" >> "$tmp_extra_vars"
   fi

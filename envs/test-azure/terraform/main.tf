@@ -4,7 +4,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 module "network" {
-  source = "../../../src/terraform/modules/network"
+  source              = "../../../src/terraform/modules/network"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   vnet                = var.vnet
@@ -67,4 +67,18 @@ module "pgbackrest_storage" {
     AnsibleGroup = "pgbackrest"
     Environment  = "dev"
   }
+}
+
+resource "azurerm_role_assignment" "pgbackrest_blob_data_contributor" {
+  for_each = {
+    for vm_name, principal_id in module.database_cluster.vm_identity_principal_ids :
+    vm_name => principal_id
+    if principal_id != null
+  }
+
+  scope                            = module.pgbackrest_storage.storage_container_id
+  role_definition_name             = "Storage Blob Data Contributor"
+  principal_id                     = each.value
+  principal_type                   = "ServicePrincipal"
+  skip_service_principal_aad_check = true
 }
