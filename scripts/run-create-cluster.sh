@@ -1,30 +1,33 @@
-#!/usr/bin/env sh
-set -eu
+#!/usr/bin/env bash
+set -euo pipefail
 
-if [ "$#" -ne 6 ]; then
+if [[ "$#" -ne 6 ]]; then
   echo "Usage: $0 <environment> <admin_user> <jumpbox_public_ip> <ssh_private_key_path> <vault_password_file> <db_node_private_ips_csv>" >&2
   exit 2
 fi
 
-environment="$1"
-admin_user="$2"
-jumpbox_ip="$3"
-ssh_priv_key_path="$4"
-vault_password_file="$5"
-db_node_private_ips_csv="$6"
+# Cleanup function for trap
+cleanup() {
+  rm -f "$tmp_ssh_config"
+  [[ -n "$tmp_extra_vars" ]] && rm -f "$tmp_extra_vars"
+}
+trap cleanup EXIT INT TERM
 
-ssh_dir="$HOME/.ssh"
+# Set readonly variables from script arguments
+readonly environment="$1"
+readonly admin_user="$2"
+readonly jumpbox_ip="$3"
+readonly ssh_priv_key_path="$4"
+readonly vault_password_file="$5"
+readonly db_node_private_ips_csv="$6"
+readonly ssh_dir="$HOME/.ssh"
 mkdir -p "$ssh_dir"
+
+# Temporary files variables
 tmp_ssh_config="$(mktemp "$ssh_dir/ppg-tmp-ssh-config.XXXXXX")"
 tmp_extra_vars=""
 
-cleanup() {
-  rm -f "$tmp_ssh_config"
-  rm -f "$tmp_extra_vars"
-}
-
-trap cleanup EXIT INT TERM
-
+# Generate SSH config
 {
   echo "Host jumpbox"
   echo "  HostName $jumpbox_ip"
@@ -35,18 +38,14 @@ trap cleanup EXIT INT TERM
   echo ""
 } > "$tmp_ssh_config"
 
-old_ifs="$IFS"
-IFS=','
-set -- $db_node_private_ips_csv
-IFS="$old_ifs"
-
-if [ "$#" -lt 1 ]; then
-  echo "Expected at least 1 database node IP, got $#" >&2
+IFS=',' read -ra node_ips <<< "$db_node_private_ips_csv"
+if [[ "${#node_ips[@]}" -lt 1 ]]; then
+  echo "Expected at least 1 database node IP, got ${#node_ips[@]}" >&2
   exit 2
 fi
 
-idx=0
-for node_ip in "$@"; do
+for idx in "${!node_ips[@]}"; do
+  node_ip="${node_ips[$idx]}"
   {
     echo "Host percona-node-vm-$idx $node_ip"
     echo "  HostName $node_ip"
@@ -57,38 +56,41 @@ for node_ip in "$@"; do
     echo "  UserKnownHostsFile /dev/null"
     echo ""
   } >> "$tmp_ssh_config"
-  idx=$((idx + 1))
 done
 
 chmod 600 "$tmp_ssh_config"
 
-if [ -n "${PGBACKREST_AZURE_ACCOUNT:-}" ] || [ -n "${PGBACKREST_AZURE_CONTAINER:-}" ]; then
+# Handle optional extra vars for Azure
+if [[ -n "${PGBACKREST_AZURE_ACCOUNT:-}" || -n "${PGBACKREST_AZURE_CONTAINER:-}" ]]; then
   tmp_extra_vars="$(mktemp /tmp/ppg-extra-vars.XXXXXX.yml)"
-  : > "$tmp_extra_vars"
-  if [ -n "${PGBACKREST_AZURE_ACCOUNT:-}" ]; then
+
+  [[ -n "${PGBACKREST_AZURE_ACCOUNT:-}" ]] && \
     printf "pgbackrest_azure_account: '%s'\n" "$PGBACKREST_AZURE_ACCOUNT" >> "$tmp_extra_vars"
-  fi
-  if [ -n "${PGBACKREST_AZURE_CONTAINER:-}" ]; then
+
+  [[ -n "${PGBACKREST_AZURE_CONTAINER:-}" ]] && \
     printf "pgbackrest_azure_container: '%s'\n" "$PGBACKREST_AZURE_CONTAINER" >> "$tmp_extra_vars"
-  fi
+
   chmod 600 "$tmp_extra_vars"
 fi
 
-script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
-repo_root="$(CDPATH= cd -- "$script_dir/.." && pwd)"
-
+# Determine script directories securely
+readonly script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+readonly repo_root="$(cd "$script_dir/.." &>/dev/null && pwd)"
 export ANSIBLE_CONFIG="$repo_root/src/ansible/ansible.cfg"
 
-set -- \
-  -i "$repo_root/envs/$environment/ansible/inventory/inventory_azure_rm.yml" \
-  -i "$repo_root/envs/$environment/ansible/inventory/topology.yml" \
-  "$repo_root/src/ansible/playbooks/create-pgg-cluster.yml" \
-  -e "files_glob=$repo_root/envs/$environment/ansible/databases/*.yml" \
-  -e "ansible_ssh_common_args=-F$tmp_ssh_config" \
+# Build Ansible command arguments dynamically using bash arrays
+ansible_args=(
+  -i "$repo_root/envs/$environment/ansible/inventory/inventory_azure_rm.yml"
+  -i "$repo_root/envs/$environment/ansible/inventory/topology.yml"
+  "$repo_root/src/ansible/playbooks/create-pgg-cluster.yml"
+  -e "files_glob=$repo_root/envs/$environment/ansible/databases/*.yml"
+  -e "ansible_ssh_common_args=-F$tmp_ssh_config"
   --vault-password-file "$vault_password_file"
+)
 
-if [ -n "$tmp_extra_vars" ]; then
-  set -- "$@" -e "@$tmp_extra_vars"
+if [[ -n "$tmp_extra_vars" ]]; then
+  ansible_args+=("-e" "@$tmp_extra_vars")
 fi
 
-ansible-playbook "$@"
+# Replace current shell with ansible process
+exec ansible-playbook "${ansible_args[@]}"
