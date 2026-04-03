@@ -50,6 +50,30 @@ variable "vm_size" {
   default = "Standard_D2s_v5"
 }
 
+variable "create_ansible_host" {
+  description = "Whether to create a dedicated host for running Ansible deployment"
+  type        = bool
+  default     = true
+}
+
+variable "ansible_host_name" {
+  description = "Name of the VM used as Ansible deployment host"
+  type        = string
+  default     = "ppg-ansible-host"
+}
+
+variable "ansible_host_vm_size" {
+  description = "Size of the Ansible deployment host VM"
+  type        = string
+  default     = "Standard_B2s"
+}
+
+variable "ansible_host_private_ip_hostnumber" {
+  description = "Host number in subnet_prefix used for static private IP of Ansible host"
+  type        = number
+  default     = 250
+}
+
 variable "create_data_disk" {
   description = "Whether to create an additional disk for the database cluster (true/false)"
   type        = bool
