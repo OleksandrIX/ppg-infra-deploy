@@ -31,6 +31,7 @@ The Azure environment in `envs/test-azure/terraform/` creates:
 - one virtual network with database and jumpbox subnets
 - one jumpbox VM with a public IP
 - three PostgreSQL nodes with attached data disks
+- one Azure internal load balancer with a static private IP
 - one Azure storage account and container for pgBackRest
 
 Typical workflow:
