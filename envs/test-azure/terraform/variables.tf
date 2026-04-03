@@ -4,12 +4,6 @@ variable "resource_group_name" {
   default     = "rg-ppg-cluster-dev"
 }
 
-variable "location" {
-  description = "Azure region for deployment"
-  type        = string
-  default     = "polandcentral"
-}
-
 variable "virtual_network_name" {
   description = "Existing virtual network name where postgres subnet exists"
   type        = string
@@ -17,11 +11,6 @@ variable "virtual_network_name" {
 
 variable "postgres_percona_subnet_name" {
   description = "Existing subnet name for postgres-percona deployment"
-  type        = string
-}
-
-variable "subnet_prefix" {
-  description = "CIDR prefix of the existing subnet (used for static IP allocation)"
   type        = string
 }
 
