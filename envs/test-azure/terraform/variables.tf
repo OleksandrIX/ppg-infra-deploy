@@ -109,11 +109,18 @@ variable "database_lb_rules" {
 
   default = {
     primary = {
-      frontend_port      = 5432
+      frontend_port      = 5000
       backend_port       = 6432
       probe_port         = 8008
       probe_protocol     = "Http"
       probe_request_path = "/primary"
+    }
+    replica = {
+      frontend_port      = 5001
+      backend_port       = 6432
+      probe_port         = 8008
+      probe_protocol     = "Http"
+      probe_request_path = "/replica"
     }
   }
 }
