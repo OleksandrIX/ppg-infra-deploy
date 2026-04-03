@@ -6,9 +6,9 @@ resource "azurerm_network_interface" "ansible_host_nic" {
   tags                = var.tags
 
   ip_configuration {
-    name                          = "internal"
+    name                          = var.nic_ip_configuration_name
     subnet_id                     = var.subnet_id
-    private_ip_address_allocation = "Static"
+    private_ip_address_allocation = var.private_ip_address_allocation
     private_ip_address            = cidrhost(var.subnet_prefix, var.ansible_host_private_ip_hostnumber)
   }
 }
@@ -32,14 +32,14 @@ resource "azurerm_linux_virtual_machine" "ansible_host" {
   }
 
   os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Premium_LRS"
+    caching              = var.os_disk_caching
+    storage_account_type = var.os_disk_storage_account_type
   }
 
   source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts"
-    version   = "latest"
+    publisher = var.image_publisher
+    offer     = var.image_offer
+    sku       = var.image_sku
+    version   = var.image_version
   }
 }
