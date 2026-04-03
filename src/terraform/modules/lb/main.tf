@@ -1,7 +1,7 @@
 locals {
   backend_ip_map = {
-    for ip_address in var.backend_ip_addresses :
-    replace(ip_address, ".", "-") => ip_address
+    for index, ip_address in var.backend_ip_addresses :
+    tostring(index) => ip_address
   }
 
   rules = {
