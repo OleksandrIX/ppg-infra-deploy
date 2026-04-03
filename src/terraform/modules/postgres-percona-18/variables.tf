@@ -8,11 +8,6 @@ variable "location" {
   type        = string
 }
 
-variable "vnet_id" {
-  description = "Virtual network ID"
-  type        = string
-}
-
 variable "subnet_id" {
   description = "Subnet ID for VM network interfaces"
   type        = string

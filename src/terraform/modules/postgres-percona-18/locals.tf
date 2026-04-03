@@ -1,7 +1,15 @@
 locals {
-  lb_backend_ip_map = {
-    for i, nic in azurerm_network_interface.nic :
-    tostring(i) => nic.ip_configuration[0].private_ip_address
+  vm_data_disks = {
+    for pair in flatten([
+      for vm_i in range(var.cluster_vm.count) : [
+        for disk_cfg in var.data_disks : {
+          key        = "${vm_i}-lun-${disk_cfg.lun}"
+          vm_index   = vm_i
+          disk_lun   = disk_cfg.lun
+          config     = disk_cfg
+        }
+      ]
+    ]) : pair.key => pair
   }
 
   lb_rules = {
@@ -18,25 +26,11 @@ locals {
     }
   }
 
-  lb_rule_backend_address_map = {
-    for pair in setproduct(keys(local.lb_rules), keys(local.lb_backend_ip_map)) :
+  nic_backend_assoc = {
+    for pair in setproduct(range(var.cluster_vm.count), keys(local.lb_rules)) :
     "${pair[0]}-${pair[1]}" => {
-      rule_name  = pair[0]
-      ip_address = local.lb_backend_ip_map[pair[1]]
-      index      = pair[1]
+      nic_index = pair[0]
+      rule_name = tostring(pair[1])
     }
-  }
-
-  vm_data_disks = {
-    for pair in flatten([
-      for vm_i in range(var.cluster_vm.count) : [
-        for disk_cfg in var.data_disks : {
-          key        = "${vm_i}-lun-${disk_cfg.lun}"
-          vm_index   = vm_i
-          disk_lun   = disk_cfg.lun
-          config     = disk_cfg
-        }
-      ]
-    ]) : pair.key => pair
   }
 }

@@ -19,13 +19,12 @@ resource "azurerm_lb_backend_address_pool" "backend_pool" {
   loadbalancer_id = azurerm_lb.lb.id
 }
 
-resource "azurerm_lb_backend_address_pool_address" "backend_pool_address" {
-  for_each = local.lb_rule_backend_address_map
+resource "azurerm_network_interface_backend_address_pool_association" "nic_backend_assoc" {
+  for_each = local.nic_backend_assoc
 
-  name                    = "${var.lb.name}-${each.value.rule_name}-backend-${each.value.index}"
+  network_interface_id    = azurerm_network_interface.nic[each.value.nic_index].id
+  ip_configuration_name   = var.cluster_vm.nic_ip_configuration_name
   backend_address_pool_id = azurerm_lb_backend_address_pool.backend_pool[each.value.rule_name].id
-  virtual_network_id      = var.vnet_id
-  ip_address              = each.value.ip_address
 }
 
 resource "azurerm_lb_probe" "health_probe" {
