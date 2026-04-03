@@ -10,22 +10,19 @@ variable "location" {
   default     = "polandcentral"
 }
 
-variable "vnet" {
-  description = "Virtual network address space"
-  type        = list(string)
-  default     = ["10.0.0.0/16"]
+variable "virtual_network_name" {
+  description = "Existing virtual network name where postgres subnet exists"
+  type        = string
 }
 
-variable "database_subnet" {
-  description = "Database subnet address space"
-  type        = list(string)
-  default     = ["10.0.1.0/24"]
+variable "postgres_percona_subnet_name" {
+  description = "Existing subnet name for postgres-percona deployment"
+  type        = string
 }
 
-variable "jumpbox_subnet" {
-  description = "Jumpbox subnet address space"
-  type        = list(string)
-  default     = ["10.0.2.0/24"]
+variable "subnet_prefix" {
+  description = "CIDR prefix of the existing subnet (used for static IP allocation)"
+  type        = string
 }
 
 variable "admin_username" {
@@ -40,23 +37,8 @@ variable "ssh_pub_key_path" {
   default     = "~/.ssh/azure-ppg-cluster.pub"
 }
 
-variable "admin_ip" {
-  description = "My public IP address for SSH access to Jumpbox"
-  type        = string
-}
-
 variable "environment" {
   description = "Environment name"
-  type        = string
-}
-
-variable "storage_account_name" {
-  description = "Name of the storage account for pgBackRest repository"
-  type        = string
-}
-
-variable "container_name" {
-  description = "Name of the storage container for pgBackRest repository"
   type        = string
 }
 
