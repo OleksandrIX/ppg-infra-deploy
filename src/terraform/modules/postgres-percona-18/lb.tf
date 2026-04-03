@@ -19,8 +19,8 @@ resource "azurerm_lb_backend_address_pool" "backend_pool" {
   loadbalancer_id = azurerm_lb.lb.id
 }
 
-resource "azurerm_network_interface_backend_address_pool_association" "nic_backend_assoc" {
-  for_each = local.nic_backend_assoc
+resource "azurerm_network_interface_backend_address_pool_association" "nic_backend_association" {
+  for_each = local.nic_backend_association
 
   network_interface_id    = azurerm_network_interface.nic[each.value.nic_index].id
   ip_configuration_name   = var.cluster_vm.nic_ip_configuration_name

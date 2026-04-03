@@ -26,7 +26,7 @@ locals {
     }
   }
 
-  nic_backend_assoc = {
+  nic_backend_association = {
     for pair in setproduct(range(var.cluster_vm.count), keys(local.lb_rules)) :
     "${pair[0]}-${pair[1]}" => {
       nic_index = pair[0]
