@@ -3,7 +3,6 @@ resource "azurerm_network_interface" "ansible_host_nic" {
   name                = "${var.ansible_host.name}-nic"
   location            = var.location
   resource_group_name = var.resource_group_name
-  tags                = var.tags
 
   ip_configuration {
     name                          = var.cluster_vm.nic_ip_configuration_name
@@ -20,7 +19,6 @@ resource "azurerm_linux_virtual_machine" "ansible_host" {
   location            = var.location
   size                = var.ansible_host.vm_size
   admin_username      = var.admin_username
-  tags                = var.tags
 
   network_interface_ids = [
     azurerm_network_interface.ansible_host_nic[0].id,

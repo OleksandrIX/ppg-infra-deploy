@@ -35,12 +35,6 @@ variable "ssh_public_key" {
   type        = string
 }
 
-variable "tags" {
-  description = "Tags to apply to the virtual machines"
-  type        = map(string)
-  default     = {}
-}
-
 variable "ansible_host" {
   description = "Dedicated host configuration for running Ansible deployment"
   type = object({

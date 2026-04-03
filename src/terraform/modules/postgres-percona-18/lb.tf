@@ -3,7 +3,6 @@ resource "azurerm_lb" "lb" {
   location            = var.location
   resource_group_name = var.resource_group_name
   sku                 = var.lb.sku
-  tags                = var.tags
 
   frontend_ip_configuration {
     name                          = var.lb.frontend_configuration_name
