@@ -13,17 +13,19 @@ variable "vnet" {
   type        = list(string)
 }
 
+variable "vnet_name" {
+  description = "Virtual network name"
+  type        = string
+  default     = "vnet-ppg-cluster"
+}
+
 variable "database_subnet" {
   description = "Database subnet address space"
   type        = list(string)
 }
 
-variable "jumpbox_subnet" {
-  description = "Jumpbox subnet address space"
-  type        = list(string)
-}
-
-variable "admin_ip" {
-  description = "Allowed IP address for SSH access"
+variable "database_subnet_name" {
+  description = "Database subnet name"
   type        = string
+  default     = "snet-database"
 }
