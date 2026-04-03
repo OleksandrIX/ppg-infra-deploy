@@ -88,3 +88,44 @@ variable "data_disk_size_gb" {
   type        = number
   default     = 64
 }
+
+variable "database_lb_private_ip" {
+  description = "Static private IP address for the internal Azure load balancer"
+  type        = string
+}
+
+variable "database_lb_rules" {
+  description = "Map of internal load balancer rules keyed by logical rule name"
+  type = map(object({
+    frontend_port           = number
+    backend_port            = optional(number)
+    protocol                = optional(string)
+    probe_port              = optional(number)
+    probe_protocol          = optional(string)
+    probe_request_path      = optional(string)
+    idle_timeout_in_minutes = optional(number)
+    disable_outbound_snat   = optional(bool)
+  }))
+
+  default = {
+    primary = {
+      frontend_port      = 5432
+      backend_port       = 6432
+      probe_port         = 8008
+      probe_protocol     = "Http"
+      probe_request_path = "/primary"
+    }
+  }
+}
+
+variable "database_lb_probe_interval_in_seconds" {
+  description = "Health probe interval for the internal load balancer"
+  type        = number
+  default     = 5
+}
+
+variable "database_lb_number_of_probes" {
+  description = "Number of failed probes before marking a backend unhealthy"
+  type        = number
+  default     = 2
+}

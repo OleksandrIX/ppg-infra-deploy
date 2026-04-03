@@ -71,3 +71,27 @@ module "database_cluster" {
     Environment  = var.environment
   }
 }
+
+module "database_lb" {
+  source                      = "../../../src/terraform/modules/lb"
+  name                        = "percona-postgresql-lb"
+  resource_group_name         = azurerm_resource_group.rg.name
+  location                    = azurerm_resource_group.rg.location
+  backend_vnet_id             = module.network.vnet_id
+  frontend_subnet_id          = module.network.database_subnet_id
+  frontend_private_ip_address = var.database_lb_private_ip
+  probe_interval_in_seconds   = var.database_lb_probe_interval_in_seconds
+  number_of_probes            = var.database_lb_number_of_probes
+
+  backend_ip_addresses = [
+    for vm_name in sort(keys(module.database_cluster.vm_details)) :
+    module.database_cluster.vm_details[vm_name].private_ip
+  ]
+
+  rules = var.database_lb_rules
+
+  tags = {
+    Environment = var.environment
+    Role        = "database-lb"
+  }
+}
