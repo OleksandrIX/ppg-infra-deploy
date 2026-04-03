@@ -105,29 +105,33 @@ variable "cluster_vm" {
   }
 }
 
-variable "data_disk" {
-  description = "Additional data disk configuration for cluster VMs"
-  type = object({
-    create               = bool
+variable "data_disks" {
+  description = "List of data disks to create per cluster VM. Each disk has independent parameters. Empty list = no disks."
+  type = list(object({
     storage_account_type = string
     create_option        = string
     size_gb              = number
-    attachment_lun       = number
-    attachment_caching   = string
-  })
+    lun                  = number
+    caching              = string
+  }))
 
-  default = {
-    create               = false
-    storage_account_type = "Premium_LRS"
-    create_option        = "Empty"
-    size_gb              = 64
-    attachment_lun       = 10
-    attachment_caching   = "ReadOnly"
-  }
+  default = []
+  # data_disks = [
+  #   {
+  #     storage_account_type = "Premium_ZRS"
+  #     create_option        = "Empty"
+  #     size_gb              = 256
+  #     lun                  = 10
+  #     caching              = "ReadOnly"
+  #   },
+  # ]
 
   validation {
-    condition     = contains(["Standard_LRS", "StandardSSD_ZRS", "Premium_LRS", "PremiumV2_LRS", "Premium_ZRS", "StandardSSD_LRS", "UltraSSD_LRS"], var.data_disk.storage_account_type)
-    error_message = "data_disk.storage_account_type must be one of: Standard_LRS, StandardSSD_ZRS, Premium_LRS, PremiumV2_LRS, Premium_ZRS, StandardSSD_LRS, UltraSSD_LRS."
+    condition = alltrue([
+      for d in var.data_disks :
+      contains(["Standard_LRS", "StandardSSD_ZRS", "Premium_LRS", "PremiumV2_LRS", "Premium_ZRS", "StandardSSD_LRS", "UltraSSD_LRS"], d.storage_account_type)
+    ])
+    error_message = "Each data_disks entry storage_account_type must be one of: Standard_LRS, StandardSSD_ZRS, Premium_LRS, PremiumV2_LRS, Premium_ZRS, StandardSSD_LRS, UltraSSD_LRS."
   }
 }
 

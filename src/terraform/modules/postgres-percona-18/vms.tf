@@ -1,9 +1,9 @@
 resource "azurerm_network_interface" "nic" {
-  count               = var.cluster_vm.count
+  count = var.cluster_vm.count
+
   name                = "${var.cluster_vm.name_prefix}-nic-${count.index}"
   location            = var.location
   resource_group_name = var.resource_group_name
-  tags                = var.tags
 
   ip_configuration {
     name                          = var.cluster_vm.nic_ip_configuration_name
@@ -14,13 +14,13 @@ resource "azurerm_network_interface" "nic" {
 }
 
 resource "azurerm_linux_virtual_machine" "vm" {
-  count               = var.cluster_vm.count
+  count = var.cluster_vm.count
+
   name                = "${var.cluster_vm.name_prefix}-vm-${count.index}"
   resource_group_name = var.resource_group_name
   location            = var.location
   size                = var.cluster_vm.size
   admin_username      = var.admin_username
-  tags                = var.tags
   zone                = var.cluster_vm.zones[count.index % length(var.cluster_vm.zones)]
 
   network_interface_ids = [
@@ -46,20 +46,22 @@ resource "azurerm_linux_virtual_machine" "vm" {
 }
 
 resource "azurerm_managed_disk" "data_disk" {
-  count                = var.data_disk.create ? var.cluster_vm.count : 0
-  name                 = "${var.cluster_vm.name_prefix}-datadisk-${count.index}"
+  for_each = local.vm_data_disks
+
+  name                 = "${var.cluster_vm.name_prefix}-data-${each.value.vm_index}-${each.value.disk_index}"
   location             = var.location
   resource_group_name  = var.resource_group_name
-  storage_account_type = var.data_disk.storage_account_type
-  create_option        = var.data_disk.create_option
-  disk_size_gb         = var.data_disk.size_gb
-  zone                 = contains(["Premium_ZRS", "StandardSSD_ZRS"], var.data_disk.storage_account_type) ? null : var.cluster_vm.zones[count.index % length(var.cluster_vm.zones)]
+  storage_account_type = each.value.config.storage_account_type
+  create_option        = each.value.config.create_option
+  disk_size_gb         = each.value.config.size_gb
+  zone                 = contains(["Premium_ZRS", "StandardSSD_ZRS"], each.value.config.storage_account_type) ? null : var.cluster_vm.zones[each.value.vm_index % length(var.cluster_vm.zones)]
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "data_attach" {
-  count              = var.data_disk.create ? var.cluster_vm.count : 0
-  managed_disk_id    = azurerm_managed_disk.data_disk[count.index].id
-  virtual_machine_id = azurerm_linux_virtual_machine.vm[count.index].id
-  lun                = var.data_disk.attachment_lun
-  caching            = var.data_disk.attachment_caching
+  for_each = local.vm_data_disks
+
+  managed_disk_id    = azurerm_managed_disk.data_disk[each.key].id
+  virtual_machine_id = azurerm_linux_virtual_machine.vm[each.value.vm_index].id
+  lun                = each.value.config.lun
+  caching            = each.value.config.caching
 }
