@@ -62,7 +62,60 @@ variable "data_disk_size_gb" {
   default = 64
 }
 
-variable "storage_container_id" {
-  description = "ID of the Azure Storage container for role assignment scope"
+variable "vnet_id" {
+  description = "Virtual network ID used by the load balancer backend pool"
   type        = string
+}
+
+variable "lb_name" {
+  description = "Name of the internal Azure load balancer"
+  type        = string
+}
+
+variable "lb_frontend_private_ip_address" {
+  description = "Static private IP address assigned to the load balancer frontend"
+  type        = string
+}
+
+variable "lb_frontend_configuration_name" {
+  description = "Name of the LB frontend IP configuration"
+  type        = string
+  default     = "private-frontend"
+}
+
+variable "lb_sku" {
+  description = "SKU for the load balancer"
+  type        = string
+  default     = "Standard"
+}
+
+variable "lb_rules" {
+  description = "Map of load balancer rules keyed by logical rule name"
+  type = map(object({
+    frontend_port           = number
+    backend_port            = optional(number)
+    protocol                = optional(string)
+    probe_port              = optional(number)
+    probe_protocol          = optional(string)
+    probe_request_path      = optional(string)
+    idle_timeout_in_minutes = optional(number)
+    disable_outbound_snat   = optional(bool)
+  }))
+
+  validation {
+    condition     = length(var.lb_rules) > 0
+    error_message = "At least one load balancer rule must be provided."
+  }
+}
+
+variable "lb_probe_interval_in_seconds" {
+  description = "Interval between health probe attempts"
+  type        = number
+  default     = 5
+}
+
+variable "lb_number_of_probes" {
+  description = "How many failed probes mark a backend as unhealthy"
+  type        = number
+  default     = 2
 }
