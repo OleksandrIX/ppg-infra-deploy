@@ -48,7 +48,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
 resource "azurerm_managed_disk" "data_disk" {
   for_each = local.vm_data_disks
 
-  name                 = "${var.cluster_vm.name_prefix}-data-${each.value.vm_index}-${each.value.disk_index}"
+  name                 = "${var.cluster_vm.name_prefix}-data-${each.value.vm_index}-lun-${each.value.disk_lun}"
   location             = var.location
   resource_group_name  = var.resource_group_name
   storage_account_type = each.value.config.storage_account_type

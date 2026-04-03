@@ -30,10 +30,10 @@ locals {
   vm_data_disks = {
     for pair in flatten([
       for vm_i in range(var.cluster_vm.count) : [
-        for disk_i, disk_cfg in var.data_disks : {
-          key        = "${vm_i}-${disk_i}"
+        for disk_cfg in var.data_disks : {
+          key        = "${vm_i}-lun-${disk_cfg.lun}"
           vm_index   = vm_i
-          disk_index = disk_i
+          disk_lun   = disk_cfg.lun
           config     = disk_cfg
         }
       ]

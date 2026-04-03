@@ -103,6 +103,16 @@ variable "cluster_vm" {
       version   = "latest"
     }
   }
+
+  validation {
+    condition     = var.cluster_vm.count > 0
+    error_message = "cluster_vm.count must be greater than 0."
+  }
+
+  validation {
+    condition     = length(var.cluster_vm.zones) > 0
+    error_message = "cluster_vm.zones must contain at least one availability zone."
+  }
 }
 
 variable "data_disks" {
@@ -132,6 +142,21 @@ variable "data_disks" {
       contains(["Standard_LRS", "StandardSSD_ZRS", "Premium_LRS", "PremiumV2_LRS", "Premium_ZRS", "StandardSSD_LRS", "UltraSSD_LRS"], d.storage_account_type)
     ])
     error_message = "Each data_disks entry storage_account_type must be one of: Standard_LRS, StandardSSD_ZRS, Premium_LRS, PremiumV2_LRS, Premium_ZRS, StandardSSD_LRS, UltraSSD_LRS."
+  }
+
+  validation {
+    condition     = alltrue([for d in var.data_disks : d.size_gb > 0])
+    error_message = "Each data_disks entry size_gb must be greater than 0."
+  }
+
+  validation {
+    condition     = alltrue([for d in var.data_disks : d.lun >= 10])
+    error_message = "Each data_disks entry lun must be >= 10."
+  }
+
+  validation {
+    condition     = length(distinct([for d in var.data_disks : d.lun])) == length(var.data_disks)
+    error_message = "Each data_disks entry must have a unique lun value."
   }
 }
 
