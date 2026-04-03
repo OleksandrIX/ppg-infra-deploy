@@ -24,18 +24,6 @@ variable "subnet_prefix" {
   default     = "10.0.1.0/24"
 }
 
-variable "vm_count" {
-  description = "Number of virtual machines to create"
-  type        = number
-  default     = 3
-}
-
-variable "vm_name_prefix" {
-  description = "Prefix for the virtual machine names"
-  type        = string
-  default     = "percona-node"
-}
-
 variable "admin_username" {
   description = "Admin username for the virtual machines"
   type        = string
@@ -73,6 +61,8 @@ variable "ansible_host" {
 variable "cluster_vm" {
   description = "Cluster VM configuration"
   type = object({
+    count                         = number
+    name_prefix                   = string
     size                          = string
     nic_ip_configuration_name     = string
     private_ip_address_allocation = string
@@ -93,6 +83,8 @@ variable "cluster_vm" {
   })
 
   default = {
+    count                         = 3
+    name_prefix                   = "percona-node"
     size                          = "Standard_D2s_v5"
     nic_ip_configuration_name     = "internal"
     private_ip_address_allocation = "Static"

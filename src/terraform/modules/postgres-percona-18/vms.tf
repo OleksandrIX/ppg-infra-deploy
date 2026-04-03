@@ -1,6 +1,6 @@
 resource "azurerm_network_interface" "nic" {
-  count               = var.vm_count
-  name                = "${var.vm_name_prefix}-nic-${count.index}"
+  count               = var.cluster_vm.count
+  name                = "${var.cluster_vm.name_prefix}-nic-${count.index}"
   location            = var.location
   resource_group_name = var.resource_group_name
   tags                = var.tags
@@ -14,8 +14,8 @@ resource "azurerm_network_interface" "nic" {
 }
 
 resource "azurerm_linux_virtual_machine" "vm" {
-  count               = var.vm_count
-  name                = "${var.vm_name_prefix}-vm-${count.index}"
+  count               = var.cluster_vm.count
+  name                = "${var.cluster_vm.name_prefix}-vm-${count.index}"
   resource_group_name = var.resource_group_name
   location            = var.location
   size                = var.cluster_vm.size
@@ -46,8 +46,8 @@ resource "azurerm_linux_virtual_machine" "vm" {
 }
 
 resource "azurerm_managed_disk" "data_disk" {
-  count                = var.data_disk.create ? var.vm_count : 0
-  name                 = "${var.vm_name_prefix}-datadisk-${count.index}"
+  count                = var.data_disk.create ? var.cluster_vm.count : 0
+  name                 = "${var.cluster_vm.name_prefix}-datadisk-${count.index}"
   location             = var.location
   resource_group_name  = var.resource_group_name
   storage_account_type = var.data_disk.storage_account_type
@@ -57,7 +57,7 @@ resource "azurerm_managed_disk" "data_disk" {
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "data_attach" {
-  count              = var.data_disk.create ? var.vm_count : 0
+  count              = var.data_disk.create ? var.cluster_vm.count : 0
   managed_disk_id    = azurerm_managed_disk.data_disk[count.index].id
   virtual_machine_id = azurerm_linux_virtual_machine.vm[count.index].id
   lun                = var.data_disk.attachment_lun
