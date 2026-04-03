@@ -1,16 +1,27 @@
 variable "resource_group_name" {
-  description = "Resource group name for the Azure resources"
+  description = "Resource group name"
   type        = string
 }
 
 variable "location" {
-  description = "Azure region for deployment"
+  description = "Region name (e.g., eastus, westus2)"
+  type        = string
+}
+
+variable "vnet_id" {
+  description = "Virtual network ID"
   type        = string
 }
 
 variable "subnet_id" {
-  description = "ID of the subnet for the Azure virtual machines"
+  description = "Subnet ID for VM network interfaces"
   type        = string
+}
+
+variable "subnet_prefix" {
+  description = "CIDR prefix for the subnet (e.g., 10.0.1.0/24) for generating static IPs"
+  type        = string
+  default     = "10.0.1.0/24"
 }
 
 variable "vm_count" {
@@ -42,217 +53,138 @@ variable "tags" {
   default     = {}
 }
 
-variable "subnet_prefix" {
-  description = "CIDR prefix for the subnet (e.g., 10.0.1.0/24) for generating static IPs"
-  type        = string
-  default     = "10.0.1.0/24"
-}
-
-variable "nic_ip_configuration_name" {
-  description = "Name of NIC IP configuration"
-  type        = string
-  default     = "internal"
-}
-
-variable "private_ip_address_allocation" {
-  description = "Private IP allocation method for VM NICs"
-  type        = string
-  default     = "Static"
-}
-
-variable "vm_private_ip_host_offset" {
-  description = "Starting host offset in subnet_prefix for cluster VM private IPs"
-  type        = number
-  default     = 10
-}
-
-variable "vm_size" {
-  description = "Size of the virtual machines (e.g., Standard_D2s_v5)"
-  type    = string
-  default = "Standard_D2s_v5"
-}
-
-variable "os_disk_caching" {
-  description = "OS disk caching mode for VMs"
-  type        = string
-  default     = "ReadWrite"
-}
-
-variable "os_disk_storage_account_type" {
-  description = "OS disk storage account type for VMs"
-  type        = string
-  default     = "Premium_LRS"
-}
-
-variable "image_publisher" {
-  description = "Publisher of VM image"
-  type        = string
-  default     = "Canonical"
-}
-
-variable "image_offer" {
-  description = "Offer of VM image"
-  type        = string
-  default     = "0001-com-ubuntu-server-jammy"
-}
-
-variable "image_sku" {
-  description = "SKU of VM image"
-  type        = string
-  default     = "22_04-lts"
-}
-
-variable "image_version" {
-  description = "Version of VM image"
-  type        = string
-  default     = "latest"
-}
-
-variable "create_ansible_host" {
-  description = "Whether to create a dedicated host for running Ansible deployment"
-  type        = bool
-  default     = true
-}
-
-variable "ansible_host_name" {
-  description = "Name of the VM used as Ansible deployment host"
-  type        = string
-  default     = "percona-ansible-host"
-}
-
-variable "ansible_host_vm_size" {
-  description = "Size of the Ansible deployment host VM"
-  type        = string
-  default     = "Standard_B2s"
-}
-
-variable "ansible_host_private_ip_hostnumber" {
-  description = "Host number in subnet_prefix used for static private IP of Ansible host"
-  type        = number
-  default     = 250
-}
-
-variable "create_data_disk" {
-  description = "Whether to create an additional disk for the database cluster (true/false)"
-  type        = bool
-  default     = false
-}
-
-variable "data_disk_storage_account_type" {
-  description = "Storage account type for additional data disk"
-  type        = string
-  default     = "Premium_LRS"
-}
-
-variable "data_disk_create_option" {
-  description = "Create option for additional data disk"
-  type        = string
-  default     = "Empty"
-}
-
-variable "data_disk_size_gb" {
-  description = "Size of the additional data disk in GB (applicable if create_data_disk is true)"
-  type    = number
-  default = 64
-}
-
-variable "data_disk_attachment_lun" {
-  description = "LUN for attaching additional data disk"
-  type        = number
-  default     = 10
-}
-
-variable "data_disk_attachment_caching" {
-  description = "Caching mode for attached additional data disk"
-  type        = string
-  default     = "ReadOnly"
-}
-
-variable "vnet_id" {
-  description = "Virtual network ID used by the load balancer backend pool"
-  type        = string
-}
-
-variable "lb_name" {
-  description = "Name of the internal Azure load balancer"
-  type        = string
-  default     = "ppg-internal-lb"
-}
-
-variable "lb_frontend_private_ip_address" {
-  description = "Static private IP address assigned to the load balancer frontend"
-  type        = string
-  default     = "10.0.0.100"
-}
-
-variable "lb_frontend_configuration_name" {
-  description = "Name of the LB frontend IP configuration"
-  type        = string
-  default     = "private-frontend"
-}
-
-variable "lb_sku" {
-  description = "SKU for the load balancer"
-  type        = string
-  default     = "Standard"
-}
-
-variable "lb_private_ip_address_allocation" {
-  description = "Private IP allocation method for LB frontend"
-  type        = string
-  default     = "Static"
-}
-
-variable "lb_default_protocol" {
-  description = "Default LB rule protocol when not provided in rule"
-  type        = string
-  default     = "Tcp"
-}
-
-variable "lb_default_idle_timeout_in_minutes" {
-  description = "Default idle timeout for LB rules"
-  type        = number
-  default     = 4
-}
-
-variable "lb_default_disable_outbound_snat" {
-  description = "Default outbound SNAT behavior for LB rules"
-  type        = bool
-  default     = false
-}
-
-variable "lb_rules" {
-  description = "Map of load balancer rules keyed by logical rule name"
-  type = map(object({
-    frontend_port           = number
-    backend_port            = optional(number)
-    protocol                = optional(string)
-    probe_port              = optional(number)
-    probe_protocol          = optional(string)
-    probe_request_path      = optional(string)
-    idle_timeout_in_minutes = optional(number)
-    disable_outbound_snat   = optional(bool)
-  }))
+variable "ansible_host" {
+  description = "Dedicated host configuration for running Ansible deployment"
+  type = object({
+    create                = bool
+    name                  = string
+    vm_size               = string
+    private_ip_hostnumber = number
+  })
 
   default = {
-    postgres = {
-      frontend_port      = 5432
-      backend_port       = 6432
-      probe_port         = 8008
-      probe_protocol     = "Http"
-      probe_request_path = "/primary"
+    create                = true
+    name                  = "percona-ansible-host"
+    vm_size               = "Standard_B2s"
+    private_ip_hostnumber = 250
+  }
+}
+
+variable "cluster_vm" {
+  description = "Cluster VM configuration"
+  type = object({
+    size                          = string
+    nic_ip_configuration_name     = string
+    private_ip_address_allocation = string
+    private_ip_host_offset        = number
+    zones                         = list(string)
+
+    os_disk = object({
+      caching              = string
+      storage_account_type = string
+    })
+
+    image = object({
+      publisher = string
+      offer     = string
+      sku       = string
+      version   = string
+    })
+  })
+
+  default = {
+    size                          = "Standard_D2s_v5"
+    nic_ip_configuration_name     = "internal"
+    private_ip_address_allocation = "Static"
+    private_ip_host_offset        = 10
+    zones                         = ["1", "2", "3"]
+
+    os_disk = {
+      caching              = "ReadWrite"
+      storage_account_type = "Premium_LRS"
+    }
+
+    image = {
+      publisher = "Canonical"
+      offer     = "0001-com-ubuntu-server-jammy"
+      sku       = "22_04-lts"
+      version   = "latest"
     }
   }
 }
 
-variable "lb_probe_interval_in_seconds" {
-  description = "Interval between health probe attempts"
-  type        = number
-  default     = 5
+variable "data_disk" {
+  description = "Additional data disk configuration for cluster VMs"
+  type = object({
+    create               = bool
+    storage_account_type = string
+    create_option        = string
+    size_gb              = number
+    attachment_lun       = number
+    attachment_caching   = string
+  })
+
+  default = {
+    create               = false
+    storage_account_type = "Premium_LRS"
+    create_option        = "Empty"
+    size_gb              = 64
+    attachment_lun       = 10
+    attachment_caching   = "ReadOnly"
+  }
+
+  validation {
+    condition     = contains(["Standard_LRS", "StandardSSD_ZRS", "Premium_LRS", "PremiumV2_LRS", "Premium_ZRS", "StandardSSD_LRS", "UltraSSD_LRS"], var.data_disk.storage_account_type)
+    error_message = "data_disk.storage_account_type must be one of: Standard_LRS, StandardSSD_ZRS, Premium_LRS, PremiumV2_LRS, Premium_ZRS, StandardSSD_LRS, UltraSSD_LRS."
+  }
 }
 
-variable "lb_number_of_probes" {
-  description = "How many failed probes mark a backend as unhealthy"
-  type        = number
-  default     = 2
+variable "lb" {
+  description = "Internal load balancer configuration"
+  type = object({
+    name                          = string
+    frontend_private_ip_address   = string
+    frontend_configuration_name   = string
+    sku                           = string
+    private_ip_address_allocation = string
+    probe_interval_in_seconds     = number
+    number_of_probes              = number
+    default_protocol              = string
+    default_idle_timeout_minutes  = number
+    default_disable_outbound_snat = bool
+
+    rules = map(object({
+      frontend_port           = number
+      backend_port            = optional(number)
+      protocol                = optional(string)
+      probe_port              = optional(number)
+      probe_protocol          = optional(string)
+      probe_request_path      = optional(string)
+      idle_timeout_in_minutes = optional(number)
+      disable_outbound_snat   = optional(bool)
+    }))
+  })
+
+  default = {
+    name                          = "ppg-internal-lb"
+    frontend_private_ip_address   = "10.0.0.100"
+    frontend_configuration_name   = "private-frontend"
+    sku                           = "Standard"
+    private_ip_address_allocation = "Static"
+    probe_interval_in_seconds     = 5
+    number_of_probes              = 2
+    default_protocol              = "Tcp"
+    default_idle_timeout_minutes  = 4
+    default_disable_outbound_snat = false
+
+    rules = {
+      postgres = {
+        frontend_port      = 5432
+        backend_port       = 6432
+        probe_port         = 8008
+        probe_protocol     = "Http"
+        probe_request_path = "/primary"
+      }
+    }
+  }
 }

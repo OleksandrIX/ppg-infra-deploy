@@ -6,10 +6,10 @@ resource "azurerm_network_interface" "nic" {
   tags                = var.tags
 
   ip_configuration {
-    name                          = var.nic_ip_configuration_name
+    name                          = var.cluster_vm.nic_ip_configuration_name
     subnet_id                     = var.subnet_id
-    private_ip_address_allocation = var.private_ip_address_allocation
-    private_ip_address            = cidrhost(var.subnet_prefix, count.index + var.vm_private_ip_host_offset)
+    private_ip_address_allocation = var.cluster_vm.private_ip_address_allocation
+    private_ip_address            = cidrhost(var.subnet_prefix, count.index + var.cluster_vm.private_ip_host_offset)
   }
 }
 
@@ -18,10 +18,10 @@ resource "azurerm_linux_virtual_machine" "vm" {
   name                = "${var.vm_name_prefix}-vm-${count.index}"
   resource_group_name = var.resource_group_name
   location            = var.location
-  size                = var.vm_size
+  size                = var.cluster_vm.size
   admin_username      = var.admin_username
   tags                = var.tags
-  zone                = tostring((count.index % 3) + 1)
+  zone                = var.cluster_vm.zones[count.index % length(var.cluster_vm.zones)]
 
   network_interface_ids = [
     azurerm_network_interface.nic[count.index].id,
@@ -33,33 +33,33 @@ resource "azurerm_linux_virtual_machine" "vm" {
   }
 
   os_disk {
-    caching              = var.os_disk_caching
-    storage_account_type = var.os_disk_storage_account_type
+    caching              = var.cluster_vm.os_disk.caching
+    storage_account_type = var.cluster_vm.os_disk.storage_account_type
   }
 
   source_image_reference {
-    publisher = var.image_publisher
-    offer     = var.image_offer
-    sku       = var.image_sku
-    version   = var.image_version
+    publisher = var.cluster_vm.image.publisher
+    offer     = var.cluster_vm.image.offer
+    sku       = var.cluster_vm.image.sku
+    version   = var.cluster_vm.image.version
   }
 }
 
 resource "azurerm_managed_disk" "data_disk" {
-  count                = var.create_data_disk ? var.vm_count : 0
+  count                = var.data_disk.create ? var.vm_count : 0
   name                 = "${var.vm_name_prefix}-datadisk-${count.index}"
   location             = var.location
   resource_group_name  = var.resource_group_name
-  storage_account_type = var.data_disk_storage_account_type
-  create_option        = var.data_disk_create_option
-  disk_size_gb         = var.data_disk_size_gb
-  zone                 = tostring((count.index % 3) + 1)
+  storage_account_type = var.data_disk.storage_account_type
+  create_option        = var.data_disk.create_option
+  disk_size_gb         = var.data_disk.size_gb
+  zone                 = contains(["Premium_ZRS", "StandardSSD_ZRS"], var.data_disk.storage_account_type) ? null : var.cluster_vm.zones[count.index % length(var.cluster_vm.zones)]
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "data_attach" {
-  count              = var.create_data_disk ? var.vm_count : 0
+  count              = var.data_disk.create ? var.vm_count : 0
   managed_disk_id    = azurerm_managed_disk.data_disk[count.index].id
   virtual_machine_id = azurerm_linux_virtual_machine.vm[count.index].id
-  lun                = var.data_disk_attachment_lun
-  caching            = var.data_disk_attachment_caching
+  lun                = var.data_disk.attachment_lun
+  caching            = var.data_disk.attachment_caching
 }

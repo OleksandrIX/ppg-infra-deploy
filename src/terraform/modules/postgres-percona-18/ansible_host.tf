@@ -1,24 +1,24 @@
 resource "azurerm_network_interface" "ansible_host_nic" {
-  count               = var.create_ansible_host ? 1 : 0
-  name                = "${var.ansible_host_name}-nic"
+  count               = var.ansible_host.create ? 1 : 0
+  name                = "${var.ansible_host.name}-nic"
   location            = var.location
   resource_group_name = var.resource_group_name
   tags                = var.tags
 
   ip_configuration {
-    name                          = var.nic_ip_configuration_name
+    name                          = var.cluster_vm.nic_ip_configuration_name
     subnet_id                     = var.subnet_id
-    private_ip_address_allocation = var.private_ip_address_allocation
-    private_ip_address            = cidrhost(var.subnet_prefix, var.ansible_host_private_ip_hostnumber)
+    private_ip_address_allocation = var.cluster_vm.private_ip_address_allocation
+    private_ip_address            = cidrhost(var.subnet_prefix, var.ansible_host.private_ip_hostnumber)
   }
 }
 
 resource "azurerm_linux_virtual_machine" "ansible_host" {
-  count               = var.create_ansible_host ? 1 : 0
-  name                = var.ansible_host_name
+  count               = var.ansible_host.create ? 1 : 0
+  name                = var.ansible_host.name
   resource_group_name = var.resource_group_name
   location            = var.location
-  size                = var.ansible_host_vm_size
+  size                = var.ansible_host.vm_size
   admin_username      = var.admin_username
   tags                = var.tags
 
@@ -32,14 +32,14 @@ resource "azurerm_linux_virtual_machine" "ansible_host" {
   }
 
   os_disk {
-    caching              = var.os_disk_caching
-    storage_account_type = var.os_disk_storage_account_type
+    caching              = var.cluster_vm.os_disk.caching
+    storage_account_type = var.cluster_vm.os_disk.storage_account_type
   }
 
   source_image_reference {
-    publisher = var.image_publisher
-    offer     = var.image_offer
-    sku       = var.image_sku
-    version   = var.image_version
+    publisher = var.cluster_vm.image.publisher
+    offer     = var.cluster_vm.image.offer
+    sku       = var.cluster_vm.image.sku
+    version   = var.cluster_vm.image.version
   }
 }

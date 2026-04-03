@@ -5,16 +5,16 @@ locals {
   }
 
   lb_rules = {
-    for rule_name, rule in var.lb_rules :
+    for rule_name, rule in var.lb.rules :
     rule_name => {
       frontend_port           = rule.frontend_port
       backend_port            = coalesce(rule.backend_port, rule.frontend_port)
-      protocol                = coalesce(rule.protocol, var.lb_default_protocol)
+      protocol                = coalesce(rule.protocol, var.lb.default_protocol)
       probe_port              = coalesce(rule.probe_port, coalesce(rule.backend_port, rule.frontend_port))
-      probe_protocol          = coalesce(rule.probe_protocol, var.lb_default_protocol)
+      probe_protocol          = coalesce(rule.probe_protocol, var.lb.default_protocol)
       probe_request_path      = rule.probe_request_path
-      idle_timeout_in_minutes = coalesce(rule.idle_timeout_in_minutes, var.lb_default_idle_timeout_in_minutes)
-      disable_outbound_snat   = coalesce(rule.disable_outbound_snat, var.lb_default_disable_outbound_snat)
+      idle_timeout_in_minutes = coalesce(rule.idle_timeout_in_minutes, var.lb.default_idle_timeout_minutes)
+      disable_outbound_snat   = coalesce(rule.disable_outbound_snat, var.lb.default_disable_outbound_snat)
     }
   }
 
