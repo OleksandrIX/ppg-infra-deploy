@@ -57,11 +57,3 @@ resource "azurerm_key_vault" "kv" {
     secret_permissions = ["Get", "List", "Set", "Delete", "Purge", "Recover"]
   }
 }
-
-output "key_vault_id" {
-  value = azurerm_key_vault.kv.id
-}
-
-output "key_vault_name" {
-  value = azurerm_key_vault.kv.name
-}
