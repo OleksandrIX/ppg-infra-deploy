@@ -40,4 +40,8 @@ resource "azurerm_linux_virtual_machine" "ansible_host" {
     sku       = var.cluster_vm.image.sku
     version   = var.cluster_vm.image.version
   }
+
+  depends_on = [
+    azurerm_key_vault_secret.ssh_public_key,
+  ]
 }
