@@ -39,14 +39,26 @@ variable "storage_account_name" {
   type        = string
 }
 
-variable "container_name" {
+variable "pgbackrest_container_name" {
   description = "Storage container name for pgBackRest"
   type        = string
   default     = "pgbackrest-repo"
 }
 
-variable "container_access_type" {
-  description = "Access level for storage container"
+variable "tfstate_container_name" {
+  description = "Storage container name for Terraform remote state"
+  type        = string
+  default     = "tfstate"
+}
+
+variable "pgbackrest_container_access_type" {
+  description = "Access level for pgBackRest storage container"
+  type        = string
+  default     = "private"
+}
+
+variable "tfstate_container_access_type" {
+  description = "Access level for Terraform state storage container"
   type        = string
   default     = "private"
 }

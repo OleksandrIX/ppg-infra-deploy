@@ -30,7 +30,13 @@ resource "azurerm_storage_account" "sa" {
 }
 
 resource "azurerm_storage_container" "sc" {
-  name                  = var.container_name
+  name                  = var.pgbackrest_container_name
   storage_account_id    = azurerm_storage_account.sa.id
-  container_access_type = var.container_access_type
+  container_access_type = var.pgbackrest_container_access_type
+}
+
+resource "azurerm_storage_container" "tfstate" {
+  name                  = var.tfstate_container_name
+  storage_account_id    = azurerm_storage_account.sa.id
+  container_access_type = var.tfstate_container_access_type
 }
