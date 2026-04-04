@@ -37,7 +37,7 @@ variables:
       value: "ARM-ServiceApp-rg-ppg-cluster-dev-Contributor"
 
 pool:
-  vmImage: ubuntu-latest
+  name: Default
 
 steps:
   - template: src/pipelines/terraform-install.yaml
