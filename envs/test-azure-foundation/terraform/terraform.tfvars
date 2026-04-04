@@ -21,3 +21,7 @@ replication_type                 = "LRS"
 public_network_access_enabled    = true
 allow_nested_items_to_be_public  = false
 min_tls_version                  = "TLS1_2"
+
+# Key Vault settings
+key_vault_name = "kv-ppg-cluster-dev"
+key_vault_sku  = "standard"

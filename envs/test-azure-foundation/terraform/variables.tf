@@ -92,3 +92,14 @@ variable "min_tls_version" {
   type        = string
   default     = "TLS1_2"
 }
+
+variable "key_vault_name" {
+  description = "Azure Key Vault name (must be globally unique)"
+  type        = string
+}
+
+variable "key_vault_sku" {
+  description = "Azure Key Vault SKU (standard or premium)"
+  type        = string
+  default     = "standard"
+}
