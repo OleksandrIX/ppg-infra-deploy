@@ -1,0 +1,10 @@
+steps:
+- task: AzureCLI@2
+  displayName: 'Apply Terrafrom code'
+  inputs:
+    azureSubscription: $(azureSubscription)
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    workingDirectory: 'envs/${{ parameters.environment }}/terraform'
+    inlineScript: |
+      terraform apply -refresh-only -input=false "tfplan"

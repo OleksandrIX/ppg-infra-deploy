@@ -1,0 +1,10 @@
+steps:
+- task: AzureCLI@2
+  displayName: 'Plan Terraform deployment'
+  inputs:
+    azureSubscription: $(azureSubscription)
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    workingDirectory: 'envs/${{ parameters.environment }}/terraform'
+    inlineScript: |
+      terraform plan -input=false -out=tfplan

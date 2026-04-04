@@ -1,0 +1,90 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+name: "terraform ${{ parameters.environment }} environment ${{ parameters.action }}"
+trigger:
+  - none
+parameters:
+  - name: environment
+    displayName: Target environment
+    type: string
+    default: test-azure
+    values:
+      - test-azure
+  - name: action
+    displayName: Desired Action
+    type: string
+    default: apply
+    values:
+      - apply
+      - apply-refresh-only
+      - destroy
+      - plan
+      - plan-refresh-only
+
+variables:
+  - name: containerName
+    value: "tfstate"
+  - name: storageAccount
+    ${{ if eq(parameters.environment, 'test-azure') }}:
+      value: "ppgclusterpgbackrest2"
+  - name: resourceGroup
+    ${{ if eq(parameters.environment, 'test-azure') }}:
+      value: "rg-ppg-cluster-dev"
+  - name: azureSubscription
+    ${{ if eq(parameters.environment, 'test-azure') }}:
+      value: "ARM-ServiceApp-rg-ppg-cluster-dev-Contributor"
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - template: src/pipelines/terraform-install.yaml
+  - template: src/pipelines/terraform-check-sa.yaml
+  - template: src/pipelines/terraform-init.yaml
+    parameters:
+      environment: ${{ parameters.environment }}
+
+  - ${{ if eq(parameters.action, 'apply') }}:
+    - template: src/pipelines/terraform-validate.yaml
+      parameters:
+        environment: ${{ parameters.environment }}
+    - template: src/pipelines/terraform-plan.yaml
+      parameters:
+        environment: ${{ parameters.environment }}
+    - template: src/pipelines/terraform-apply.yaml
+      parameters:
+        environment: ${{ parameters.environment }}
+
+  - ${{ if eq(parameters.action, 'destroy') }}:
+    - template: src/pipelines/terraform-destroy.yaml
+      parameters:
+        environment: ${{ parameters.environment }}
+
+  - ${{ if eq(parameters.action, 'plan') }}:
+    - template: src/pipelines/terraform-validate.yaml
+      parameters:
+        environment: ${{ parameters.environment }}
+    - template: src/pipelines/terraform-plan.yaml
+      parameters:
+        environment: ${{ parameters.environment }}
+
+  - ${{ if eq(parameters.action, 'apply-refresh-only') }}:
+    - template: src/pipelines/terraform-validate.yaml
+      parameters:
+        environment: ${{ parameters.environment }}
+    - template: src/pipelines/terraform-plan-refresh-only.yaml
+      parameters:
+        environment: ${{ parameters.environment }}
+    - template: src/pipelines/terraform-apply-refresh-only.yaml
+      parameters:
+        environment: ${{ parameters.environment }}
+
+  - ${{ if eq(parameters.action, 'plan-refresh-only') }}:
+    - template: src/pipelines/terraform-validate.yaml
+      parameters:
+        environment: ${{ parameters.environment }}
+    - template: src/pipelines/terraform-plan-refresh-only.yaml
+      parameters:
+        environment: ${{ parameters.environment }}

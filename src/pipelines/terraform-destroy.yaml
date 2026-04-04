@@ -1,0 +1,10 @@
+steps:
+- task: AzureCLI@2
+  displayName: 'Destroy Terraform Deployment'
+  inputs:
+    azureSubscription: $(azureSubscription)
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    workingDirectory: 'envs/${{ parameters.environment }}/terraform'
+    inlineScript: |
+      terraform destroy --auto-approve

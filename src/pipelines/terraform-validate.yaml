@@ -1,0 +1,10 @@
+steps:
+- task: AzureCLI@2
+  displayName: 'Validate Terraform code'
+  inputs:
+    azureSubscription: $(azureSubscription)
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    workingDirectory: 'envs/${{ parameters.environment }}/terraform'
+    inlineScript: |
+      terraform validate
