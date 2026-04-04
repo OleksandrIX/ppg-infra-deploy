@@ -8,7 +8,6 @@ __pycache__/
 # Ignore Terraform state files
 envs/*/terraform/.terraform
 envs/*/terraform/.terraform.lock.hcl
-envs/*/terraform/*.tfvars
 envs/*/terraform/*.tfstate
 envs/*/terraform/*.tfstate.backup
 envs/*/terraform/*.tfstate.lock.info
