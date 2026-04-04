@@ -6,9 +6,11 @@ environment         = "test-azure"
 virtual_network_name         = "vnet-ppg-cluster"
 postgres_percona_subnet_name = "snet-database"
 
-# Admin credentials and SSH key
-admin_username   = "oleksandrix"
-ssh_pub_key_path = "~/.ssh/azure-ppg-cluster.pub"
+# Admin credentials
+admin_username = "oleksandrix"
+
+# Key Vault name (created by foundation)
+key_vault_name = "kv-ppg-cluster-dev"
 
 # Ansible host settings
 ansible_host = {

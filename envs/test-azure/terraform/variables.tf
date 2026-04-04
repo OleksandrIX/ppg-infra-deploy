@@ -20,10 +20,9 @@ variable "admin_username" {
   default     = "oleksandrix"
 }
 
-variable "ssh_pub_key_path" {
-  description = "Path to the public SSH key for VM access"
+variable "key_vault_name" {
+  description = "Azure Key Vault name where SSH keys are stored"
   type        = string
-  default     = "~/.ssh/azure-ppg-cluster.pub"
 }
 
 variable "environment" {
