@@ -47,44 +47,44 @@ steps:
       environment: ${{ parameters.environment }}
 
   - ${{ if eq(parameters.action, 'apply') }}:
-    - template: src/pipelines/terraform-validate.yaml
-      parameters:
-        environment: ${{ parameters.environment }}
-    - template: src/pipelines/terraform-plan.yaml
-      parameters:
-        environment: ${{ parameters.environment }}
-    - template: src/pipelines/terraform-apply.yaml
-      parameters:
-        environment: ${{ parameters.environment }}
+      - template: src/pipelines/terraform-validate.yaml
+        parameters:
+          environment: ${{ parameters.environment }}
+      - template: src/pipelines/terraform-plan.yaml
+        parameters:
+          environment: ${{ parameters.environment }}
+      - template: src/pipelines/terraform-apply.yaml
+        parameters:
+          environment: ${{ parameters.environment }}
 
   - ${{ if eq(parameters.action, 'destroy') }}:
-    - template: src/pipelines/terraform-destroy.yaml
-      parameters:
-        environment: ${{ parameters.environment }}
+      - template: src/pipelines/terraform-destroy.yaml
+        parameters:
+          environment: ${{ parameters.environment }}
 
   - ${{ if eq(parameters.action, 'plan') }}:
-    - template: src/pipelines/terraform-validate.yaml
-      parameters:
-        environment: ${{ parameters.environment }}
-    - template: src/pipelines/terraform-plan.yaml
-      parameters:
-        environment: ${{ parameters.environment }}
+      - template: src/pipelines/terraform-validate.yaml
+        parameters:
+          environment: ${{ parameters.environment }}
+      - template: src/pipelines/terraform-plan.yaml
+        parameters:
+          environment: ${{ parameters.environment }}
 
   - ${{ if eq(parameters.action, 'apply-refresh-only') }}:
-    - template: src/pipelines/terraform-validate.yaml
-      parameters:
-        environment: ${{ parameters.environment }}
-    - template: src/pipelines/terraform-plan-refresh-only.yaml
-      parameters:
-        environment: ${{ parameters.environment }}
-    - template: src/pipelines/terraform-apply-refresh-only.yaml
-      parameters:
-        environment: ${{ parameters.environment }}
+      - template: src/pipelines/terraform-validate.yaml
+        parameters:
+          environment: ${{ parameters.environment }}
+      - template: src/pipelines/terraform-plan-refresh-only.yaml
+        parameters:
+          environment: ${{ parameters.environment }}
+      - template: src/pipelines/terraform-apply-refresh-only.yaml
+        parameters:
+          environment: ${{ parameters.environment }}
 
   - ${{ if eq(parameters.action, 'plan-refresh-only') }}:
-    - template: src/pipelines/terraform-validate.yaml
-      parameters:
-        environment: ${{ parameters.environment }}
-    - template: src/pipelines/terraform-plan-refresh-only.yaml
-      parameters:
-        environment: ${{ parameters.environment }}
+      - template: src/pipelines/terraform-validate.yaml
+        parameters:
+          environment: ${{ parameters.environment }}
+      - template: src/pipelines/terraform-plan-refresh-only.yaml
+        parameters:
+          environment: ${{ parameters.environment }}
