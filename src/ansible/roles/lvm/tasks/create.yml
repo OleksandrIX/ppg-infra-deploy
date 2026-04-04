@@ -1,17 +1,8 @@
 ---
-- name: "Create partition on disks for LVM"
-  ansible.builtin.parted:
-    device: "{{ item }}"
-    number: 1
-    flags: ["lvm"]
-    state: "present"
-    label: "gpt"
-  loop: "{{ pv_devices }}"
-
 - name: "Create Volume Group (VG)"
   community.general.lvg:
     vg: "{{ vg_name }}"
-    pvs: "{{ pv_devices | map('regex_replace', '$', '1') | list }}"
+    pvs: "{{ pv_devices }}"
     state: "present"
 
 - name: "Create Logical Volume (LV)"
