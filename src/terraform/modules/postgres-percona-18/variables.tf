@@ -25,8 +25,8 @@ variable "admin_username" {
   default     = "azureuser"
 }
 
-variable "ssh_public_key" {
-  description = "SSH public key for the virtual machines"
+variable "key_vault_id" {
+  description = "Azure Key Vault ID where SSH keys will be stored"
   type        = string
 }
 

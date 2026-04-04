@@ -29,7 +29,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
   admin_ssh_key {
     username   = var.admin_username
-    public_key = var.ssh_public_key
+    public_key = tls_private_key.ssh.public_key_openssh
   }
 
   os_disk {
