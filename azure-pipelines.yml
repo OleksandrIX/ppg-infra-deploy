@@ -40,6 +40,14 @@ pool:
   name: Default
 
 steps:
+  - script: |
+      if command -v ansible &> /dev/null; then
+        echo "INSTALLED"
+        ansible --version
+      else
+        echo "NOT FOUND"
+      fi
+    displayName: Check Ansible availability
   - template: src/pipelines/terraform-install.yaml
   - template: src/pipelines/terraform-check-sa.yaml
   - template: src/pipelines/terraform-init.yaml
