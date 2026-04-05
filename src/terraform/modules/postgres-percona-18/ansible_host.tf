@@ -42,6 +42,10 @@ resource "azurerm_linux_virtual_machine" "ansible_host" {
     version   = var.cluster_vm.image.version
   }
 
+  boot_diagnostics {
+    storage_account_uri = null
+  }
+
   depends_on = [
     azurerm_key_vault_secret.ssh_public_key,
   ]
