@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ "$#" -lt 7 || "$#" -gt 8 ]]; then
-  echo "Usage: $0 <environment> <admin_user> <jumpbox_public_ip> <ssh_private_key_path> <db_node_private_ips_csv> <vm_name_prefix> <vault_password_file> [inventory_files_csv]" >&2
+if [[ "$#" -lt 4 || "$#" -gt 6 ]]; then
+  echo "Usage: $0 <admin_user> <ssh_private_key_path> <db_node_private_ips_csv> <vm_name_prefix> [vault_password_file|-] [inventory_files_csv]" >&2
   exit 2
 fi
 
@@ -14,14 +14,12 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 # Set readonly variables from script arguments
-readonly environment="$1"
-readonly admin_user="$2"
-readonly jumpbox_ip="$3"
-readonly ssh_priv_key_path="$4"
-readonly db_node_private_ips_csv="$5"
-readonly vm_name_prefix="$6"
-readonly vault_password_file="$7"
-readonly inventory_files_csv="${8:-}"
+readonly admin_user="$1"
+readonly ssh_priv_key_path="$2"
+readonly db_node_private_ips_csv="$3"
+readonly vm_name_prefix="$4"
+readonly vault_password_file="${5:--}"
+readonly inventory_files_csv="${6:-}"
 readonly ssh_dir="$HOME/.ssh"
 mkdir -p "$ssh_dir"
 
@@ -30,15 +28,7 @@ tmp_ssh_config="$(mktemp "$ssh_dir/ppg-tmp-ssh-config.XXXXXX")"
 tmp_extra_vars=""
 
 # Generate SSH config
-{
-  echo "Host jumpbox"
-  echo "  HostName $jumpbox_ip"
-  echo "  User $admin_user"
-  echo "  IdentityFile $ssh_priv_key_path"
-  echo "  StrictHostKeyChecking no"
-  echo "  UserKnownHostsFile /dev/null"
-  echo ""
-} > "$tmp_ssh_config"
+: > "$tmp_ssh_config"
 
 IFS=',' read -ra node_ips <<< "$db_node_private_ips_csv"
 if [[ "${#node_ips[@]}" -lt 1 ]]; then
@@ -53,7 +43,6 @@ for idx in "${!node_ips[@]}"; do
     echo "  HostName $node_ip"
     echo "  User $admin_user"
     echo "  IdentityFile $ssh_priv_key_path"
-    echo "  ProxyJump jumpbox"
     echo "  StrictHostKeyChecking no"
     echo "  UserKnownHostsFile /dev/null"
     echo ""
@@ -75,11 +64,22 @@ if [[ -n "${PGBACKREST_AZURE_ACCOUNT:-}" || -n "${PGBACKREST_AZURE_CONTAINER:-}"
   chmod 600 "$tmp_extra_vars"
 fi
 
-# Determine script directories securely
-readonly script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
-readonly repo_root="$(cd "$script_dir/.." &>/dev/null && pwd)"
-readonly env_inventory_dir="$repo_root/envs/$environment/ansible/inventory"
-export ANSIBLE_CONFIG="$repo_root/src/ansible/ansible.cfg"
+# Use only ansible bundle mode (wrapper executes on ansible-host).
+if [[ -z "${ANSIBLE_BUNDLE_ROOT:-}" ]]; then
+  echo "ANSIBLE_BUNDLE_ROOT must be set (expected /home/<user>/ansible on ansible-host)" >&2
+  exit 2
+fi
+
+if [[ ! -d "${ANSIBLE_BUNDLE_ROOT}" ]]; then
+  echo "ANSIBLE_BUNDLE_ROOT not found: ${ANSIBLE_BUNDLE_ROOT}" >&2
+  exit 2
+fi
+
+readonly ansible_root="$ANSIBLE_BUNDLE_ROOT"
+readonly env_inventory_dir="$ANSIBLE_BUNDLE_ROOT/inventory"
+readonly files_glob="$ANSIBLE_BUNDLE_ROOT/databases/*.yml"
+
+export ANSIBLE_CONFIG="$ansible_root/ansible.cfg"
 
 # Build inventory argument list dynamically.
 inventory_files=()
@@ -119,6 +119,7 @@ fi
 
 # Build Ansible command arguments dynamically using bash arrays
 ansible_args=()
+playbook_path="$ansible_root/playbooks/create-pgg-cluster.yml"
 
 for inventory_file in "${inventory_files[@]}"; do
   ansible_args+=("-i" "$inventory_file")
@@ -128,12 +129,24 @@ if [[ -n "$tmp_extra_vars" ]]; then
   ansible_args+=("-e" "@$tmp_extra_vars")
 fi
 
+if [[ -n "${ANSIBLE_EXTRA_VARS_FILE:-}" ]]; then
+  if [[ ! -f "${ANSIBLE_EXTRA_VARS_FILE}" ]]; then
+    echo "ANSIBLE_EXTRA_VARS_FILE not found: ${ANSIBLE_EXTRA_VARS_FILE}" >&2
+    exit 2
+  fi
+  ansible_args+=("-e" "@${ANSIBLE_EXTRA_VARS_FILE}")
+fi
+
 ansible_args+=(
   -e "ansible_ssh_common_args=-F$tmp_ssh_config"
-  -e "files_glob=$repo_root/envs/$environment/ansible/databases/*.yml"
-  --vault-password-file="$vault_password_file"
-  "$repo_root/src/ansible/playbooks/create-pgg-cluster.yml"
+  -e "files_glob=$files_glob"
 )
+
+if [[ "$vault_password_file" != "-" && -n "$vault_password_file" ]]; then
+  ansible_args+=("--vault-password-file=$vault_password_file")
+fi
+
+ansible_args+=("$playbook_path")
 
 # Replace current shell with ansible process
 exec ansible-playbook "${ansible_args[@]}"

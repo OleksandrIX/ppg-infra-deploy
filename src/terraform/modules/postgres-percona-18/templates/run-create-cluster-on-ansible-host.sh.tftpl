@@ -1,0 +1,40 @@
+set -euo pipefail
+
+ANSIBLE_HOME="/home/${admin_username}/ansible"
+WRAPPER_SCRIPT="$${ANSIBLE_HOME}/scripts/run-create-cluster.sh"
+SSH_KEY_PATH="/home/${admin_username}/.ssh/ppg-cluster-key.pem"
+EXTRA_VARS_FILE="/home/${admin_username}/.secrets/ansible-extra-vars.json"
+BUNDLE_HASH="${bundle_hash}"
+
+echo "Ansible bundle hash: $${BUNDLE_HASH}"
+
+if command -v cloud-init >/dev/null 2>&1; then
+  cloud-init status --wait || true
+fi
+
+mkdir -p "/home/${admin_username}/.ssh" "/home/${admin_username}/.secrets"
+
+cat > "$${SSH_KEY_PATH}" <<'SSH_KEY_EOF'
+${ssh_private_key_pem}
+SSH_KEY_EOF
+
+cat > "$${EXTRA_VARS_FILE}" <<'EXTRA_VARS_EOF'
+${ansible_secret_vars_json}
+EXTRA_VARS_EOF
+
+chmod 600 "$${SSH_KEY_PATH}" "$${EXTRA_VARS_FILE}"
+chown ${admin_username}:${admin_username} "$${SSH_KEY_PATH}" "$${EXTRA_VARS_FILE}"
+
+for _ in $(seq 1 180); do
+  if [ -f "$${WRAPPER_SCRIPT}" ] && [ -f "$${ANSIBLE_HOME}/inventory/hosts.yml" ]; then
+    break
+  fi
+  sleep 1
+done
+
+test -f "$${WRAPPER_SCRIPT}"
+test -f "$${ANSIBLE_HOME}/inventory/hosts.yml"
+test -s "$${EXTRA_VARS_FILE}"
+
+chmod +x "$${WRAPPER_SCRIPT}"
+ANSIBLE_BUNDLE_ROOT="$${ANSIBLE_HOME}" ANSIBLE_EXTRA_VARS_FILE="$${EXTRA_VARS_FILE}" "$${WRAPPER_SCRIPT}" "${admin_username}" "$${SSH_KEY_PATH}" "${db_node_private_ips_csv}" "${vm_name_prefix}" "-" "hosts.yml"
