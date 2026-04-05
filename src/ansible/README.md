@@ -7,12 +7,10 @@ This directory contains the Ansible configuration used to prepare hosts and depl
 | Path | Description |
 |---|---|
 | `ansible.cfg` | Main Ansible configuration |
-| `inventory/dev/` | Static development inventory |
-| `inventory/azure/` | Azure dynamic inventory and Azure-specific variables |
+| `inventory/<environment>/` | Invetory for specific environment |
 | `inventory/<environment>/databases/` | Vault-encrypted database spec files for post-initialization |
 | `playbooks/create-pgg-cluster.yml` | Main cluster deployment playbook |
 | `playbooks/destroy-ppg-cluster.yml` | Cluster cleanup playbook |
-| `playbooks/lvm-setup.yml` | Standalone LVM extension playbook |
 | `roles/` | Ansible roles for each stack component |
 
 ## Inventories
@@ -36,18 +34,6 @@ Run only PostgreSQL post-initialization (users/databases/grants/extensions):
 
 ```bash
 ansible-playbook playbooks/create-pgg-cluster.yml -t post_init
-```
-
-Static dev inventory example:
-
-```bash
-ansible-playbook -i inventory/dev/hosts.yaml playbooks/create-pgg-cluster.yml
-```
-
-### Extend LVM storage
-
-```bash
-ansible-playbook -i inventory/dev/hosts.yaml playbooks/lvm-setup.yml
 ```
 
 ### Destroy cluster
