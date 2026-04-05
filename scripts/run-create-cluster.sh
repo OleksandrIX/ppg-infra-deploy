@@ -8,7 +8,7 @@ fi
 
 # Cleanup function for trap
 cleanup() {
-  rm -f "$tmp_ssh_config"
+  [[ -n "$tmp_ssh_config" ]] && rm -f "$tmp_ssh_config"
   [[ -n "$tmp_extra_vars" ]] && rm -f "$tmp_extra_vars"
 }
 trap cleanup EXIT INT TERM
@@ -20,10 +20,11 @@ readonly db_node_private_ips_csv="$3"
 readonly vm_name_prefix="$4"
 readonly vault_password_file="${5:--}"
 readonly inventory_files_csv="${6:-}"
-readonly ssh_dir="$HOME/.ssh"
+readonly ssh_dir="/home/$admin_user/.ssh"
 mkdir -p "$ssh_dir"
 
 # Temporary files variables
+tmp_ssh_config=""
 tmp_ssh_config="$(mktemp "$ssh_dir/ppg-tmp-ssh-config.XXXXXX")"
 tmp_extra_vars=""
 
@@ -78,6 +79,9 @@ fi
 readonly ansible_root="$ANSIBLE_BUNDLE_ROOT"
 readonly env_inventory_dir="$ANSIBLE_BUNDLE_ROOT/inventory"
 readonly files_glob="$ANSIBLE_BUNDLE_ROOT/databases/*.yml"
+readonly log_dir="/home/$admin_user/logs"
+readonly log_file="$log_dir/ansible-$(date +%Y%m%d-%H%M%S).log"
+mkdir -p "$log_dir"
 
 export ANSIBLE_CONFIG="$ansible_root/ansible.cfg"
 
@@ -148,5 +152,5 @@ fi
 
 ansible_args+=("$playbook_path")
 
-# Replace current shell with ansible process
-exec ansible-playbook "${ansible_args[@]}"
+echo "Ansible log: $log_file"
+ansible-playbook "${ansible_args[@]}" 2>&1 | tee "$log_file"
