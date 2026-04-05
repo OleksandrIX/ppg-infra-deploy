@@ -37,6 +37,12 @@ variable "pgbackrest_azure_key" {
   sensitive   = true
 }
 
+variable "run_ansible_on_apply" {
+  description = "Enable ansible wrapper execution on ansible-host during terraform apply"
+  type        = bool
+  default     = false
+}
+
 variable "cluster_vm" {
   description = "Cluster VM configuration"
   type = object({

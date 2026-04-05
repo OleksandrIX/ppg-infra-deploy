@@ -42,7 +42,7 @@ module "database_cluster" {
   ansible_env_dir     = local.ansible_env_dir
   wrapper_script_path = local.wrapper_script_path
 
-  run_ansible_on_apply = true
+  run_ansible_on_apply = var.run_ansible_on_apply
   pgbackrest_azure_key = var.pgbackrest_azure_key
 
   depends_on = [
