@@ -8,6 +8,10 @@ if [ -n "${ansible_env_dir}" ] && [ -d "${ansible_env_dir}" ]; then
   cp -a "${ansible_env_dir}/." "$bundle_dir/"
 fi
 
+mkdir -p "$bundle_dir/scripts"
+cp -a "${wrapper_script_path}" "$bundle_dir/scripts/run-create-cluster.sh"
+chmod +x "$bundle_dir/scripts/run-create-cluster.sh"
+
 mkdir -p "$bundle_dir/inventory"
 cat > "$bundle_dir/inventory/hosts.yml" <<'INVENTORY_EOF'
 ${generated_inventory_content}

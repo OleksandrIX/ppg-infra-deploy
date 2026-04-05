@@ -210,3 +210,22 @@ variable "ansible_source_dir" {
   type        = string
   default     = ""
 }
+
+variable "wrapper_script_path" {
+  description = "Path to run-create-cluster wrapper script that should be bundled"
+  type        = string
+  default     = ""
+}
+
+variable "run_ansible_on_apply" {
+  description = "Execute run-create-cluster wrapper on ansible-host during terraform apply"
+  type        = bool
+  default     = true
+}
+
+variable "pgbackrest_azure_key" {
+  description = "pgBackRest Azure account key passed from Azure DevOps pipeline"
+  type        = string
+  default     = ""
+  sensitive   = true
+}

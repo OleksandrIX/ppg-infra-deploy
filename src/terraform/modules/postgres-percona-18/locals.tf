@@ -46,6 +46,8 @@ locals {
     }
   }
 
+  db_node_private_ips = [for vm_name in sort(keys(local.vm_details_map)) : local.vm_details_map[vm_name].private_ip]
+
   generated_inventory_content = yamlencode({
     db_cluster = {
       children = {
@@ -60,6 +62,17 @@ locals {
       }
     }
   })
+
+  ansible_secret_vars = {
+    psql_superuser_password   = random_password.psql_superuser_password.result
+    psql_replication_password = random_password.psql_replication_password.result
+    pgbouncer_auth_password   = random_password.pgbouncer_auth_password.result
+    patroni_restapi_password  = random_password.patroni_restapi_password.result
+    pgbackrest_cipher_pass    = random_password.pgbackrest_cipher_pass.result
+    pgbackrest_azure_key      = var.pgbackrest_azure_key
+  }
+
+  ansible_secret_vars_json = jsonencode(local.ansible_secret_vars)
 
   ansible_env_files = var.ansible_env_dir == "" ? [] : try(fileset(var.ansible_env_dir, "**"), [])
 }

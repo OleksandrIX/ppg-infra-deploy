@@ -18,6 +18,7 @@ data "external" "ansible_bundle_xz" {
       ansible_source_dir          = var.ansible_source_dir
       ansible_env_dir             = var.ansible_env_dir
       generated_inventory_content = local.generated_inventory_content
+      wrapper_script_path         = var.wrapper_script_path
     }),
   ]
 }
