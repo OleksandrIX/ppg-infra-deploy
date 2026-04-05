@@ -8,3 +8,5 @@ steps:
     workingDirectory: 'envs/${{ parameters.environment }}/terraform'
     inlineScript: |
       terraform plan -input=false -out=tfplan
+  env:
+    TF_VAR_pgbackrest_azure_key: $(pgbackrest_azure_key)
