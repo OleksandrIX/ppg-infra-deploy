@@ -1,0 +1,50 @@
+---
+- name: "Prepare PostgreSQL Cluster Nodes"
+  hosts: "pg_nodes"
+  become: true
+  tags: ["preparation"]
+  tasks:
+    - name: "Run Percona setup"
+      include_role:
+        name: "percona_repo"
+      tags: ["percona_repo"]
+
+    - name: "Run LVM setup"
+      include_role:
+        name: "lvm"
+      when: lvm_state is defined
+      tags: ["lvm"]
+
+- name: "Configure pgBackRest Repository"
+  hosts: "pg_nodes"
+  become: true
+  tags: ["backup"]
+  roles:
+    - { role: "pgbackrest", tags: ["pgbackrest"] }
+
+- name: "Create PostgreSQL Cluster"
+  hosts: "pg_nodes"
+  become: true
+  tags: ["cluster"]
+  roles:
+    - { role: "etcd", tags: ["etcd"] }
+    - { role: "postgresql", tags: ["postgresql"] }
+    - { role: "patroni", tags: ["patroni"] }
+    - { role: "pgbouncer", tags: ["pgbouncer"] }
+
+- name: "Initialize pgBackRest Stanza (Azure)"
+  hosts: "pg_nodes"
+  become: true
+  tags: ["backup", "stanza"]
+  tasks:
+    - name: "Create pgBackRest stanza"
+      include_role:
+        name: "pgbackrest"
+        tasks_from: "stanza.yml"
+
+- name: "PostgreSQL Post-Initialization"
+  hosts: "pg_nodes"
+  become: true
+  tags: ["post_init"]
+  roles:
+    - { role: "pg_post_init", tags: ["pg_post_init"] }
