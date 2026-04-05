@@ -105,6 +105,12 @@ variable "min_tls_version" {
   default     = "TLS1_2"
 }
 
+variable "bastion_subnet" {
+  description = "Azure Bastion subnet address prefix (must be named AzureBastionSubnet, minimum /26)"
+  type        = list(string)
+  default     = ["10.0.2.0/26"]
+}
+
 variable "key_vault_name" {
   description = "Azure Key Vault name (must be globally unique)"
   type        = string

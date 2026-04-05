@@ -19,6 +19,32 @@ resource "azurerm_subnet" "database_subnet" {
   address_prefixes     = var.database_subnet
 }
 
+resource "azurerm_public_ip" "nat_pip" {
+  name                = "pip-nat-gateway"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
+resource "azurerm_nat_gateway" "nat" {
+  name                    = "natgw-ppg-cluster"
+  location                = azurerm_resource_group.rg.location
+  resource_group_name     = azurerm_resource_group.rg.name
+  sku_name                = "Standard"
+  idle_timeout_in_minutes = 10
+}
+
+resource "azurerm_nat_gateway_public_ip_association" "nat_pip_assoc" {
+  nat_gateway_id       = azurerm_nat_gateway.nat.id
+  public_ip_address_id = azurerm_public_ip.nat_pip.id
+}
+
+resource "azurerm_subnet_nat_gateway_association" "database_subnet_nat" {
+  subnet_id      = azurerm_subnet.database_subnet.id
+  nat_gateway_id = azurerm_nat_gateway.nat.id
+}
+
 resource "azurerm_storage_account" "sa" {
   name                     = var.storage_account_name
   resource_group_name      = azurerm_resource_group.rg.name
@@ -47,6 +73,33 @@ resource "azurerm_storage_container" "ansible_artifacts" {
   name                  = var.ansible_artifacts_container_name
   storage_account_id    = azurerm_storage_account.sa.id
   container_access_type = var.ansible_artifacts_container_access_type
+}
+
+resource "azurerm_subnet" "bastion_subnet" {
+  name                 = "AzureBastionSubnet"
+  resource_group_name  = azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = var.bastion_subnet
+}
+
+resource "azurerm_public_ip" "bastion_pip" {
+  name                = "pip-bastion"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
+resource "azurerm_bastion_host" "bastion" {
+  name                = "bastion-ppg-cluster"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  ip_configuration {
+    name                 = "configuration"
+    subnet_id            = azurerm_subnet.bastion_subnet.id
+    public_ip_address_id = azurerm_public_ip.bastion_pip.id
+  }
 }
 
 resource "azurerm_key_vault" "kv" {
