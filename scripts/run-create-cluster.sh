@@ -6,6 +6,10 @@ if [[ "$#" -lt 4 || "$#" -gt 6 ]]; then
   exit 2
 fi
 
+# Temporary files — must be declared before trap so cleanup sees them under set -u
+tmp_ssh_config=""
+tmp_extra_vars=""
+
 # Cleanup function for trap
 cleanup() {
   [[ -n "$tmp_ssh_config" ]] && rm -f "$tmp_ssh_config"
@@ -23,10 +27,7 @@ readonly inventory_files_csv="${6:-}"
 readonly ssh_dir="/home/$admin_user/.ssh"
 mkdir -p "$ssh_dir"
 
-# Temporary files variables
-tmp_ssh_config=""
 tmp_ssh_config="$(mktemp "$ssh_dir/ppg-tmp-ssh-config.XXXXXX")"
-tmp_extra_vars=""
 
 # Generate SSH config
 : > "$tmp_ssh_config"
