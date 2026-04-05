@@ -34,10 +34,10 @@ locals {
     }
   }
 
-  ansible_host_cloud_init = templatefile("${path.module}/templates/ansible-host-cloud-init.sh.tftpl", {})
-
-  generated_dir      = "${path.module}/.generated"
-  ansible_bundle_dir = "${local.generated_dir}/ansible_bundle"
+  ansible_host_cloud_init = templatefile("${path.module}/templates/ansible-host-cloud-init.sh.tftpl", {
+    admin_username       = var.admin_username
+    ansible_bundle_xz_b64 = data.external.ansible_bundle_xz.result.archive_b64
+  })
 
   vm_details_map = {
     for i in range(var.cluster_vm.count) :

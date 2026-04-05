@@ -5,4 +5,17 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y software-properties-common
 add-apt-repository --yes --update ppa:ansible/ansible
-apt-get install -y ansible
+apt-get install -y ansible xz-utils
+
+ANSIBLE_HOME="/home/${admin_username}/ansible"
+BUNDLE_XZ_B64="/tmp/ansible-bundle.tar.xz.b64"
+BUNDLE_XZ="/tmp/ansible-bundle.tar.xz"
+
+mkdir -p "${ANSIBLE_HOME}"
+cat > "${BUNDLE_XZ_B64}" <<'BUNDLE_EOF'
+${ansible_bundle_xz_b64}
+BUNDLE_EOF
+
+base64 -d "${BUNDLE_XZ_B64}" > "${BUNDLE_XZ}"
+tar -xJf "${BUNDLE_XZ}" -C "${ANSIBLE_HOME}"
+chown -R ${admin_username}:${admin_username} "${ANSIBLE_HOME}"
