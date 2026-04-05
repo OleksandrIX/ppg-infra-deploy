@@ -51,6 +51,12 @@ variable "tfstate_container_name" {
   default     = "tfstate"
 }
 
+variable "ansible_artifacts_container_name" {
+  description = "Storage container name for Ansible artifacts"
+  type        = string
+  default     = "ansible-artifacts"
+}
+
 variable "pgbackrest_container_access_type" {
   description = "Access level for pgBackRest storage container"
   type        = string
@@ -59,6 +65,12 @@ variable "pgbackrest_container_access_type" {
 
 variable "tfstate_container_access_type" {
   description = "Access level for Terraform state storage container"
+  type        = string
+  default     = "private"
+}
+
+variable "ansible_artifacts_container_access_type" {
+  description = "Access level for Ansible artifacts storage container"
   type        = string
   default     = "private"
 }
