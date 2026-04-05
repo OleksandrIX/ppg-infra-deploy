@@ -33,4 +33,6 @@ locals {
       rule_name = tostring(pair[1])
     }
   }
+
+  ansible_host_cloud_init = templatefile("${path.module}/templates/ansible-host-cloud-init.sh.tftpl", {})
 }
