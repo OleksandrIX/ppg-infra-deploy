@@ -35,4 +35,31 @@ locals {
   }
 
   ansible_host_cloud_init = templatefile("${path.module}/templates/ansible-host-cloud-init.sh.tftpl", {})
+
+  generated_dir      = "${path.module}/.generated"
+  ansible_bundle_dir = "${local.generated_dir}/ansible_bundle"
+
+  vm_details_map = {
+    for i in range(var.cluster_vm.count) :
+    azurerm_linux_virtual_machine.vm[i].name => {
+      private_ip = azurerm_network_interface.nic[i].private_ip_address
+    }
+  }
+
+  generated_inventory_content = yamlencode({
+    db_cluster = {
+      children = {
+        pg_nodes = {
+          hosts = {
+            for vm_name, vm in local.vm_details_map :
+            vm_name => {
+              ansible_host = vm.private_ip
+            }
+          }
+        }
+      }
+    }
+  })
+
+  ansible_env_files = var.ansible_env_dir == "" ? [] : try(fileset(var.ansible_env_dir, "**"), [])
 }
