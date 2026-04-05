@@ -29,6 +29,10 @@ psql_password_encryption: "scram-sha-256"
 # Patroni configuration
 patroni_scope: "postgresql-cluster"
 patroni_namespace: "/service/"
+patroni_restapi_user: "admin"
+
+# PgBouncer configuration
+pgbouncer_auth_user: "pgbouncer_auth"
 
 # HAProxy + Keepalived deployment (disabled for Azure)
 haproxy_keepalived_enabled: false
