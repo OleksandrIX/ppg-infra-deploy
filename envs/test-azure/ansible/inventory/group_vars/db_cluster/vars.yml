@@ -1,9 +1,0 @@
-# Ansible variables
-# ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q oleksandrix@{{ hostvars[groups["jumpbox"][0]]["ansible_host"] }}"'
-
-# Hosts
-postgres_hosts: "{{ groups['pg_nodes'] }}"
-
-# PostgreSQL configuration
-psql_version: "17"
-psql_data_dir: "/var/lib/postgresql/data"
