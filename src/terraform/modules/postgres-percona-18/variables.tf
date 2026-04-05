@@ -208,5 +208,5 @@ variable "ansible_env_dir" {
 variable "ansible_source_dir" {
   description = "Path to ansible source directory containing playbooks and roles"
   type        = string
-  default     = "${path.module}/../../../src/ansible"
+  default     = ""
 }

@@ -156,3 +156,15 @@ variable "lb" {
     }
   }
 }
+
+variable "ansible_env_dir" {
+  description = "Optional environment-specific ansible files directory (e.g., containing group_vars)."
+  type        = string
+  default     = ""
+}
+
+variable "ansible_source_dir" {
+  description = "Path to ansible source directory containing playbooks and roles"
+  type        = string
+  default     = ""
+}
