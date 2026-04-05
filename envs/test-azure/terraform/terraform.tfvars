@@ -12,10 +12,6 @@ admin_username = "oleksandrix"
 # Key Vault name (created by foundation)
 key_vault_name = "kv-ppg-cluster-dev"
 
-# Ansible source and environment directories
-ansible_source_dir = "${path.module}/../../../src/ansible"
-ansible_env_dir    = "${path.module}/../ansible"
-
 # Ansible host settings
 ansible_host = {
   create                = true

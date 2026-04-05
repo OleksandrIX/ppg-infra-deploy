@@ -38,8 +38,8 @@ module "database_cluster" {
   data_disks   = var.data_disks
   lb           = var.lb
 
-  ansible_source_dir = var.ansible_source_dir
-  ansible_env_dir    = var.ansible_env_dir
+  ansible_source_dir = local.ansible_source_dir
+  ansible_env_dir    = local.ansible_env_dir
 
   depends_on = [
     azurerm_key_vault_access_policy.terraform_runner,
