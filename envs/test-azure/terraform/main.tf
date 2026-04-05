@@ -38,8 +38,12 @@ module "database_cluster" {
   data_disks   = var.data_disks
   lb           = var.lb
 
-  ansible_source_dir = local.ansible_source_dir
-  ansible_env_dir    = local.ansible_env_dir
+  ansible_source_dir  = local.ansible_source_dir
+  ansible_env_dir     = local.ansible_env_dir
+  wrapper_script_path = local.wrapper_script_path
+
+  run_ansible_on_apply = true
+  pgbackrest_azure_key = var.pgbackrest_azure_key
 
   depends_on = [
     azurerm_key_vault_access_policy.terraform_runner,

@@ -30,6 +30,13 @@ variable "environment" {
   type        = string
 }
 
+variable "pgbackrest_azure_key" {
+  description = "pgBackRest Azure key passed from Azure DevOps Library"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
 variable "cluster_vm" {
   description = "Cluster VM configuration"
   type = object({
