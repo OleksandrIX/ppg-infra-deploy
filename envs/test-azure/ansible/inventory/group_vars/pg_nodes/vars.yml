@@ -10,6 +10,7 @@ mount_path: "/var/lib/postgresql"
 postgres_monitoring_user: "exporter"
 
 # Hosts
+postgres_hosts: "{{ groups['pg_nodes'] }}"
 etcd_hosts: "{{ groups['pg_nodes'] }}"
 allow_connection_hosts: []
 
@@ -19,7 +20,9 @@ etcd_cluster_token: "ppg-cluster-dev-token"
 etcd_data_dir: "/var/lib/etcd/postgresql"
 
 # PostgreSQL configuration
+psql_version: "17"
 psql_home_dir: "/var/lib/postgresql"
+psql_data_dir: "/var/lib/postgresql/data"
 psql_bin_dir: "/usr/lib/postgresql/{{ psql_version }}/bin"
 psql_password_encryption: "scram-sha-256"
 
