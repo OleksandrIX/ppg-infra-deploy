@@ -1,7 +1,7 @@
 # Terraform variables for test-azure environment
-resource_group_name = "rg-ppg-cluster-dev"
-environment         = "test-azure"
-virtual_network_name         = "vnet-ppg-cluster"
+resource_group_name  = "rg-ppg-cluster-dev"
+environment          = "test-azure"
+virtual_network_name = "vnet-ppg-cluster"
 
 # Existing network values provided externally
 postgres_percona_subnet_name = "snet-database"
