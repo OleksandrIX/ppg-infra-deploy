@@ -35,8 +35,7 @@ locals {
   }
 
   ansible_host_cloud_init = templatefile("${path.module}/templates/ansible-host-cloud-init.sh.tftpl", {
-    admin_username       = var.admin_username
-    ansible_bundle_xz_b64 = data.external.ansible_bundle_xz.result.archive_b64
+    admin_username = var.admin_username
   })
 
   vm_details_map = {
