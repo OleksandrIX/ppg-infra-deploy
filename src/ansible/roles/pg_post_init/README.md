@@ -41,7 +41,7 @@ database_spec:
   owner: app_user
   users:
     - name: app_user
-      password: "super-secret"
+      password_env: APP_DB_USER_PASSWORD
       role_attr_flags: "LOGIN"
       grants:
         - type: database
@@ -50,6 +50,9 @@ database_spec:
     - pgcrypto
     - "uuid-ossp"
 ```
+
+Password sources for users:
+- `password_env`: name of environment variable that contains password (required)
 
 ## Validation Rules
 

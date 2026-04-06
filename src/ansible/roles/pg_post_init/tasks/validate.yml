@@ -34,8 +34,13 @@
     that:
       - db_user.name is defined
       - db_user.name | length > 0
-      - db_user.password is defined
-      - db_user.password | length > 0
+      - db_user.password_env is defined
+      - db_user.password_env | length > 0
+      - >-
+        (
+          lookup('ansible.builtin.env', db_user.password_env, default='')
+          | length
+        )
       - db_user.grants is defined
       - db_user.grants is iterable
       - db_user.grants | length > 0

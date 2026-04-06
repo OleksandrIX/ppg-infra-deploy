@@ -83,3 +83,4 @@ Each role has its own README under `roles/<role>/README.md`:
 - Sensitive values are stored in Ansible vault files under the relevant inventory group directories.
 - The create playbook runs `pgbackrest` on `db_cluster`, so shared backup-topology variables should be visible to all participating hosts at the correct inventory level.
 - Database post-initialization is managed by specs in `inventory/<environment>/databases/*.yml` (one `database_spec` per file, intended to be encrypted with Ansible Vault).
+- For database users, use `password_env` in specs and pass secrets as environment variables at runtime.
