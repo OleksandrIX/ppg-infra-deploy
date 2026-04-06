@@ -41,8 +41,9 @@ fi
 
 for idx in "${!node_ips[@]}"; do
   node_ip="${node_ips[$idx]}"
+  node_num=$((idx + 1))
   {
-    echo "Host ${vm_name_prefix}-vm-$idx $node_ip"
+    echo "Host ${vm_name_prefix}-vm-$node_num $node_ip"
     echo "  HostName $node_ip"
     echo "  User $admin_user"
     echo "  IdentityFile $ssh_priv_key_path"
