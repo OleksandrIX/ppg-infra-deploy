@@ -1,5 +1,5 @@
 resource "azurerm_lb" "lb" {
-  name                = var.lb.name
+  name                = var.lb_name
   location            = var.location
   resource_group_name = var.resource_group_name
   sku                 = var.lb.sku
@@ -15,7 +15,7 @@ resource "azurerm_lb" "lb" {
 resource "azurerm_lb_backend_address_pool" "backend_pool" {
   for_each = local.lb_rules
 
-  name            = "${var.lb.name}-${each.key}-backend-pool"
+  name            = "${var.lb_name}-${each.key}-backend-pool"
   loadbalancer_id = azurerm_lb.lb.id
 }
 
@@ -30,7 +30,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "nic_backe
 resource "azurerm_lb_probe" "health_probe" {
   for_each = local.lb_rules
 
-  name                = "${var.lb.name}-${each.key}-probe"
+  name                = "${var.lb_name}-${each.key}-probe"
   loadbalancer_id     = azurerm_lb.lb.id
   protocol            = each.value.probe_protocol
   port                = each.value.probe_port
@@ -42,7 +42,7 @@ resource "azurerm_lb_probe" "health_probe" {
 resource "azurerm_lb_rule" "lb_rule" {
   for_each = local.lb_rules
 
-  name                           = "${var.lb.name}-${each.key}-rule"
+  name                           = "${var.lb_name}-${each.key}-rule"
   loadbalancer_id                = azurerm_lb.lb.id
   protocol                       = each.value.protocol
   frontend_port                  = each.value.frontend_port

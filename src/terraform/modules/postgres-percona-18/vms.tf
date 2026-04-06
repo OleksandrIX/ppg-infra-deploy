@@ -1,7 +1,7 @@
 resource "azurerm_network_interface" "nic" {
   count = var.cluster_vm.count
 
-  name                = "${var.cluster_vm.name_prefix}-nic-${count.index + 1}"
+  name                = "${var.cluster_vm_name_prefix}-nic-${count.index + 1}"
   location            = var.location
   resource_group_name = var.resource_group_name
 
@@ -16,7 +16,7 @@ resource "azurerm_network_interface" "nic" {
 resource "azurerm_linux_virtual_machine" "vm" {
   count = var.cluster_vm.count
 
-  name                = "${var.cluster_vm.name_prefix}-vm-${count.index + 1}"
+  name                = "${var.cluster_vm_name_prefix}-vm-${count.index + 1}"
   resource_group_name = var.resource_group_name
   location            = var.location
   size                = var.cluster_vm.size
@@ -52,7 +52,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
 resource "azurerm_managed_disk" "data_disk" {
   for_each = local.vm_data_disks
 
-  name                 = "${var.cluster_vm.name_prefix}-data-${each.value.vm_index + 1}-lun-${each.value.disk_lun}"
+  name                 = "${var.cluster_vm_name_prefix}-data-${each.value.vm_index + 1}-lun-${each.value.disk_lun}"
   location             = var.location
   resource_group_name  = var.resource_group_name
   storage_account_type = each.value.config.storage_account_type

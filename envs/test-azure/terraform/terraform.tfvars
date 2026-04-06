@@ -12,11 +12,17 @@ admin_username = "oleksandrix"
 # Key Vault name (created by foundation)
 key_vault_name = "kv-ppg-cluster-dev"
 
-# Ansible host settings
+# Toggle Ansible execution on terraform apply
 run_ansible_on_apply = true
+
+# Naming settings
+cluster_vm_name_prefix = "percona-node"
+ansible_host_name      = "percona-ansible-host"
+lb_name                = "ppg-internal-lb"
+
+# Ansible host VM settings
 ansible_host = {
   create                = true
-  name                  = "percona-ansible-host"
   vm_size               = "Standard_D2s_v4"
   private_ip_hostnumber = 250
 }
@@ -24,7 +30,6 @@ ansible_host = {
 # Cluster VM settings
 cluster_vm = {
   count                         = 3
-  name_prefix                   = "percona-node"
   size                          = "Standard_D2s_v4"
   nic_ip_configuration_name     = "internal"
   private_ip_address_allocation = "Static"
@@ -57,7 +62,6 @@ data_disks = [
 
 # Internal load balancer settings
 lb = {
-  name                          = "ppg-internal-lb"
   frontend_private_ip_address   = "10.0.1.100"
   frontend_configuration_name   = "private-frontend"
   sku                           = "Standard"

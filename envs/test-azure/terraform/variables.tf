@@ -36,11 +36,28 @@ variable "run_ansible_on_apply" {
   default     = false
 }
 
+variable "cluster_vm_name_prefix" {
+  description = "Name prefix for cluster VMs"
+  type        = string
+  default     = "percona-node"
+}
+
+variable "ansible_host_name" {
+  description = "Name for ansible host VM"
+  type        = string
+  default     = "percona-ansible-host"
+}
+
+variable "lb_name" {
+  description = "Name for internal load balancer"
+  type        = string
+  default     = "ppg-internal-lb"
+}
+
 variable "cluster_vm" {
   description = "Cluster VM configuration"
   type = object({
     count                         = number
-    name_prefix                   = string
     size                          = string
     nic_ip_configuration_name     = string
     private_ip_address_allocation = string
@@ -62,7 +79,6 @@ variable "cluster_vm" {
 
   default = {
     count                         = 3
-    name_prefix                   = "percona-node"
     size                          = "Standard_D2s_v5"
     nic_ip_configuration_name     = "internal"
     private_ip_address_allocation = "Static"
@@ -87,14 +103,12 @@ variable "ansible_host" {
   description = "Ansible deployment host configuration"
   type = object({
     create                = bool
-    name                  = string
     vm_size               = string
     private_ip_hostnumber = number
   })
 
   default = {
     create                = true
-    name                  = "percona-ansible-host"
     vm_size               = "Standard_B2s"
     private_ip_hostnumber = 250
   }
@@ -116,7 +130,6 @@ variable "data_disks" {
 variable "lb" {
   description = "Internal load balancer configuration"
   type = object({
-    name                          = string
     frontend_private_ip_address   = string
     frontend_configuration_name   = string
     sku                           = string
@@ -140,7 +153,6 @@ variable "lb" {
   })
 
   default = {
-    name                          = "ppg-internal-lb"
     frontend_private_ip_address   = "10.0.0.100"
     frontend_configuration_name   = "private-frontend"
     sku                           = "Standard"

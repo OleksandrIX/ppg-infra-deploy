@@ -16,7 +16,7 @@ resource "azurerm_virtual_machine_run_command" "run_create_cluster" {
       ssh_private_key_pem      = tls_private_key.ssh.private_key_pem
       ansible_secret_vars_json = local.ansible_secret_vars_json
       db_node_private_ips_csv  = join(",", local.db_node_private_ips)
-      vm_name_prefix           = var.cluster_vm.name_prefix
+      vm_name_prefix           = var.cluster_vm_name_prefix
     })
   }
 

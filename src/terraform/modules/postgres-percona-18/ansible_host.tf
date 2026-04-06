@@ -1,6 +1,6 @@
 resource "azurerm_network_interface" "ansible_host_nic" {
   count               = var.ansible_host.create ? 1 : 0
-  name                = "${var.ansible_host.name}-nic"
+  name                = "${var.ansible_host_name}-nic"
   location            = var.location
   resource_group_name = var.resource_group_name
 
@@ -14,7 +14,7 @@ resource "azurerm_network_interface" "ansible_host_nic" {
 
 resource "azurerm_linux_virtual_machine" "ansible_host" {
   count               = var.ansible_host.create ? 1 : 0
-  name                = var.ansible_host.name
+  name                = var.ansible_host_name
   resource_group_name = var.resource_group_name
   location            = var.location
   size                = var.ansible_host.vm_size

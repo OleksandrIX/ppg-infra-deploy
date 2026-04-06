@@ -30,6 +30,10 @@ module "database_cluster" {
   data_disks   = var.data_disks
   lb           = var.lb
 
+  cluster_vm_name_prefix = var.cluster_vm_name_prefix
+  ansible_host_name      = var.ansible_host_name
+  lb_name                = var.lb_name
+
   ansible_source_dir  = local.ansible_source_dir
   ansible_env_dir     = local.ansible_env_dir
   wrapper_script_path = local.wrapper_script_path
