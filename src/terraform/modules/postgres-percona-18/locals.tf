@@ -63,11 +63,11 @@ locals {
   })
 
   ansible_secret_vars = {
-    # psql_superuser_password   = random_password.psql_superuser_password.result
-    # psql_replication_password = random_password.psql_replication_password.result
-    # pgbouncer_auth_password   = random_password.pgbouncer_auth_password.result
-    # patroni_restapi_password  = random_password.patroni_restapi_password.result
-    # pgbackrest_cipher_pass    = random_password.pgbackrest_cipher_pass.result
+    psql_superuser_password   = random_password.psql_superuser_password.result
+    psql_replication_password = random_password.psql_replication_password.result
+    pgbouncer_auth_password   = random_password.pgbouncer_auth_password.result
+    patroni_restapi_password  = random_password.patroni_restapi_password.result
+    pgbackrest_cipher_pass    = random_password.pgbackrest_cipher_pass.result
     pgbackrest_azure_key      = var.pgbackrest_azure_key
   }
 
