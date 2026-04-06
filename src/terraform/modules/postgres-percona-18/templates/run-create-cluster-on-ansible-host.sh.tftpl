@@ -15,6 +15,7 @@ if command -v cloud-init >/dev/null 2>&1; then
 fi
 
 mkdir -p "/home/${admin_username}/.ssh" "/home/${admin_username}/.secrets" "$${ANSIBLE_HOME}"
+chown -R ${admin_username}:${admin_username} "/home/${admin_username}/.ssh" "/home/${admin_username}/.secrets" "$${ANSIBLE_HOME}"
 
 cat > "$${BUNDLE_XZ_B64_FILE}" <<'BUNDLE_EOF'
 ${ansible_bundle_xz_b64}
@@ -41,4 +42,4 @@ test -f "$${ANSIBLE_HOME}/inventory/hosts.yml"
 test -s "$${EXTRA_VARS_FILE}"
 
 chmod +x "$${WRAPPER_SCRIPT}"
-ANSIBLE_BUNDLE_ROOT="$${ANSIBLE_HOME}" ANSIBLE_EXTRA_VARS_FILE="$${EXTRA_VARS_FILE}" "$${WRAPPER_SCRIPT}" "${admin_username}" "$${SSH_KEY_PATH}" "${db_node_private_ips_csv}" "${vm_name_prefix}" "-" "hosts.yml"
+sudo -u ${admin_username} -- env ANSIBLE_BUNDLE_ROOT="$${ANSIBLE_HOME}" ANSIBLE_EXTRA_VARS_FILE="$${EXTRA_VARS_FILE}" "$${WRAPPER_SCRIPT}" "${admin_username}" "$${SSH_KEY_PATH}" "${db_node_private_ips_csv}" "${vm_name_prefix}" "-" "hosts.yml"

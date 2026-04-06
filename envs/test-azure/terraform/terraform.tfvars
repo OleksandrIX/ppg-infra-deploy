@@ -13,7 +13,7 @@ admin_username = "oleksandrix"
 key_vault_name = "kv-ppg-cluster-dev"
 
 # Ansible host settings
-run_ansible_on_apply = false
+run_ansible_on_apply = true
 ansible_host = {
   create                = true
   name                  = "percona-ansible-host"

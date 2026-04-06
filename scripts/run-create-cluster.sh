@@ -14,6 +14,7 @@ tmp_extra_vars=""
 cleanup() {
   [[ -n "$tmp_ssh_config" ]] && rm -f "$tmp_ssh_config"
   [[ -n "$tmp_extra_vars" ]] && rm -f "$tmp_extra_vars"
+  return 0
 }
 trap cleanup EXIT INT TERM
 
@@ -83,6 +84,7 @@ readonly files_glob="$ANSIBLE_BUNDLE_ROOT/databases/*.yml"
 readonly log_dir="/home/$admin_user/logs"
 readonly log_file="$log_dir/ansible-$(date +%Y%m%d-%H%M%S).log"
 mkdir -p "$log_dir"
+chown "$admin_user:$admin_user" "$log_dir" || true
 
 export ANSIBLE_CONFIG="$ansible_root/ansible.cfg"
 
@@ -153,5 +155,15 @@ fi
 
 ansible_args+=("$playbook_path")
 
+set +e
 echo "Ansible log: $log_file"
-ansible-playbook "${ansible_args[@]}" 2>&1 | tee "$log_file"
+ansible-playbook "${ansible_args[@]}" >>"$log_file" 2>&1
+ansible_rc=$?
+set -e
+
+if [ "$ansible_rc" -ne 0 ]; then
+  echo "Ansible failed with return code $ansible_rc"
+  exit "$ansible_rc"
+fi
+
+echo "Ansible finished successfully"

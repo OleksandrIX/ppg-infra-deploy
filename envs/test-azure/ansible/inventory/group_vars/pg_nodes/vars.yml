@@ -38,7 +38,8 @@ pgbouncer_auth_user: "pgbouncer_auth"
 haproxy_keepalived_enabled: false
 
 # pgBackRest configuration
+pgbackrest_azure_key_type: "shared"
 pgbackrest_repo_type: "azure"
 pgbackrest_stanza: "ppg-cluster"
-pgbackrest_azure_account: "ppgclusterpgbackrest"
+pgbackrest_azure_account: "ppgclusterpgbackrest2"
 pgbackrest_azure_container: "pgbackrest-repo"
