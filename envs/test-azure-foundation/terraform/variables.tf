@@ -121,3 +121,9 @@ variable "key_vault_sku" {
   type        = string
   default     = "standard"
 }
+
+variable "additional_key_vault_object_ids" {
+  description = "Additional Azure AD object IDs that need Key Vault secret permissions (e.g., pipeline runners)"
+  type        = list(string)
+  default     = []
+}

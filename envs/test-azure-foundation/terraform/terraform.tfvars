@@ -25,3 +25,7 @@ min_tls_version                  = "TLS1_2"
 # Key Vault settings
 key_vault_name = "kv-ppg-cluster-dev"
 key_vault_sku  = "standard"
+
+additional_key_vault_object_ids = [
+  "8ad51a80-413d-46f2-8eec-40f2befe3739",
+]
