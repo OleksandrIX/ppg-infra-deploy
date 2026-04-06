@@ -94,6 +94,7 @@ resource "azurerm_bastion_host" "bastion" {
   name                = "bastion-ppg-cluster"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "Standard"
 
   ip_configuration {
     name                 = "configuration"
