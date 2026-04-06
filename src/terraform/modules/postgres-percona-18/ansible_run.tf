@@ -31,11 +31,11 @@ resource "azurerm_virtual_machine_run_command" "run_create_cluster" {
     azurerm_linux_virtual_machine.vm,
     azurerm_virtual_machine_data_disk_attachment.data_attach,
     azurerm_linux_virtual_machine.ansible_host,
-    azurerm_key_vault_secret.psql_superuser_password,
-    azurerm_key_vault_secret.psql_replication_password,
-    azurerm_key_vault_secret.pgbouncer_auth_password,
-    azurerm_key_vault_secret.patroni_restapi_password,
-    azurerm_key_vault_secret.pgbackrest_cipher_pass,
-    azurerm_key_vault_secret.pgbackrest_azure_key,
+    # azurerm_key_vault_secret.psql_superuser_password,
+    # azurerm_key_vault_secret.psql_replication_password,
+    # azurerm_key_vault_secret.pgbouncer_auth_password,
+    # azurerm_key_vault_secret.patroni_restapi_password,
+    # azurerm_key_vault_secret.pgbackrest_cipher_pass,
+    # azurerm_key_vault_secret.pgbackrest_azure_key,
   ]
 }
