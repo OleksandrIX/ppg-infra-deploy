@@ -53,8 +53,7 @@ resource "azurerm_key_vault_secret" "pgbackrest_cipher_pass" {
   key_vault_id = var.key_vault_id
 }
 
-resource "azurerm_key_vault_secret" "pgbackrest_azure_key" {
+data "azurerm_key_vault_secret" "pgbackrest_azure_key" {
   name         = "${var.cluster_vm.name_prefix}-pgbackrest-azure-key"
-  value        = var.pgbackrest_azure_key
   key_vault_id = var.key_vault_id
 }

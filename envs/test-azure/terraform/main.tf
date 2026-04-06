@@ -35,7 +35,6 @@ module "database_cluster" {
   wrapper_script_path = local.wrapper_script_path
 
   run_ansible_on_apply = var.run_ansible_on_apply
-  pgbackrest_azure_key = var.pgbackrest_azure_key
 
   depends_on = [
     azurerm_key_vault_access_policy.terraform_runner,

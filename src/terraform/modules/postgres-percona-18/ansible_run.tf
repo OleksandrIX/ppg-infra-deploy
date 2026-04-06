@@ -22,8 +22,8 @@ resource "azurerm_virtual_machine_run_command" "run_create_cluster" {
 
   lifecycle {
     precondition {
-      condition     = !var.run_ansible_on_apply || length(trimspace(var.pgbackrest_azure_key)) > 0
-      error_message = "pgbackrest_azure_key must be provided when run_ansible_on_apply is enabled."
+      condition     = !var.run_ansible_on_apply || length(trimspace(data.azurerm_key_vault_secret.pgbackrest_azure_key.value)) > 0
+      error_message = "pgbackrest_azure_key secret is missing or empty in Key Vault when run_ansible_on_apply is enabled."
     }
   }
 
@@ -36,6 +36,6 @@ resource "azurerm_virtual_machine_run_command" "run_create_cluster" {
     azurerm_key_vault_secret.pgbouncer_auth_password,
     azurerm_key_vault_secret.patroni_restapi_password,
     azurerm_key_vault_secret.pgbackrest_cipher_pass,
-    azurerm_key_vault_secret.pgbackrest_azure_key,
+    data.azurerm_key_vault_secret.pgbackrest_azure_key,
   ]
 }

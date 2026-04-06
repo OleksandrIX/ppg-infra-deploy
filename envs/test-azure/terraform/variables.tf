@@ -30,13 +30,6 @@ variable "environment" {
   type        = string
 }
 
-variable "pgbackrest_azure_key" {
-  description = "pgBackRest Azure key passed from Azure DevOps Library"
-  type        = string
-  default     = ""
-  sensitive   = true
-}
-
 variable "run_ansible_on_apply" {
   description = "Enable ansible wrapper execution on ansible-host during terraform apply"
   type        = bool

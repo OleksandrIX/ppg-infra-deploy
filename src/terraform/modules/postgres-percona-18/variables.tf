@@ -222,10 +222,3 @@ variable "run_ansible_on_apply" {
   type        = bool
   default     = true
 }
-
-variable "pgbackrest_azure_key" {
-  description = "pgBackRest Azure account key passed from Azure DevOps pipeline"
-  type        = string
-  default     = ""
-  sensitive   = true
-}
