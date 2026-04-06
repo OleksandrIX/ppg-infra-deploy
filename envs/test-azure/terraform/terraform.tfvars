@@ -15,11 +15,6 @@ key_vault_name = "kv-ppg-cluster-dev"
 # Toggle Ansible execution on terraform apply
 run_ansible_on_apply = true
 
-# Naming settings
-cluster_vm_name_prefix = "percona-node"
-ansible_host_name      = "percona-ansible-host"
-lb_name                = "ppg-internal-lb"
-
 # Ansible host VM settings
 ansible_host = {
   create                = true

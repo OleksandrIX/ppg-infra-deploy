@@ -36,24 +36,6 @@ variable "run_ansible_on_apply" {
   default     = false
 }
 
-variable "cluster_vm_name_prefix" {
-  description = "Name prefix for cluster VMs"
-  type        = string
-  default     = "percona-node"
-}
-
-variable "ansible_host_name" {
-  description = "Name for ansible host VM"
-  type        = string
-  default     = "percona-ansible-host"
-}
-
-variable "lb_name" {
-  description = "Name for internal load balancer"
-  type        = string
-  default     = "ppg-internal-lb"
-}
-
 variable "cluster_vm" {
   description = "Cluster VM configuration"
   type = object({

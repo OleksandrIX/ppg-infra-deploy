@@ -30,9 +30,9 @@ module "database_cluster" {
   data_disks   = var.data_disks
   lb           = var.lb
 
-  cluster_vm_name_prefix = var.cluster_vm_name_prefix
-  ansible_host_name      = var.ansible_host_name
-  lb_name                = var.lb_name
+  cluster_vm_name_prefix = local.postgres_percona_cluster_vm_name_prefix
+  ansible_host_name      = local.postgres_percona_ansible_host_name
+  lb_name                = local.postgres_percona_lb_name
 
   ansible_source_dir  = local.ansible_source_dir
   ansible_env_dir     = local.ansible_env_dir
