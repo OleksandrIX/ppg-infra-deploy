@@ -4,6 +4,11 @@ variable "resource_group_name" {
   default     = "rg-ppg-cluster-dev"
 }
 
+variable "environment" {
+  description = "Environment name"
+  type        = string
+}
+
 variable "virtual_network_name" {
   description = "Existing virtual network name where postgres subnet exists"
   type        = string
@@ -14,29 +19,24 @@ variable "postgres_percona_subnet_name" {
   type        = string
 }
 
-variable "admin_username" {
+variable "postgres_percona_admin_username" {
   description = "Administrator username for all virtual machines"
   type        = string
   default     = "oleksandrix"
 }
 
-variable "key_vault_name" {
+variable "postgres_percona_key_vault_name" {
   description = "Azure Key Vault name where SSH keys are stored"
   type        = string
 }
 
-variable "environment" {
-  description = "Environment name"
-  type        = string
-}
-
-variable "run_ansible_on_apply" {
+variable "postgres_percona_run_ansible_on_apply" {
   description = "Enable ansible wrapper execution on ansible-host during terraform apply"
   type        = bool
   default     = false
 }
 
-variable "cluster_vm" {
+variable "postgres_percona_cluster_vm" {
   description = "Cluster VM configuration"
   type = object({
     count                         = number
@@ -81,7 +81,7 @@ variable "cluster_vm" {
   }
 }
 
-variable "ansible_host" {
+variable "postgres_percona_ansible_host" {
   description = "Ansible deployment host configuration"
   type = object({
     create                = bool
@@ -96,7 +96,7 @@ variable "ansible_host" {
   }
 }
 
-variable "data_disks" {
+variable "postgres_percona_data_disks" {
   description = "List of data disks to create per cluster VM"
   type = list(object({
     storage_account_type = string
@@ -109,7 +109,7 @@ variable "data_disks" {
   default = []
 }
 
-variable "lb" {
+variable "postgres_percona_lb" {
   description = "Internal load balancer configuration"
   type = object({
     frontend_private_ip_address   = string
