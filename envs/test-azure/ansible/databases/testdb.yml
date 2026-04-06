@@ -5,7 +5,7 @@ database_spec:
 
   users:
     - name: "testuser"
-      password_env: "ANSIBLE_TESTDB_TESTUSER_PASSWORD"
+      password: "password123"
       role_attr_flags: "LOGIN"
       grants:
         - type: "database"
