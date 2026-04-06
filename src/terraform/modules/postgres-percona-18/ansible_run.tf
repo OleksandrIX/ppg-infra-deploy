@@ -8,7 +8,10 @@ resource "azurerm_virtual_machine_run_command" "run_create_cluster" {
   source {
     script = templatefile("${path.module}/templates/run-create-cluster-on-ansible-host.sh.tftpl", {
       admin_username           = var.admin_username
-      bundle_hash              = sha1(data.external.ansible_bundle_xz.result.archive_b64)
+      bundle_hash              = sha1(join("", [
+        data.external.ansible_bundle_xz.result.archive_b64,
+        data.external.ansible_bundle_xz.result.bundle_template_hash
+      ]))
       ansible_bundle_xz_b64    = data.external.ansible_bundle_xz.result.archive_b64
       ssh_private_key_pem      = tls_private_key.ssh.private_key_pem
       ansible_secret_vars_json = local.ansible_secret_vars_json

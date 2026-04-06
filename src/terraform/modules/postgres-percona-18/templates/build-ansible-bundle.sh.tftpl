@@ -17,5 +17,13 @@ cat > "$bundle_dir/inventory/hosts.yml" <<'INVENTORY_EOF'
 ${generated_inventory_content}
 INVENTORY_EOF
 
-archive_b64="$(tar -C "$bundle_dir" -c . | xz -9 -T1 | base64 -w0)"
-printf '{"archive_b64":"%s"}' "$archive_b64"
+# Keep docs out of runtime artifact so README edits do not trigger infra updates.
+find "$bundle_dir" -type f \( -name '*.md' -o -name '*.MD' \) -delete
+
+# Build a deterministic archive so unchanged inputs don't trigger perpetual diffs.
+archive_b64="$(tar \
+  --sort=name \
+  --mtime='UTC 1970-01-01' \
+  --owner=0 --group=0 --numeric-owner \
+  -C "$bundle_dir" -c . | xz -9 -T1 | base64 -w0)"
+printf '{"archive_b64":"%s","bundle_template_hash":"%s"}' "$archive_b64" "${bundle_template_hash}"
