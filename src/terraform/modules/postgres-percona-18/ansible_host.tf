@@ -5,9 +5,9 @@ resource "azurerm_network_interface" "ansible_host_nic" {
   resource_group_name = var.resource_group_name
 
   ip_configuration {
-    name                          = var.cluster_vm.nic_ip_configuration_name
+    name                          = var.ansible_host.nic_ip_configuration_name
     subnet_id                     = var.subnet_id
-    private_ip_address_allocation = var.cluster_vm.private_ip_address_allocation
+    private_ip_address_allocation = var.ansible_host.private_ip_address_allocation
     private_ip_address            = cidrhost(var.subnet_prefix, var.ansible_host.private_ip_hostnumber)
   }
 }
@@ -31,15 +31,15 @@ resource "azurerm_linux_virtual_machine" "ansible_host" {
   }
 
   os_disk {
-    caching              = var.cluster_vm.os_disk.caching
-    storage_account_type = var.cluster_vm.os_disk.storage_account_type
+    caching              = var.ansible_host.os_disk.caching
+    storage_account_type = var.ansible_host.os_disk.storage_account_type
   }
 
   source_image_reference {
-    publisher = var.cluster_vm.image.publisher
-    offer     = var.cluster_vm.image.offer
-    sku       = var.cluster_vm.image.sku
-    version   = var.cluster_vm.image.version
+    publisher = var.ansible_host.image.publisher
+    offer     = var.ansible_host.image.offer
+    sku       = var.ansible_host.image.sku
+    version   = var.ansible_host.image.version
   }
 
   boot_diagnostics {

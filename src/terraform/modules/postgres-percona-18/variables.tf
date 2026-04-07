@@ -30,18 +30,64 @@ variable "key_vault_id" {
   type        = string
 }
 
+variable "cluster_vm_name_prefix" {
+  description = "Name prefix for cluster VMs"
+  type        = string
+  default     = "percona-node"
+}
+
+variable "ansible_host_name" {
+  description = "Name for ansible host VM"
+  type        = string
+  default     = "percona-ansible-host"
+}
+
+variable "lb_name" {
+  description = "Name for internal load balancer"
+  type        = string
+  default     = "ppg-internal-lb"
+}
+
 variable "ansible_host" {
   description = "Dedicated host configuration for running Ansible deployment"
   type = object({
-    create                = bool
-    vm_size               = string
-    private_ip_hostnumber = number
+    create                        = optional(bool, true)
+    vm_size                       = optional(string, "Standard_B2s")
+    private_ip_hostnumber         = optional(number, 250)
+    nic_ip_configuration_name     = optional(string, "internal")
+    private_ip_address_allocation = optional(string, "Static")
+
+    os_disk = optional(object({
+      caching              = optional(string, "ReadWrite")
+      storage_account_type = optional(string, "Premium_LRS")
+    }), {})
+
+    image = optional(object({
+      publisher = optional(string, "Canonical")
+      offer     = optional(string, "0001-com-ubuntu-server-noble")
+      sku       = optional(string, "24_04-lts")
+      version   = optional(string, "latest")
+    }), {})
   })
 
   default = {
-    create                = true
-    vm_size               = "Standard_B2s"
-    private_ip_hostnumber = 250
+    create                        = true
+    vm_size                       = "Standard_B2s"
+    private_ip_hostnumber         = 250
+    nic_ip_configuration_name     = "internal"
+    private_ip_address_allocation = "Static"
+
+    os_disk = {
+      caching              = "ReadWrite"
+      storage_account_type = "Premium_LRS"
+    }
+
+    image = {
+      publisher = "Canonical"
+      offer     = "0001-com-ubuntu-server-noble"
+      sku       = "24_04-lts"
+      version   = "latest"
+    }
   }
 }
 
@@ -191,24 +237,6 @@ variable "lb" {
       }
     }
   }
-}
-
-variable "cluster_vm_name_prefix" {
-  description = "Name prefix for cluster VMs"
-  type        = string
-  default     = "percona-node"
-}
-
-variable "ansible_host_name" {
-  description = "Name for ansible host VM"
-  type        = string
-  default     = "percona-ansible-host"
-}
-
-variable "lb_name" {
-  description = "Name for internal load balancer"
-  type        = string
-  default     = "ppg-internal-lb"
 }
 
 variable "ansible_env_dir" {
