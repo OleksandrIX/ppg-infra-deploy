@@ -49,7 +49,7 @@ variable "lb_name" {
 }
 
 variable "ansible_host" {
-  description = "Dedicated host configuration for running Ansible deployment"
+  description = "Ansible deployment host configuration"
   type = object({
     create                        = optional(bool, true)
     vm_size                       = optional(string, "Standard_B2s")
@@ -93,25 +93,25 @@ variable "ansible_host" {
 
 variable "cluster_vm" {
   description = "Cluster VM configuration"
-  type = object({
-    count                         = number
-    size                          = string
-    nic_ip_configuration_name     = string
-    private_ip_address_allocation = string
-    private_ip_host_offset        = number
-    zones                         = list(string)
+   type = object({
+    count                         = optional(number, 3)
+    size                          = optional(string, "Standard_D2s_v5")
+    nic_ip_configuration_name     = optional(string, "internal")
+    private_ip_address_allocation = optional(string, "Static")
+    private_ip_host_offset        = optional(number, 10)
+    zones                         = optional(list(string), ["1", "2", "3"])
 
-    os_disk = object({
-      caching              = string
-      storage_account_type = string
-    })
+    os_disk = optional(object({
+      caching              = optional(string, "ReadWrite")
+      storage_account_type = optional(string, "Premium_LRS")
+    }), {})
 
-    image = object({
-      publisher = string
-      offer     = string
-      sku       = string
-      version   = string
-    })
+    image = optional(object({
+      publisher = optional(string, "Canonical")
+      offer     = optional(string, "0001-com-ubuntu-server-noble")
+      sku       = optional(string, "24_04-lts")
+      version   = optional(string, "latest")
+    }), {})
   })
 
   default = {
@@ -129,8 +129,8 @@ variable "cluster_vm" {
 
     image = {
       publisher = "Canonical"
-      offer     = "0001-com-ubuntu-server-jammy"
-      sku       = "22_04-lts"
+      offer     = "0001-com-ubuntu-server-noble"
+      sku       = "24_04-lts"
       version   = "latest"
     }
   }
@@ -195,16 +195,16 @@ variable "lb" {
   description = "Internal load balancer configuration"
   type = object({
     frontend_private_ip_address   = string
-    frontend_configuration_name   = string
-    sku                           = string
-    private_ip_address_allocation = string
-    probe_interval_in_seconds     = number
-    number_of_probes              = number
-    default_protocol              = string
-    default_idle_timeout_minutes  = number
-    default_disable_outbound_snat = bool
+    frontend_configuration_name   = optional(string, "private-frontend")
+    sku                           = optional(string, "Standard")
+    private_ip_address_allocation = optional(string, "Static")
+    probe_interval_in_seconds     = optional(number, 5)
+    number_of_probes              = optional(number, 2)
+    default_protocol              = optional(string, "Tcp")
+    default_idle_timeout_minutes  = optional(number, 4)
+    default_disable_outbound_snat = optional(bool, false)
 
-    rules = map(object({
+    rules = optional(map(object({
       frontend_port           = number
       backend_port            = optional(number)
       protocol                = optional(string)
@@ -213,7 +213,15 @@ variable "lb" {
       probe_request_path      = optional(string)
       idle_timeout_in_minutes = optional(number)
       disable_outbound_snat   = optional(bool)
-    }))
+      })), {
+      postgres = {
+        frontend_port      = 5432
+        backend_port       = 6432
+        probe_port         = 8008
+        probe_protocol     = "Http"
+        probe_request_path = "/primary"
+      }
+    })
   })
 
   default = {

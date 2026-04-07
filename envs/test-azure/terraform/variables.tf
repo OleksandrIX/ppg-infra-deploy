@@ -36,6 +36,49 @@ variable "postgres_percona_run_ansible_on_apply" {
   default     = false
 }
 
+variable "postgres_percona_ansible_host" {
+  description = "Ansible deployment host configuration"
+  type = object({
+    create                        = optional(bool, true)
+    vm_size                       = optional(string, "Standard_B2s")
+    private_ip_hostnumber         = optional(number, 250)
+    nic_ip_configuration_name     = optional(string, "internal")
+    private_ip_address_allocation = optional(string, "Static")
+
+    os_disk = optional(object({
+      caching              = optional(string, "ReadWrite")
+      storage_account_type = optional(string, "Premium_LRS")
+    }), {})
+
+    image = optional(object({
+      publisher = optional(string, "Canonical")
+      offer     = optional(string, "0001-com-ubuntu-server-noble")
+      sku       = optional(string, "24_04-lts")
+      version   = optional(string, "latest")
+    }), {})
+  })
+
+  default = {
+    create                        = true
+    vm_size                       = "Standard_B2s"
+    private_ip_hostnumber         = 250
+    nic_ip_configuration_name     = "internal"
+    private_ip_address_allocation = "Static"
+
+    os_disk = {
+      caching              = "ReadWrite"
+      storage_account_type = "Premium_LRS"
+    }
+
+    image = {
+      publisher = "Canonical"
+      offer     = "0001-com-ubuntu-server-noble"
+      sku       = "24_04-lts"
+      version   = "latest"
+    }
+  }
+}
+
 variable "postgres_percona_cluster_vm" {
   description = "Cluster VM configuration"
   type = object({
@@ -66,49 +109,6 @@ variable "postgres_percona_cluster_vm" {
     private_ip_address_allocation = "Static"
     private_ip_host_offset        = 10
     zones                         = ["1", "2", "3"]
-
-    os_disk = {
-      caching              = "ReadWrite"
-      storage_account_type = "Premium_LRS"
-    }
-
-    image = {
-      publisher = "Canonical"
-      offer     = "0001-com-ubuntu-server-noble"
-      sku       = "24_04-lts"
-      version   = "latest"
-    }
-  }
-}
-
-variable "postgres_percona_ansible_host" {
-  description = "Ansible deployment host configuration"
-  type = object({
-    create                        = optional(bool, true)
-    vm_size                       = optional(string, "Standard_B2s")
-    private_ip_hostnumber         = optional(number, 250)
-    nic_ip_configuration_name     = optional(string, "internal")
-    private_ip_address_allocation = optional(string, "Static")
-
-    os_disk = optional(object({
-      caching              = optional(string, "ReadWrite")
-      storage_account_type = optional(string, "Premium_LRS")
-    }), {})
-
-    image = optional(object({
-      publisher = optional(string, "Canonical")
-      offer     = optional(string, "0001-com-ubuntu-server-noble")
-      sku       = optional(string, "24_04-lts")
-      version   = optional(string, "latest")
-    }), {})
-  })
-
-  default = {
-    create                        = true
-    vm_size                       = "Standard_B2s"
-    private_ip_hostnumber         = 250
-    nic_ip_configuration_name     = "internal"
-    private_ip_address_allocation = "Static"
 
     os_disk = {
       caching              = "ReadWrite"
