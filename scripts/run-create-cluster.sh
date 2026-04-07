@@ -99,7 +99,8 @@ readonly inventory_files_csv
 readonly pgbackrest_azure_account
 readonly pgbackrest_azure_container
 readonly ssh_dir="/home/$admin_user/.ssh"
-mkdir -p "$ssh_dir"
+readonly extra_vars_dir="/home/$admin_user/.ansible-tmp"
+mkdir -p "$ssh_dir" "$extra_vars_dir"
 
 tmp_ssh_config="$(mktemp "$ssh_dir/ppg-tmp-ssh-config.XXXXXX")"
 
@@ -130,7 +131,7 @@ chmod 600 "$tmp_ssh_config"
 
 # Handle optional extra vars for Azure
 if [[ -n "$pgbackrest_azure_account" || -n "$pgbackrest_azure_container" ]]; then
-  tmp_extra_vars="$(mktemp /tmp/ppg-extra-vars.XXXXXX.yml)"
+  tmp_extra_vars="$(mktemp "$extra_vars_dir/ppg-extra-vars.XXXXXX.yml")"
 
   [[ -n "$pgbackrest_azure_account" ]] && \
     printf "pgbackrest_azure_account: '%s'\n" "$pgbackrest_azure_account" >> "$tmp_extra_vars"
