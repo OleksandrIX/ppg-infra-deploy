@@ -13,7 +13,7 @@ data "azurerm_key_vault" "postgres_percona_key_vault" {
   resource_group_name = var.resource_group_name
 }
 
-module "database_cluster" {
+module "postgres_percona_database_cluster" {
   source = "../../../src/terraform/modules/postgres-percona-18"
 
   resource_group_name = data.azurerm_resource_group.main.name
