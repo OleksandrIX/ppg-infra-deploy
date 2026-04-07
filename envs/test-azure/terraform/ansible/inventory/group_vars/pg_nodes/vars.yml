@@ -1,6 +1,6 @@
 # LVM configuration for PostgreSQL data storage
 lvm_state: "create"
-pv_devices: ["/dev/disk/azure/scsi1/lun10"]
+pv_devices: ["/dev/disk/azure/scsi1/lun10", "/dev/disk/azure/scsi1/lun11"]
 vg_name: "vg_pgdata"
 lv_name: "lv_pgdata"
 fs_type: "xfs"

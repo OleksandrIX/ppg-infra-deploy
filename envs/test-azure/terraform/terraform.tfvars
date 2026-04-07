@@ -39,6 +39,13 @@ postgres_percona_data_disks = [
     lun                  = 10
     caching              = "ReadOnly"
   },
+  {
+    storage_account_type = "Premium_ZRS"
+    create_option        = "Empty"
+    size_gb              = 128
+    lun                  = 11
+    caching              = "ReadOnly"
+  },
 ]
 
 # Internal load balancer settings
