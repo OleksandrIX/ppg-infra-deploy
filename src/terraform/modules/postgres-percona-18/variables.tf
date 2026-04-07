@@ -64,8 +64,8 @@ variable "ansible_host" {
 
     image = optional(object({
       publisher = optional(string, "Canonical")
-      offer     = optional(string, "0001-com-ubuntu-server-noble")
-      sku       = optional(string, "24_04-lts")
+      offer     = optional(string, "ubuntu-24_04-lts")
+      sku       = optional(string, "server")
       version   = optional(string, "latest")
     }), {})
   })
@@ -84,8 +84,8 @@ variable "ansible_host" {
 
     image = {
       publisher = "Canonical"
-      offer     = "0001-com-ubuntu-server-noble"
-      sku       = "24_04-lts"
+      offer     = "ubuntu-24_04-lts"
+      sku       = "server"
       version   = "latest"
     }
   }
@@ -108,8 +108,8 @@ variable "cluster_vm" {
 
     image = optional(object({
       publisher = optional(string, "Canonical")
-      offer     = optional(string, "0001-com-ubuntu-server-noble")
-      sku       = optional(string, "24_04-lts")
+      offer     = optional(string, "ubuntu-24_04-lts")
+      sku       = optional(string, "server")
       version   = optional(string, "latest")
     }), {})
   })
@@ -129,8 +129,8 @@ variable "cluster_vm" {
 
     image = {
       publisher = "Canonical"
-      offer     = "0001-com-ubuntu-server-noble"
-      sku       = "24_04-lts"
+      offer     = "ubuntu-24_04-lts"
+      sku       = "server"
       version   = "latest"
     }
   }
