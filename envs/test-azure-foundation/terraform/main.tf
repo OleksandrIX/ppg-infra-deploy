@@ -69,12 +69,6 @@ resource "azurerm_storage_container" "tfstate" {
   container_access_type = var.tfstate_container_access_type
 }
 
-resource "azurerm_storage_container" "ansible_artifacts" {
-  name                  = var.ansible_artifacts_container_name
-  storage_account_id    = azurerm_storage_account.sa.id
-  container_access_type = var.ansible_artifacts_container_access_type
-}
-
 resource "azurerm_subnet" "bastion_subnet" {
   name                 = "AzureBastionSubnet"
   resource_group_name  = azurerm_resource_group.rg.name
