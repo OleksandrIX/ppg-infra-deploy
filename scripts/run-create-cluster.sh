@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ "$#" -lt 4 || "$#" -gt 6 ]]; then
-  echo "Usage: $0 <admin_user> <ssh_private_key_path> <db_node_private_ips_csv> <vm_name_prefix> [vault_password_file|-] [inventory_files_csv]" >&2
-  exit 2
-fi
+usage() {
+  cat >&2 <<'EOF'
+Usage:
+  run-create-cluster.sh --admin-user <user> --ssh-private-key-path <path> \
+    --db-node-private-ips-csv <ip1,ip2,...> --vm-name-prefix <prefix> \
+    [--vault-password-file <path|->] [--inventory-files-csv <file1,file2,...>] \
+    [--pgbackrest-azure-account <account>] [--pgbackrest-azure-container <container>]
+EOF
+}
 
 # Temporary files — must be declared before trap so cleanup sees them under set -u
 tmp_ssh_config=""
@@ -18,13 +23,81 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-# Set readonly variables from script arguments
-readonly admin_user="$1"
-readonly ssh_priv_key_path="$2"
-readonly db_node_private_ips_csv="$3"
-readonly vm_name_prefix="$4"
-readonly vault_password_file="${5:--}"
-readonly inventory_files_csv="${6:-}"
+# Parse script arguments.
+admin_user=""
+ssh_priv_key_path=""
+db_node_private_ips_csv=""
+vm_name_prefix=""
+vault_password_file="-"
+inventory_files_csv=""
+pgbackrest_azure_account="${PGBACKREST_AZURE_ACCOUNT:-}"
+pgbackrest_azure_container="${PGBACKREST_AZURE_CONTAINER:-}"
+
+if [[ "$#" -eq 0 ]]; then
+  usage
+  exit 2
+fi
+
+while [[ "$#" -gt 0 ]]; do
+  case "$1" in
+    --admin-user)
+      admin_user="${2:-}"
+      shift 2
+      ;;
+    --ssh-private-key-path)
+      ssh_priv_key_path="${2:-}"
+      shift 2
+      ;;
+    --db-node-private-ips-csv)
+      db_node_private_ips_csv="${2:-}"
+      shift 2
+      ;;
+    --vm-name-prefix)
+      vm_name_prefix="${2:-}"
+      shift 2
+      ;;
+    --vault-password-file)
+      vault_password_file="${2:-}"
+      shift 2
+      ;;
+    --inventory-files-csv)
+      inventory_files_csv="${2:-}"
+      shift 2
+      ;;
+    --pgbackrest-azure-account)
+      pgbackrest_azure_account="${2:-}"
+      shift 2
+      ;;
+    --pgbackrest-azure-container)
+      pgbackrest_azure_container="${2:-}"
+      shift 2
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      usage
+      exit 2
+      ;;
+  esac
+done
+
+if [[ -z "$admin_user" || -z "$ssh_priv_key_path" || -z "$db_node_private_ips_csv" || -z "$vm_name_prefix" ]]; then
+  echo "Missing required arguments" >&2
+  usage
+  exit 2
+fi
+
+readonly admin_user
+readonly ssh_priv_key_path
+readonly db_node_private_ips_csv
+readonly vm_name_prefix
+readonly vault_password_file
+readonly inventory_files_csv
+readonly pgbackrest_azure_account
+readonly pgbackrest_azure_container
 readonly ssh_dir="/home/$admin_user/.ssh"
 mkdir -p "$ssh_dir"
 
@@ -56,14 +129,14 @@ done
 chmod 600 "$tmp_ssh_config"
 
 # Handle optional extra vars for Azure
-if [[ -n "${PGBACKREST_AZURE_ACCOUNT:-}" || -n "${PGBACKREST_AZURE_CONTAINER:-}" ]]; then
+if [[ -n "$pgbackrest_azure_account" || -n "$pgbackrest_azure_container" ]]; then
   tmp_extra_vars="$(mktemp /tmp/ppg-extra-vars.XXXXXX.yml)"
 
-  [[ -n "${PGBACKREST_AZURE_ACCOUNT:-}" ]] && \
-    printf "pgbackrest_azure_account: '%s'\n" "$PGBACKREST_AZURE_ACCOUNT" >> "$tmp_extra_vars"
+  [[ -n "$pgbackrest_azure_account" ]] && \
+    printf "pgbackrest_azure_account: '%s'\n" "$pgbackrest_azure_account" >> "$tmp_extra_vars"
 
-  [[ -n "${PGBACKREST_AZURE_CONTAINER:-}" ]] && \
-    printf "pgbackrest_azure_container: '%s'\n" "$PGBACKREST_AZURE_CONTAINER" >> "$tmp_extra_vars"
+  [[ -n "$pgbackrest_azure_container" ]] && \
+    printf "pgbackrest_azure_container: '%s'\n" "$pgbackrest_azure_container" >> "$tmp_extra_vars"
 
   chmod 600 "$tmp_extra_vars"
 fi

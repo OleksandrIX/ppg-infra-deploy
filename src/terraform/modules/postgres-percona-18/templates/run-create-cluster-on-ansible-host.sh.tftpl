@@ -2,11 +2,23 @@ set -euo pipefail
 
 ANSIBLE_HOME="/home/${admin_username}/ansible"
 WRAPPER_SCRIPT="$${ANSIBLE_HOME}/scripts/run-create-cluster.sh"
-SSH_KEY_PATH="/home/${admin_username}/.ssh/ppg-cluster-key.pem"
-EXTRA_VARS_FILE="/home/${admin_username}/.secrets/ansible-extra-vars.json"
+SSH_DIR="/home/${admin_username}/.ssh"
+SSH_KEY_PATH=""
+SECRETS_DIR="/home/${admin_username}/.secrets"
+EXTRA_VARS_FILE=""
 BUNDLE_XZ_B64_FILE="/tmp/ansible-bundle.tar.xz.b64"
 BUNDLE_XZ_FILE="/tmp/ansible-bundle.tar.xz"
 BUNDLE_HASH="${bundle_hash}"
+
+cleanup() {
+  if [ -n "$${SSH_KEY_PATH}" ] && [ -f "$${SSH_KEY_PATH}" ]; then
+    rm -f "$${SSH_KEY_PATH}"
+  fi
+  if [ -n "$${EXTRA_VARS_FILE}" ] && [ -f "$${EXTRA_VARS_FILE}" ]; then
+    rm -f "$${EXTRA_VARS_FILE}"
+  fi
+}
+trap cleanup EXIT INT TERM
 
 echo "Ansible bundle hash: $${BUNDLE_HASH}"
 
@@ -14,8 +26,8 @@ if command -v cloud-init >/dev/null 2>&1; then
   cloud-init status --wait || true
 fi
 
-mkdir -p "/home/${admin_username}/.ssh" "/home/${admin_username}/.secrets" "$${ANSIBLE_HOME}"
-chown -R ${admin_username}:${admin_username} "/home/${admin_username}/.ssh" "/home/${admin_username}/.secrets" "$${ANSIBLE_HOME}"
+mkdir -p "$${SSH_DIR}" "$${SECRETS_DIR}" "$${ANSIBLE_HOME}"
+chown -R ${admin_username}:${admin_username} "$${SSH_DIR}" "$${SECRETS_DIR}" "$${ANSIBLE_HOME}"
 
 cat > "$${BUNDLE_XZ_B64_FILE}" <<'BUNDLE_EOF'
 ${ansible_bundle_xz_b64}
@@ -26,9 +38,13 @@ rm -rf "$${ANSIBLE_HOME}"/*
 tar -xJf "$${BUNDLE_XZ_FILE}" -C "$${ANSIBLE_HOME}"
 chown -R ${admin_username}:${admin_username} "$${ANSIBLE_HOME}"
 
+SSH_KEY_PATH="$(mktemp "$${SSH_DIR}/ppg-cluster-key.XXXXXX.pem")"
+
 cat > "$${SSH_KEY_PATH}" <<'SSH_KEY_EOF'
 ${ssh_private_key_pem}
 SSH_KEY_EOF
+
+EXTRA_VARS_FILE="$(mktemp "$${SECRETS_DIR}/ansible-extra-vars.XXXXXX.json")"
 
 cat > "$${EXTRA_VARS_FILE}" <<'EXTRA_VARS_EOF'
 ${ansible_secret_vars_json}
@@ -42,17 +58,12 @@ test -f "$${ANSIBLE_HOME}/inventory/hosts.yml"
 test -s "$${EXTRA_VARS_FILE}"
 
 chmod +x "$${WRAPPER_SCRIPT}"
-sudo -u ${admin_username} -- env ANSIBLE_BUNDLE_ROOT="$${ANSIBLE_HOME}" ANSIBLE_EXTRA_VARS_FILE="$${EXTRA_VARS_FILE}" "$${WRAPPER_SCRIPT}" "${admin_username}" "$${SSH_KEY_PATH}" "${db_node_private_ips_csv}" "${vm_name_prefix}" "-" "hosts.yml"
-
-sudo -u ${admin_username} -- env \
-  ANSIBLE_BUNDLE_ROOT="$${ANSIBLE_HOME}" \
-  ANSIBLE_EXTRA_VARS_FILE="$${EXTRA_VARS_FILE}" \
-  PGBACKREST_AZURE_ACCOUNT="${pgbackrest_azure_account}" \
-  PGBACKREST_AZURE_CONTAINER="${pgbackrest_azure_container}" \
+sudo -u ${admin_username} -- env ANSIBLE_BUNDLE_ROOT="$${ANSIBLE_HOME}" ANSIBLE_EXTRA_VARS_FILE="$${EXTRA_VARS_FILE}" \
   "$${WRAPPER_SCRIPT}" \
-  "${admin_username}" \
-  "$${SSH_KEY_PATH}" \
-  "${db_node_private_ips_csv}" \
-  "${vm_name_prefix}" \
-  "-" \
-  "hosts.yml"
+  --admin-user "${admin_username}" \
+  --ssh-private-key-path "$${SSH_KEY_PATH}" \
+  --db-node-private-ips-csv "${db_node_private_ips_csv}" \
+  --vm-name-prefix "${vm_name_prefix}" \
+  --inventory-files-csv "hosts.yml" \
+  --pgbackrest-azure-account "${pgbackrest_azure_account}" \
+  --pgbackrest-azure-container "${pgbackrest_azure_container}"
