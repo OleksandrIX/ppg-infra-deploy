@@ -93,7 +93,7 @@ variable "ansible_host" {
 
 variable "cluster_vm" {
   description = "Cluster VM configuration"
-   type = object({
+  type = object({
     count                         = optional(number, 3)
     size                          = optional(string, "Standard_D2s_v5")
     nic_ip_configuration_name     = optional(string, "internal")
@@ -269,4 +269,16 @@ variable "run_ansible_on_apply" {
   description = "Execute run-create-cluster wrapper on ansible-host during terraform apply"
   type        = bool
   default     = true
+}
+
+variable "pgbackrest_azure_account" {
+  description = "Azure storage account name for pgBackRest"
+  type        = string
+  default     = ""
+}
+
+variable "pgbackrest_azure_container" {
+  description = "Azure blob container name for pgBackRest"
+  type        = string
+  default     = ""
 }

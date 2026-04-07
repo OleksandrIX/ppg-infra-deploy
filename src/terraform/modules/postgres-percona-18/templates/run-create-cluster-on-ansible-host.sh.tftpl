@@ -43,3 +43,16 @@ test -s "$${EXTRA_VARS_FILE}"
 
 chmod +x "$${WRAPPER_SCRIPT}"
 sudo -u ${admin_username} -- env ANSIBLE_BUNDLE_ROOT="$${ANSIBLE_HOME}" ANSIBLE_EXTRA_VARS_FILE="$${EXTRA_VARS_FILE}" "$${WRAPPER_SCRIPT}" "${admin_username}" "$${SSH_KEY_PATH}" "${db_node_private_ips_csv}" "${vm_name_prefix}" "-" "hosts.yml"
+
+sudo -u ${admin_username} -- env \
+  ANSIBLE_BUNDLE_ROOT="$${ANSIBLE_HOME}" \
+  ANSIBLE_EXTRA_VARS_FILE="$${EXTRA_VARS_FILE}" \
+  PGBACKREST_AZURE_ACCOUNT="${pgbackrest_azure_account}" \
+  PGBACKREST_AZURE_CONTAINER="${pgbackrest_azure_container}" \
+  "$${WRAPPER_SCRIPT}" \
+  "${admin_username}" \
+  "$${SSH_KEY_PATH}" \
+  "${db_node_private_ips_csv}" \
+  "${vm_name_prefix}" \
+  "-" \
+  "hosts.yml"

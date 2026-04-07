@@ -32,6 +32,9 @@ module "postgres_percona_database_cluster" {
   data_disks   = var.postgres_percona_data_disks
   lb           = var.postgres_percona_lb
 
+  pgbackrest_azure_account   = var.storage_account
+  pgbackrest_azure_container = var.postgres_percona_pgbackrest_azure_container
+
   run_ansible_on_apply = var.postgres_percona_run_ansible_on_apply
   ansible_source_dir   = local.ansible_source_dir
   ansible_env_dir      = local.ansible_env_dir

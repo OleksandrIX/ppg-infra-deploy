@@ -14,15 +14,14 @@ variable "virtual_network_name" {
   type        = string
 }
 
-variable "postgres_percona_subnet_name" {
-  description = "Existing subnet name for postgres-percona deployment"
+variable "storage_account" {
+  description = "Azure storage account name"
   type        = string
 }
 
-variable "postgres_percona_admin_username" {
-  description = "Administrator username for all virtual machines"
+variable "postgres_percona_subnet_name" {
+  description = "Existing subnet name for postgres-percona deployment"
   type        = string
-  default     = "oleksandrix"
 }
 
 variable "postgres_percona_key_vault_name" {
@@ -30,10 +29,20 @@ variable "postgres_percona_key_vault_name" {
   type        = string
 }
 
+variable "postgres_percona_admin_username" {
+  description = "Administrator username for all virtual machines"
+  type        = string
+  default     = "postgresadmin"
+}
 variable "postgres_percona_run_ansible_on_apply" {
   description = "Enable ansible wrapper execution on ansible-host during terraform apply"
   type        = bool
   default     = false
+}
+
+variable "postgres_percona_pgbackrest_azure_container" {
+  description = "Azure blob container name for pgBackRest"
+  type        = string
 }
 
 variable "postgres_percona_ansible_host" {

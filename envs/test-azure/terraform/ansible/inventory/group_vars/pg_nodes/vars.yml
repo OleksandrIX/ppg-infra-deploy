@@ -41,5 +41,3 @@ haproxy_keepalived_enabled: false
 pgbackrest_azure_key_type: "shared"
 pgbackrest_repo_type: "azure"
 pgbackrest_stanza: "ppg-cluster"
-pgbackrest_azure_account: "ppgclusterpgbackrest2"
-pgbackrest_azure_container: "pgbackrest-repo"

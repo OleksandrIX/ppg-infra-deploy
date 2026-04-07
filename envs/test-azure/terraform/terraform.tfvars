@@ -2,6 +2,7 @@
 resource_group_name  = "rg-ppg-cluster-dev"
 environment          = "test-azure"
 virtual_network_name = "vnet-ppg-cluster"
+storage_account      = "ppgclusterpgbackrest2"
 
 # Existing network values provided externally
 postgres_percona_subnet_name = "snet-database"
@@ -14,6 +15,9 @@ postgres_percona_key_vault_name = "kv-ppg-cluster-dev"
 
 # Toggle Ansible execution on terraform apply
 postgres_percona_run_ansible_on_apply = true
+
+# Azure blob container for pgBackRest
+postgres_percona_pgbackrest_azure_container = "pgbackrest-repo"
 
 # Ansible host VM settings
 postgres_percona_ansible_host = {
