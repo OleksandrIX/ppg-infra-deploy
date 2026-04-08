@@ -1,13 +1,7 @@
 ---
 - name: Collect declared extensions from specs and always-install list
   ansible.builtin.set_fact:
-    declared_extensions: >-
-      {{
-        (
-          databases | map(attribute='extensions') | flatten | list
-          + (pg_extensions_always | default([]))
-        ) | unique | list
-      }}
+    declared_extensions: "{{ (databases | map(attribute='extensions') | flatten | list + (pg_extensions_always | default([]))) | unique | list }}"
 
 - name: Skip extension package handling when no extensions declared
   ansible.builtin.meta: end_play
