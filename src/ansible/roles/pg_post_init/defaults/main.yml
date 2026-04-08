@@ -1,5 +1,5 @@
 ---
-files_glob: "{{ inventory_dir }}/databases/*.yml"
+files_glob: ""
 allowed_grant_types:
   - "database"
   - "schema"

@@ -42,9 +42,18 @@
         name: "pgbackrest"
         tasks_from: "stanza.yml"
 
+- name: "Ensure PostgreSQL Extensions"
+  hosts: "pg_nodes"
+  become: true
+  tags: ["pg_extensions"]
+  roles:
+    - { role: "pg_extensions" }
+
 - name: "PostgreSQL Post-Initialization"
   hosts: "pg_nodes"
   become: true
   tags: ["post_init"]
   roles:
-    - { role: "pg_post_init", tags: ["pg_post_init"] }
+    - role: "pg_post_init"
+      tags: ["pg_post_init"]
+      when: files_glob | default('') | length > 0
