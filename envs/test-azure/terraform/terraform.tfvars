@@ -22,14 +22,14 @@ postgres_percona_pgbackrest_azure_container = "pgbackrest-repo"
 # Ansible host VM settings
 postgres_percona_ansible_host = {
   create                = true
-  vm_size               = "Standard_D2s_v4"
+  vm_size               = "Standard_D2s_v6"
   private_ip_hostnumber = 250
 }
 
 # Cluster VM settings
 postgres_percona_cluster_vm = {
   count                  = 3
-  size                   = "Standard_D2s_v4"
+  size                   = "Standard_D2s_v6"
   private_ip_host_offset = 87
   zones                  = ["1", "2", "3"]
 }
