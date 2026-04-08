@@ -72,7 +72,7 @@
 - name: Create or update Patroni config
   tags: ["update_dcs"]
   vars:
-    merged_patroni_dcs_config: {{ patroni_dcs_config_defaults | combine(patroni_dcs_config | default({}), recursive=True, list_merge='replace') }}
+    merged_patroni_dcs_config: "{{ patroni_dcs_config_defaults | combine(patroni_dcs_config | default({}), recursive=True, list_merge='replace') }}"
   ansible.builtin.template:
     src: patroni.j2
     dest: /etc/patroni/patroni.yml
