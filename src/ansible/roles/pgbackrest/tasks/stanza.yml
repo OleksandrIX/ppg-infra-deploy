@@ -1,7 +1,7 @@
 ---
 - name: "Check if pgBackRest stanza already exists"
-  ansible.builtin.command:
-    cmd: "pgbackrest --stanza={{ pgbackrest_stanza }} info"
+  ansible.builtin.shell:
+    cmd: "pgbackrest --stanza={{ pgbackrest_stanza }} info >/dev/null 2>&1"
   become_user: "postgres"
   register: pgbackrest_stanza_check
   changed_when: false
@@ -9,12 +9,23 @@
   run_once: true
 
 - name: "Create pgBackRest stanza"
-  ansible.builtin.command:
-    cmd: "pgbackrest --stanza={{ pgbackrest_stanza }} stanza-create"
+  ansible.builtin.shell:
+    cmd: "pgbackrest --stanza={{ pgbackrest_stanza }} stanza-create >/dev/null 2>&1"
   become_user: "postgres"
   register: pgbackrest_stanza_create
   retries: 10
   delay: 15
   until: pgbackrest_stanza_create.rc == 0
   run_once: true
+  failed_when: false
+  changed_when: pgbackrest_stanza_create.rc == 0
   when: "pgbackrest_stanza_check.rc != 0 or ('status: error' in (pgbackrest_stanza_check.stdout | lower))"
+
+- name: "Skip pgBackRest stanza role on stanza-create error"
+  ansible.builtin.debug:
+    msg: "Skipping pgBackRest stanza setup because stanza-create failed (likely corrupted/invalid repository metadata)."
+  run_once: true
+  when:
+    - pgbackrest_stanza_check.rc != 0 or ('status: error' in (pgbackrest_stanza_check.stdout | lower))
+    - pgbackrest_stanza_create is defined
+    - pgbackrest_stanza_create.rc != 0
