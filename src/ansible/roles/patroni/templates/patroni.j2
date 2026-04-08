@@ -50,25 +50,25 @@ postgresql:
 
 bootstrap:
   dcs:
-    ttl: {{ patroni_dcs_config.ttl }}
-    loop_wait: {{ patroni_dcs_config.loop_wait }}
-    retry_timeout: {{ patroni_dcs_config.retry_timeout }}
-    maximum_lag_on_failover: {{ patroni_dcs_config.maximum_lag_on_failover }}
+    ttl: {{ merged_patroni_dcs_config.ttl }}
+    loop_wait: {{ merged_patroni_dcs_config.loop_wait }}
+    retry_timeout: {{ merged_patroni_dcs_config.retry_timeout }}
+    maximum_lag_on_failover: {{ merged_patroni_dcs_config.maximum_lag_on_failover }}
     postgresql:
-      use_pg_rewind: {{ patroni_dcs_config.postgresql.use_pg_rewind }}
-      use_slots: {{ patroni_dcs_config.postgresql.use_slots }}
+      use_pg_rewind: {{ merged_patroni_dcs_config.postgresql.use_pg_rewind }}
+      use_slots: {{ merged_patroni_dcs_config.postgresql.use_slots }}
       create_replica_methods:
-{% for method in patroni_dcs_config.postgresql.create_replica_methods %}
+{% for method in merged_patroni_dcs_config.postgresql.create_replica_methods %}
         - "{{ method }}"
 {% endfor %}
       pgbackrest:
-        command: {{ patroni_dcs_config.postgresql.pgbackrest.command }}
-        keep_data: {{ patroni_dcs_config.postgresql.pgbackrest.keep_data }}
-        no_params: {{ patroni_dcs_config.postgresql.pgbackrest.no_params }}
+        command: "{{ merged_patroni_dcs_config.postgresql.pgbackrest.command }}"
+        keep_data: {{ merged_patroni_dcs_config.postgresql.pgbackrest.keep_data }}
+        no_params: {{ merged_patroni_dcs_config.postgresql.pgbackrest.no_params }}
       recovery_conf:
-        restore_command: "{{ patroni_dcs_config.postgresql.recovery_conf.restore_command }}"
+        restore_command: "{{ merged_patroni_dcs_config.postgresql.recovery_conf.restore_command }}"
       parameters:
-{% for key, value in patroni_dcs_config.postgresql.parameters.items() %}
+{% for key, value in merged_patroni_dcs_config.postgresql.parameters.items() %}
         {{ key }}: {{ value }}
 {% endfor %}
 
@@ -77,15 +77,15 @@ bootstrap:
         - host all all {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 {{ psql_password_encryption }}
         - host replication replicator {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 {{ psql_password_encryption }}
 {% endfor %}
-{% for line in patroni_dcs_config.postgresql.pg_hba %}
+{% for line in merged_patroni_dcs_config.postgresql.pg_hba %}
         - {{ line }}
 {% endfor %}
 {% for host in allow_connection_hosts %}
         - host all all {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 {{ psql_password_encryption }}
 {% endfor %}
-{% if patroni_dcs_config.postgresql.slots %}
+{% if merged_patroni_dcs_config.slots %}
       slots:
-{% for slot_name, slot_config in patroni_dcs_config.postgresql.slots.items() %}
+{% for slot_name, slot_config in merged_patroni_dcs_config.slots.items() %}
         {{ slot_name }}:
 {% for key, value in slot_config.items() %}
           {{ key }}: {{ value }}

@@ -22,7 +22,7 @@ patroni_restapi_user: "admin"
 pgbackrest_stanza: "ppg-cluster"
 
 # Patroni DCS Configuration
-patroni_dcs_config:
+patroni_dcs_config_defaults: &patroni_dcs_config_defaults
   ttl: 30
   loop_wait: 10
   retry_timeout: 10
@@ -83,3 +83,5 @@ patroni_dcs_config:
       - host all all 127.0.0.1/32 {{ psql_password_encryption }}
       - host all postgres 0.0.0.0/0 reject
   slots: {}
+
+patroni_dcs_config: *patroni_dcs_config_defaults
