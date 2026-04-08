@@ -52,7 +52,7 @@
     src: "etcd.yaml.j2"
     dest: /etc/etcd/config.yaml
   vars:
-    cluster_state: "{{ 'existing' if etcd_data_check.stat.exists else 'new' }}"
+    etcd_cluster_state: "{{ 'existing' if etcd_data_check.stat.exists else 'new' }}"
   notify: "restart etcd"
 
 - name: Created etcd service
