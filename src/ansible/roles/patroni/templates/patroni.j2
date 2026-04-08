@@ -50,74 +50,48 @@ postgresql:
 
 bootstrap:
   dcs:
-    ttl: 30
-    loop_wait: 10
-    retry_timeout: 10
-    maximum_lag_on_failover: 1048576
+    ttl: {{ patroni_dcs_config.ttl }}
+    loop_wait: {{ patroni_dcs_config.loop_wait }}
+    retry_timeout: {{ patroni_dcs_config.retry_timeout }}
+    maximum_lag_on_failover: {{ patroni_dcs_config.maximum_lag_on_failover }}
     postgresql:
-      use_pg_rewind: true
-      use_slots: true
+      use_pg_rewind: {{ patroni_dcs_config.postgresql.use_pg_rewind }}
+      use_slots: {{ patroni_dcs_config.postgresql.use_slots }}
       create_replica_methods:
-{% for method in patroni_create_replica_methods %}
+{% for method in patroni_dcs_config.postgresql.create_replica_methods %}
         - "{{ method }}"
 {% endfor %}
       pgbackrest:
-        command: "pgbackrest --stanza={{ pgbackrest_stanza }} --delta restore"
-        keep_data: true
-        no_params: true
+        command: {{ patroni_dcs_config.postgresql.pgbackrest.command }}
+        keep_data: {{ patroni_dcs_config.postgresql.pgbackrest.keep_data }}
+        no_params: {{ patroni_dcs_config.postgresql.pgbackrest.no_params }}
       recovery_conf:
-        restore_command: "pgbackrest --stanza={{ pgbackrest_stanza }} archive-get %f %p"
+        restore_command: "{{ patroni_dcs_config.postgresql.recovery_conf.restore_command }}"
       parameters:
-        archive_mode: true
-        archive_timeout: "600s"
-        archive_command: "pgbackrest --stanza={{ pgbackrest_stanza }} archive-push %p"
-        restore_command: "pgbackrest --stanza={{ pgbackrest_stanza }} archive-get %f %p"
-        shared_buffers: "2GB"
-        effective_cache_size: "6GB"
-        maintenance_work_mem: "1GB"
-        work_mem: "16MB"
-        hot_standby: true
-        password_encryption: "{{ psql_password_encryption }}"
-        log_connections: true
-        log_destination: "stderr"
-        log_directory: "/var/log/postgresql"
-        log_disconnections: true
-        log_duration: false
-        log_min_duration_statement: "1000ms"
-        log_error_verbosity: "verbose"
-        log_file_mode: "0640"
-        log_filename: "postgresql.log"
-        log_line_prefix: "%m [pid=%p] user=%u db=%d app=%a "
-        log_min_messages: "info"
-        log_rotation_age: "1d"
-        log_rotation_size: 0
-        log_statement: "ddl"
-        log_truncate_on_rotation: "off"
-        logging_collector: "on"
-        max_connections: 100
-        max_prepared_transactions: 100
-        max_replication_slots: 10
-        max_wal_senders: 5
-        min_wal_size: "256MB"
-        max_wal_size: "1GB"
-        max_slot_wal_keep_size: "10GB"
-        wal_buffers: "16MB"
-        wal_keep_size: "160MB"
-        wal_level: "replica"
-        wal_log_hints: true
+{% for key, value in patroni_dcs_config.postgresql.parameters.items() %}
+        {{ key }}: {{ value }}
+{% endfor %}
 
       pg_hba:
 {% for host in postgres_hosts %}
         - host all all {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 {{ psql_password_encryption }}
         - host replication replicator {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 {{ psql_password_encryption }}
 {% endfor %}
-        - local all postgres peer
-        - local all all {{ psql_password_encryption }}
-        - host all all 127.0.0.1/32 {{ psql_password_encryption }}
-        - host all postgres 0.0.0.0/0 reject
+{% for line in patroni_dcs_config.postgresql.pg_hba %}
+        - {{ line }}
+{% endfor %}
 {% for host in allow_connection_hosts %}
         - host all all {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 {{ psql_password_encryption }}
 {% endfor %}
+{% if patroni_dcs_config.postgresql.slots %}
+      slots:
+{% for slot_name, slot_config in patroni_dcs_config.postgresql.slots.items() %}
+        {{ slot_name }}:
+{% for key, value in slot_config.items() %}
+          {{ key }}: {{ value }}
+{% endfor %}
+{% endfor %}
+{% endif %}
 
   initdb:
     - encoding: UTF8
