@@ -69,7 +69,7 @@ bootstrap:
         restore_command: "{{ merged_patroni_dcs_config.postgresql.recovery_conf.restore_command }}"
       parameters:
 {% for key, value in merged_patroni_dcs_config.postgresql.parameters.items() %}
-        {{ key }}: {{ value }}
+        {{ key }}: {{ value | to_json }}
 {% endfor %}
 
       pg_hba:
@@ -88,7 +88,7 @@ bootstrap:
 {% for slot_name, slot_config in merged_patroni_dcs_config.slots.items() %}
         {{ slot_name }}:
 {% for key, value in slot_config.items() %}
-          {{ key }}: {{ value }}
+    {{ key }}: {{ value | to_json }}
 {% endfor %}
 {% endfor %}
 {% endif %}
