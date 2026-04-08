@@ -1,5 +1,5 @@
 ---
-pv_devices: ["/dev/sdb"] # List all devices to be used. Example for Azure: ["/dev/disk/azure/scsi1/lunX"]
+pv_devices: ["/dev/sdb"] # List all devices to be used. Example for Azure: ["/dev/disk/azure/data/by-lun/XX"]
 vg_name: "vg"
 lv_name: "lv"
 fs_type: "xfs"
