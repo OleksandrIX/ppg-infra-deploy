@@ -1,0 +1,6 @@
+---
+- name: "Load database specs"
+  include_tasks: discover.yml
+
+- name: "Install extension packages"
+  include_tasks: extension_packages.yml

@@ -1,0 +1,6 @@
+---
+files_glob: ""
+pg_extensions_always: []
+
+extension_package_map:
+  postgis: "percona-postgresql-{{ psql_version }}-postgis-3"
