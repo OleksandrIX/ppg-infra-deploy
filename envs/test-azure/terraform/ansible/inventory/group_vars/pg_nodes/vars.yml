@@ -27,7 +27,7 @@ psql_bin_dir: "/usr/lib/postgresql/{{ psql_version }}/bin"
 psql_password_encryption: "scram-sha-256"
 
 # PostgreSQL extensions configuration
-pg_extensions_always: []
+pg_extensions_always: ["postgis"]
 extension_package_map:
   postgis: "percona-postgresql-{{ psql_version }}-postgis-3"
 
