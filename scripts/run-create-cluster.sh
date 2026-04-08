@@ -201,7 +201,7 @@ fi
 
 # Build Ansible command arguments dynamically using bash arrays
 ansible_args=()
-playbook_path="$ansible_root/playbooks/create-pgg-cluster.yml"
+playbook_path="$ansible_root/playbooks/create-pgg-cluster.azure.yml"
 
 for inventory_file in "${inventory_files[@]}"; do
   ansible_args+=("-i" "$inventory_file")
