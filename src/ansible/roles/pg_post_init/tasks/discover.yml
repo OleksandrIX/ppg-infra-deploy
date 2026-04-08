@@ -11,6 +11,7 @@
     fail_msg: >-
       No database spec files found by pattern {{ files_glob }}.
       Add encrypted files under {{ inventory_dir }}/databases.
+    quiet: true
   run_once: true
 
 - name: Initialize aggregated database specs
