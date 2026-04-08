@@ -2,6 +2,7 @@
 patroni_dcs_config:
   postgresql:
     parameters:
+      max_connections: 100
       autovacuum_max_workers: 3
       autovacuum_naptime: "10s"
       default_statistics_target: 100

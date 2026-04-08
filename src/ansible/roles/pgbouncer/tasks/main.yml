@@ -32,6 +32,10 @@
     pgbouncer_userlist_password: "{{ 'md5' ~ ((pgbouncer_auth_password ~ pgbouncer_auth_user) | hash('md5')) if (psql_password_encryption | lower) == 'md5' else pgbouncer_auth_password }}"
 
 - name: Copy PgBouncer config
+  vars:
+    merged_pgbouncer_config: "{{ pgbouncer_config_defaults | combine(pgbouncer_config | default({}), recursive=True, list_merge='replace') }}"
+    merged_pgbouncer_databases: "{{ pgbouncer_databases_defaults | combine(pgbouncer_databases | default({}), recursive=True, list_merge='replace') }}"
+    merged_pgbouncer_users: "{{ pgbouncer_users_defaults | combine(pgbouncer_users | default({}), recursive=True, list_merge='replace') }}"
   ansible.builtin.template:
     src: pgbouncer.j2
     dest: /etc/pgbouncer/pgbouncer.ini
