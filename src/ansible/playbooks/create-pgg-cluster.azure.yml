@@ -12,7 +12,7 @@
     - name: "Run LVM setup"
       include_role:
         name: "lvm"
-      when: lvm_state is defined
+      when: pv_devices is defined and (pv_devices | length) > 0
       tags: ["lvm"]
 
 - name: "Configure pgBackRest Repository"

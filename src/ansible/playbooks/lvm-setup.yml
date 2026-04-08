@@ -3,7 +3,6 @@
   hosts: "db_cluster"
   become: true
   vars:
-    lvm_state: "extend"
     pv_devices: ["/dev/sdb", "/dev/sdc"]
     vg_name: "vg_pgdata"
     lv_name: "lv_pgdata"

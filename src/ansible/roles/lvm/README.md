@@ -12,7 +12,6 @@ Ansible role for managing LVM storage on PostgreSQL cluster nodes. The role supp
 
 | Variable | Default | Description |
 |---|---|---|
-| `lvm_state` | `create` | Operation mode: `create` or `extend` |
 | `pv_devices` | `["/dev/sdb"]` | Block devices to partition and use as physical volumes |
 | `vg_name` | `vg` | Volume group name |
 | `lv_name` | `lv` | Logical volume name |
@@ -30,11 +29,10 @@ Ansible role for managing LVM storage on PostgreSQL cluster nodes. The role supp
 ## Example Playbook
 
 ```yaml
-- name: "Create LVM storage"
+- name: "Configure LVM storage"
   hosts: "db_cluster"
   become: true
   vars:
-    lvm_state: "create"
     pv_devices:
       - "/dev/sdb"
     vg_name: "vg_pgdata"
@@ -50,7 +48,6 @@ Ansible role for managing LVM storage on PostgreSQL cluster nodes. The role supp
   hosts: "db_cluster"
   become: true
   vars:
-    lvm_state: "extend"
     pv_devices:
       - "/dev/sdb"
       - "/dev/sdc"
@@ -64,7 +61,8 @@ Ansible role for managing LVM storage on PostgreSQL cluster nodes. The role supp
 
 ## Notes
 
-- In `create` mode the role creates a single GPT partition with the LVM flag on every device in `pv_devices`.
+- The role auto-detects mode: if `{{ vg_name }}/{{ lv_name }}` exists, it runs extend flow; otherwise it runs create flow.
+- In create flow the role creates a single GPT partition with the LVM flag on every device in `pv_devices`.
 - The logical volume is sized to `100%VG` during creation.
-- In `extend` mode the logical volume grows by `+100%FREE` and the filesystem is resized automatically.
+- In extend flow the logical volume grows by `+100%FREE` and the filesystem is resized automatically.
 - The resulting mapped device path follows `/dev/mapper/<vg_name>-<lv_name>`.

@@ -2,10 +2,16 @@
 - name: "Prepare system for LVM setup"
   ansible.builtin.include_tasks: "prepare.yml"
 
+- name: "Detect if target Logical Volume already exists"
+  ansible.builtin.command: "lvs {{ vg_name }}/{{ lv_name }}"
+  register: "lvm_lv_check"
+  changed_when: false
+  failed_when: false
+
 - name: "Create LVM setup for PostgreSQL data storage"
   ansible.builtin.include_tasks: "create.yml"
-  when: lvm_state == "create"
+  when: lvm_lv_check.rc != 0
 
 - name: "Extend existing LVM setup for PostgreSQL data storage"
   ansible.builtin.include_tasks: "extend.yml"
-  when: lvm_state == "extend"
+  when: lvm_lv_check.rc == 0

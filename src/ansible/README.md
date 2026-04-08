@@ -47,7 +47,7 @@ ansible-playbook -i inventory/dev/hosts.yaml playbooks/destroy-ppg-cluster.yml
 The main playbook applies roles in this order:
 
 1. `percona_repo` on `db_cluster`
-2. `lvm` on `db_cluster` when `lvm_state` is defined
+2. `lvm` on `db_cluster` when `pv_devices` is defined and non-empty
 3. `pgbackrest` on `db_cluster`
 4. `etcd` on `pg_nodes`
 5. `postgresql` on `pg_nodes`
