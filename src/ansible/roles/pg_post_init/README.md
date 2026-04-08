@@ -1,6 +1,6 @@
 # pg_post_init
 
-Ansible role for declarative post-initialization of a PostgreSQL cluster: create users, databases, grants, and extensions from vault-encrypted inventory files.
+Ansible role for declarative post-initialization of a PostgreSQL cluster: create users, databases, and grants from vault-encrypted inventory files.
 
 ## Requirements
 
@@ -16,7 +16,6 @@ Ansible role for declarative post-initialization of a PostgreSQL cluster: create
 | `files_glob` | `{{ inventory_dir }}/databases/*.yml` | Glob pattern used to discover database spec files |
 | `allowed_grant_types` | see [defaults](defaults/main.yml) | Allowed values for `users[].grants[].type` |
 | `allowed_grant_privileges` | see [defaults](defaults/main.yml) | Allowed privileges per grant type |
-| `extension_package_map` | `{}` | Mapping `extension_name -> [os_package, ...]` for extensions that are missing on node |
 
 ## Included Task Files
 
@@ -24,7 +23,6 @@ Ansible role for declarative post-initialization of a PostgreSQL cluster: create
 |---|---|
 | `discover.yml` | Discovers and normalizes all `database_spec` files |
 | `validate.yml` | Validates schema, uniqueness, and grant consistency rules |
-| `extension_packages.yml` | Detects unavailable extensions and installs required OS packages |
 | `detect_primary.yml` | Detects whether the current node is PostgreSQL primary |
 | `users.yml` | Ensures PostgreSQL users exist |
 | `databases.yml` | Ensures PostgreSQL databases exist |
@@ -64,14 +62,6 @@ Password sources for users:
 - `users[].grants[].privs` must match the whitelist for selected type
 - database names must be unique across all files
 - user names must be unique across all files
-
-## Extension Package Resolution
-
-- Role checks `pg_available_extensions` on nodes
-- For extensions already available, no package mapping is required
-- For missing extensions, role requires mapping in `extension_package_map`
-- If mapping exists, role installs packages and re-checks extension availability
-- If mapping is missing for required extension, role fails fast
 
 ## Vault Workflow
 

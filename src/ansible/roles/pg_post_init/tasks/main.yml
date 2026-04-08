@@ -5,9 +5,6 @@
 - name: "Validate database specs"
   include_tasks: validate.yml
 
-- name: "Install extension packages"
-  include_tasks: extension_packages.yml
-
 - name: "Detect primary node"
   include_tasks: detect_primary.yml
 
