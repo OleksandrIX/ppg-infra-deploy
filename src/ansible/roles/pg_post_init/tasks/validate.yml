@@ -4,17 +4,30 @@
     that:
       - item.name is defined
       - item.name | length > 0
-      - item.owner is defined
-      - item.owner | length > 0
-      - item.users is defined
-      - item.users is iterable
-      - item.users | length > 0
       - item.extensions is iterable
     fail_msg: "Invalid database_spec in {{ item.__source_file }}"
     quiet: true
   loop: "{{ databases }}"
   loop_control:
     label: "{{ item.name | default(item.__source_file) }}"
+  run_once: true
+
+- name: Validate owner/users presence when relational config is provided
+  ansible.builtin.assert:
+    that:
+      - item.owner is defined
+      - item.owner | length > 0
+      - item.users is defined
+      - item.users is iterable
+      - item.users | length > 0
+    fail_msg: >-
+      Invalid database_spec in {{ item.__source_file }}:
+      when owner/users config is used, both owner and non-empty users must be defined.
+    quiet: true
+  loop: "{{ databases }}"
+  loop_control:
+    label: "{{ item.name | default(item.__source_file) }}"
+  when: item.owner is defined or item.users is defined
   run_once: true
 
 - name: Validate owner is declared in users list for each database
@@ -27,6 +40,7 @@
   loop: "{{ databases }}"
   loop_control:
     label: "{{ item.name | default(item.__source_file) }}"
+  when: item.owner is defined and item.users is defined
   run_once: true
 
 - name: Validate user definitions in database specs
@@ -115,4 +129,5 @@
   loop: "{{ databases }}"
   loop_control:
     label: "{{ item.name | default(item.__source_file) }}"
+  when: item.owner is defined and item.users is defined
   run_once: true

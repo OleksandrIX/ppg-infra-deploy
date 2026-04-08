@@ -8,7 +8,7 @@
     state: present
     login_unix_socket: "/var/run/postgresql"
   become_user: postgres
-  loop: "{{ databases }}"
+  loop: "{{ databases | selectattr('owner', 'defined') | list }}"
   loop_control:
     loop_var: db_spec
     label: "{{ db_spec.name }}"
