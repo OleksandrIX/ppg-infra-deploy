@@ -25,7 +25,4 @@
   ansible.builtin.debug:
     msg: "Skipping pgBackRest stanza setup because stanza-create failed (likely corrupted/invalid repository metadata)."
   run_once: true
-  when:
-    - pgbackrest_stanza_check.rc != 0 or ('status: error' in (pgbackrest_stanza_check.stdout | lower))
-    - pgbackrest_stanza_create is defined
-    - pgbackrest_stanza_create.rc != 0
+  when: "(pgbackrest_stanza_check.rc != 0 or ('status: error' in (pgbackrest_stanza_check.stdout | lower))) and (pgbackrest_stanza_create is defined) and (pgbackrest_stanza_create.rc != 0)"
