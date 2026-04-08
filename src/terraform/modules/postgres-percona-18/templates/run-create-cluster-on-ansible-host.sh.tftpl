@@ -64,6 +64,7 @@ sudo -u ${admin_username} -- env ANSIBLE_BUNDLE_ROOT="$${ANSIBLE_HOME}" ANSIBLE_
   --ssh-private-key-path "$${SSH_KEY_PATH}" \
   --db-node-private-ips-csv "${db_node_private_ips_csv}" \
   --vm-name-prefix "${vm_name_prefix}" \
+  --playbook "playbooks/create-pgg-cluster.azure.yml" \
   --inventory-files-csv "hosts.yml" \
   --pgbackrest-azure-account "${pgbackrest_azure_account}" \
   --pgbackrest-azure-container "${pgbackrest_azure_container}"

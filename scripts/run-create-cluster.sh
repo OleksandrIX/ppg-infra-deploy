@@ -7,7 +7,8 @@ Usage:
   run-create-cluster.sh --admin-user <user> --ssh-private-key-path <path> \
     --db-node-private-ips-csv <ip1,ip2,...> --vm-name-prefix <prefix> \
     [--vault-password-file <path|->] [--inventory-files-csv <file1,file2,...>] \
-    [--pgbackrest-azure-account <account>] [--pgbackrest-azure-container <container>]
+    [--pgbackrest-azure-account <account>] [--pgbackrest-azure-container <container>] \
+    [--playbook <path>]
 EOF
 }
 
@@ -32,6 +33,7 @@ vault_password_file="-"
 inventory_files_csv=""
 pgbackrest_azure_account="${PGBACKREST_AZURE_ACCOUNT:-}"
 pgbackrest_azure_container="${PGBACKREST_AZURE_CONTAINER:-}"
+playbook="playbooks/create-pgg-cluster.azure.yml"
 
 if [[ "$#" -eq 0 ]]; then
   usage
@@ -72,6 +74,10 @@ while [[ "$#" -gt 0 ]]; do
       pgbackrest_azure_container="${2:-}"
       shift 2
       ;;
+    --playbook)
+      playbook="${2:-}"
+      shift 2
+      ;;
     --help|-h)
       usage
       exit 0
@@ -98,6 +104,7 @@ readonly vault_password_file
 readonly inventory_files_csv
 readonly pgbackrest_azure_account
 readonly pgbackrest_azure_container
+readonly playbook
 readonly ssh_dir="/home/$admin_user/.ssh"
 readonly extra_vars_dir="/home/$admin_user/.ansible-tmp"
 mkdir -p "$ssh_dir" "$extra_vars_dir"
@@ -201,7 +208,17 @@ fi
 
 # Build Ansible command arguments dynamically using bash arrays
 ansible_args=()
-playbook_path="$ansible_root/playbooks/create-pgg-cluster.azure.yml"
+
+if [[ "$playbook" = /* ]]; then
+  playbook_path="$playbook"
+else
+  playbook_path="$ansible_root/$playbook"
+fi
+
+if [[ ! -f "$playbook_path" ]]; then
+  echo "Playbook not found: $playbook_path" >&2
+  exit 2
+fi
 
 for inventory_file in "${inventory_files[@]}"; do
   ansible_args+=("-i" "$inventory_file")
