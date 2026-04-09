@@ -1,33 +1,33 @@
 data "azurerm_client_config" "current" {}
 
 locals {
-  service_connection_key_vault_policies = {
-    for policy in flatten([
-      for cluster_key, object_id in var.service_connection_object_ids : {
-        key         = "service-connection:${cluster_key}:${object_id}"
+  key_vault_policy_bindings = flatten([
+    [
+      for cluster_key in keys(var.clusters) : {
         cluster_key = cluster_key
-        object_id   = object_id
+        object_id   = data.azurerm_client_config.current.object_id
       }
-      if contains(keys(var.clusters), cluster_key)
-    ]) : policy.key => policy
-  }
-
-  key_vault_additional_policies = {
-    for policy in flatten([
-      for cluster_key, cluster in var.clusters : [
+    ],
+    flatten([
+      for cluster_key, _ in var.clusters : [
         for object_id in var.additional_key_vault_object_ids : {
-          key         = "${cluster_key}:${object_id}"
           cluster_key = cluster_key
           object_id   = object_id
         }
       ]
-    ]) : policy.key => policy
-  }
+    ]),
+    [
+      for cluster_key, object_id in var.service_connection_object_ids : {
+        cluster_key = cluster_key
+        object_id   = object_id
+      }
+      if contains(keys(var.clusters), cluster_key)
+    ]
+  ])
 
-  key_vault_policies = merge(
-    local.key_vault_additional_policies,
-    local.service_connection_key_vault_policies
-  )
+  key_vault_policies = {
+    for policy in local.key_vault_policy_bindings : "${policy.cluster_key}:${policy.object_id}" => policy
+  }
 }
 
 resource "azurerm_resource_group" "rg" {

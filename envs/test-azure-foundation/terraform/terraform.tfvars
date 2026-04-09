@@ -39,9 +39,7 @@ clusters = {
 }
 
 # Access policies for Key Vault
-additional_key_vault_object_ids = [
-  "8ad51a80-413d-46f2-8eec-40f2befe3739",
-]
+additional_key_vault_object_ids = []
 
 # Azure DevOps service connection principals (one per environment/cluster)
 service_connection_object_ids = {
