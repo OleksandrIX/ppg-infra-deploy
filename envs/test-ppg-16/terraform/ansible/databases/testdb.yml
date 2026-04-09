@@ -1,0 +1,15 @@
+database_spec:
+  name: "testdb"
+  owner: "testuser"
+  encoding: "UTF8"
+
+  users:
+    - name: "testuser"
+      password: "password123"
+      role_attr_flags: "LOGIN"
+      grants:
+        - type: "database"
+          privs: "ALL"
+          grant_option: true
+
+  extensions: ["postgis"]

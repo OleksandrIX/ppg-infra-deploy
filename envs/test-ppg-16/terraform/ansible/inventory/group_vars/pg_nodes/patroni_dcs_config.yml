@@ -1,0 +1,11 @@
+# Patroni DCS configuration
+patroni_dcs_config:
+  postgresql:
+    parameters:
+      max_connections: 100
+      autovacuum_max_workers: 3
+      autovacuum_naptime: "10s"
+      default_statistics_target: 100
+      shared_preload_libraries: "pg_stat_statements"
+      checkpoint_completion_target: 0.9
+      max_locks_per_transaction: 64
