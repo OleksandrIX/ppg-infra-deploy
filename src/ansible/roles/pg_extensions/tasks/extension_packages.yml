@@ -39,7 +39,11 @@
 
 - name: Build list of extensions requiring extra repositories
   ansible.builtin.set_fact:
-    extensions_needing_repos: "{{ missing_extensions | select('in', extension_map.keys() | select('extract', extension_map) | selectattr('repo', 'defined') | list) | list }}"
+    extensions_needing_repos: "{{ extension_map | dict2items | selectattr('value.repo', 'defined') | map(attribute='key') | intersect(missing_extensions) | list }}"
+
+- name: Build list of extensions requiring extra repositories
+  ansible.builtin.set_fact:
+    extensions_needing_repos: "{{ missing_extensions | select('selectattr', 'repo', 'defined', extension_map) | list }}"
 
 - name: Set up extra repositories for extensions requiring them
   ansible.builtin.include_tasks: extension_repos.yml
