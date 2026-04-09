@@ -5,8 +5,8 @@ data "external" "ansible_bundle_xz" {
       filemd5("${var.ansible_source_dir}/${f}")
     ]))
     env_ansible_hash = sha1(join("", [
-      for f in sort(local.ansible_env_files) :
-      filemd5("${var.ansible_env_dir}/${f}")
+      for f in sort(fileset(abspath(var.ansible_env_dir), "**")) :
+      filemd5("${abspath(var.ansible_env_dir)}/${f}")
     ]))
     inventory_hash = sha1(local.generated_inventory_content)
     bundle_template_hash = filemd5("${path.module}/templates/build-ansible-bundle.sh.tftpl")

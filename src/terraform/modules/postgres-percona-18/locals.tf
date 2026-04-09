@@ -68,6 +68,4 @@ locals {
   }
 
   ansible_secret_vars_json = jsonencode(local.ansible_secret_vars)
-
-  ansible_env_files = var.ansible_env_dir == "" ? [] : try(fileset(var.ansible_env_dir, "**"), [])
 }
