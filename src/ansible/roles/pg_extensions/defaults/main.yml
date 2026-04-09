@@ -1,4 +1,16 @@
 ---
 files_glob: ""
-pg_extensions_always: []
-extension_package_map: []
+# extension_map maps each extension name to its packages and optional apt repo.
+# Example:
+#   extension_map:
+#     timescaledb:
+#       packages:
+#         - timescaledb-2-postgresql-{{ psql_version }}
+#       repo:               # optional: add apt repo before installing packages
+#         key_url: "https://packagecloud.io/timescale/timescaledb/gpgkey"
+#         repo: "deb https://packagecloud.io/timescale/timescaledb/ubuntu/ {{ ansible_distribution_release }} main"
+#         name: timescaledb  # optional: sources.list.d filename (defaults to extension name)
+#     postgis:
+#       packages:
+#         - percona-postgresql-{{ psql_version }}-postgis-3
+extension_map: {}

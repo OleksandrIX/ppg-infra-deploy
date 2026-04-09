@@ -1,17 +1,13 @@
 ---
-- name: Collect declared extensions from specs and always-install list
+- name: Collect declared extensions from db specs
   ansible.builtin.set_fact:
-    declared_extensions: "{{ (databases | map(attribute='extensions') | flatten | list + (pg_extensions_always | default([]))) | unique | list }}"
+    declared_extensions: "{{ databases | map(attribute='extensions') | flatten | unique | list }}"
 
-- name: Skip extension package handling when no extensions declared
-  ansible.builtin.meta: end_play
-  when: declared_extensions | length == 0
-
-- name: Validate extension package mapping type
+- name: Validate extension map type
   ansible.builtin.assert:
     that:
-      - extension_package_map is mapping
-    fail_msg: "extension_package_map must be a mapping (dictionary), for example: {postgis: [percona-postgresql-{{ psql_version }}-postgis-3]}"
+      - extension_map is mapping
+    fail_msg: "extension_map must be a mapping (dictionary), for example: {postgis: {packages: [percona-postgresql-{{ psql_version }}-postgis-3]}}"
     quiet: true
 
 - name: Read currently available PostgreSQL extensions on node
@@ -24,27 +20,34 @@
   ansible.builtin.set_fact:
     available_extensions: "{{ available_extensions_query.stdout_lines | map('trim') | reject('equalto', '') | list }}"
 
-- name: Build list of missing extensions from declared specs
+- name: Build list of unmapped extensions from db specs
   ansible.builtin.set_fact:
-    missing_extensions: "{{ declared_extensions | difference(available_extensions) }}"
+    unmapped_extensions: "{{ declared_extensions | difference(available_extensions + extension_map.keys() | list) }}"
 
-- name: Build list of unmapped missing extensions
-  ansible.builtin.set_fact:
-    unmapped_extensions: "{{ missing_extensions | reject('in', (extension_package_map | default({})).keys() | list) | list }}"
-
-- name: Validate missing extensions have package mapping
+- name: Validate all extensions from db specs are available or mapped
   ansible.builtin.assert:
     that:
       - unmapped_extensions | length == 0
     fail_msg: >-
-      Missing package mapping for extensions not available on node: {{ unmapped_extensions | join(', ') }}.
-      Add them to extension_package_map.
+      Some extensions from db specs are not available on node and not mapped in extension_map: {{ unmapped_extensions | join(', ') }}.
+      Add them to extension_map.
     quiet: true
 
-- name: Build package list required by missing extensions
+- name: Build list of extensions from extension_map that are missing on node
   ansible.builtin.set_fact:
-    extension_packages: "{{ missing_extensions | map('extract', extension_package_map) | list | flatten | unique }}"
-  when: missing_extensions | length > 0
+    missing_extensions: "{{ extension_map.keys() | list | difference(available_extensions) }}"
+
+- name: Build list of extensions requiring extra repositories
+  ansible.builtin.set_fact:
+    extensions_needing_repos: "{{ missing_extensions | select('in', extension_map.keys() | select('extract', extension_map) | selectattr('repo', 'defined') | list) | list }}"
+
+- name: Set up extra repositories for extensions requiring them
+  ansible.builtin.include_tasks: extension_repos.yml
+  when: extensions_needing_repos | length > 0
+
+- name: Build package list required by all extensions in extension_map
+  ansible.builtin.set_fact:
+    extension_packages: "{{ extension_map.values() | map(attribute='packages') | list | flatten | unique }}"
 
 - name: Install extension packages
   ansible.builtin.package:
@@ -59,16 +62,14 @@
   become_user: postgres
   register: available_extensions_query_after
   changed_when: false
-  when: declared_extensions | length > 0
 
-- name: Validate all declared extensions are available on node
+- name: Validate all extensions from db specs and extension_map are available on node
   ansible.builtin.assert:
     that:
-      - (declared_extensions | difference(available_extensions_after)) | length == 0
+      - (declared_extensions | union(extension_map.keys() | list) | difference(available_extensions_after)) | length == 0
     fail_msg: >-
-      Some declared extensions are still unavailable on node after package installation:
-      {{ declared_extensions | difference(available_extensions_after) | join(', ') }}.
+      Some extensions are still unavailable on node after package installation:
+      {{ (declared_extensions | union(extension_map.keys() | list) | difference(available_extensions_after)) | join(', ') }}.
     quiet: true
   vars:
     available_extensions_after: "{{ available_extensions_query_after.stdout_lines | map('trim') | reject('equalto', '') | list }}"
-  when: declared_extensions | length > 0

@@ -1,0 +1,21 @@
+---
+- name: Add apt GPG keys for extensions requiring extra repos
+  ansible.builtin.apt_key:
+    url: "{{ extension_map[item].repo.key_url }}"
+    state: present
+  loop: "{{ extensions_needing_repos }}"
+  when: extension_map[item].repo.key_url is defined
+
+- name: Add apt repositories for extensions requiring extra repos
+  ansible.builtin.apt_repository:
+    repo: "{{ extension_map[item].repo.repo }}"
+    filename: "{{ extension_map[item].repo.name | default(item) }}"
+    state: present
+    update_cache: false
+  loop: "{{ extensions_needing_repos }}"
+  register: apt_repos_changed
+
+- name: Update apt cache after adding repositories
+  ansible.builtin.apt:
+    update_cache: true
+  when: apt_repos_changed.changed | default(false)
