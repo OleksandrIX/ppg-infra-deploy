@@ -37,3 +37,9 @@ variable "additional_key_vault_object_ids" {
   type        = list(string)
   default     = []
 }
+
+variable "service_connection_object_ids" {
+  description = "Azure AD object IDs for Azure DevOps service connections keyed by cluster key"
+  type        = map(string)
+  default     = {}
+}

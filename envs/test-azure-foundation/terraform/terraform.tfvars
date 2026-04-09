@@ -42,3 +42,9 @@ clusters = {
 additional_key_vault_object_ids = [
   "8ad51a80-413d-46f2-8eec-40f2befe3739",
 ]
+
+# Azure DevOps service connection principals (one per environment/cluster)
+service_connection_object_ids = {
+  pg16 = "77b74386-027d-4006-a7e1-cfae71d22112" # ppg-16
+  pg18 = "aaff0cc7-b1e9-4761-9c13-1523ca318cba" # ppg-18
+}

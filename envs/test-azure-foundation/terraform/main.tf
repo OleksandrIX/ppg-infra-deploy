@@ -1,6 +1,17 @@
 data "azurerm_client_config" "current" {}
 
 locals {
+  service_connection_key_vault_policies = {
+    for policy in flatten([
+      for cluster_key, object_id in var.service_connection_object_ids : {
+        key         = "service-connection:${cluster_key}:${object_id}"
+        cluster_key = cluster_key
+        object_id   = object_id
+      }
+      if contains(keys(var.clusters), cluster_key)
+    ]) : policy.key => policy
+  }
+
   key_vault_additional_policies = {
     for policy in flatten([
       for cluster_key, cluster in var.clusters : [
@@ -12,6 +23,11 @@ locals {
       ]
     ]) : policy.key => policy
   }
+
+  key_vault_policies = merge(
+    local.key_vault_additional_policies,
+    local.service_connection_key_vault_policies
+  )
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -149,13 +165,35 @@ resource "azurerm_key_vault" "kv" {
 }
 
 resource "azurerm_key_vault_access_policy" "terraform_runner_additional" {
-  for_each = local.key_vault_additional_policies
+  for_each = local.key_vault_policies
 
   key_vault_id = azurerm_key_vault.kv[each.value.cluster_key].id
   tenant_id    = data.azurerm_client_config.current.tenant_id
   object_id    = each.value.object_id
 
   secret_permissions = ["Get", "List", "Set", "Delete", "Purge", "Recover"]
+}
+
+resource "azurerm_role_assignment" "service_connection_rg_contributor" {
+  for_each = {
+    for cluster_key, object_id in var.service_connection_object_ids : cluster_key => object_id
+    if contains(keys(var.clusters), cluster_key)
+  }
+
+  scope                = azurerm_resource_group.rg[each.key].id
+  role_definition_name = "Contributor"
+  principal_id         = each.value
+}
+
+resource "azurerm_role_assignment" "service_connection_storage_blob_data_contributor" {
+  for_each = {
+    for cluster_key, object_id in var.service_connection_object_ids : cluster_key => object_id
+    if contains(keys(var.clusters), cluster_key)
+  }
+
+  scope                = azurerm_storage_account.sa[each.key].id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = each.value
 }
 
 resource "azurerm_role_assignment" "me_kv_admin" {
