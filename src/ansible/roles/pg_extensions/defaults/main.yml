@@ -9,6 +9,7 @@ files_glob: ""
 #       repo:               # optional: add apt repo before installing packages
 #         key_url: "https://packagecloud.io/timescale/timescaledb/gpgkey"
 #         repo: "deb https://packagecloud.io/timescale/timescaledb/ubuntu/ {{ ansible_distribution_release }} main"
+#         script: "curl -s https://packagecloud.io/install/repositories/timescale/timescaledb/script.deb.sh | sudo bash"
 #         name: timescaledb  # optional: sources.list.d filename (defaults to extension name)
 #     postgis:
 #       packages:

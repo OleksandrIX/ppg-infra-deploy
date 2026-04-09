@@ -1,21 +1,38 @@
 ---
-- name: Add apt GPG keys for extensions requiring extra repos
-  ansible.builtin.apt_key:
-    url: "{{ extension_map[item].repo.key_url }}"
-    state: present
+- name: Set up extension repository via script
+  block:
+    - name: Run repository setup script if defined
+      ansible.builtin.shell: |
+        set -e
+        {{ extension_map[item].repo.script }}
+      args:
+        executable: /bin/bash
   loop: "{{ extensions_needing_repos }}"
-  when: extension_map[item].repo.key_url is defined
+  when:
+    - extension_map[item].repo.script is defined
+    - extension_map[item].repo.key_url is not defined
+    - extension_map[item].repo.repo is not defined
 
-- name: Add apt repositories for extensions requiring extra repos
-  ansible.builtin.apt_repository:
-    repo: "{{ extension_map[item].repo.repo }}"
-    filename: "{{ extension_map[item].repo.name | default(item) }}"
-    state: present
-    update_cache: false
+- name: Set up extension repository via key+repo
+  block:
+    - name: Add apt GPG key if defined
+      ansible.builtin.apt_key:
+        url: "{{ extension_map[item].repo.key_url }}"
+        state: present
+
+    - name: Add apt repository if defined
+      ansible.builtin.apt_repository:
+        repo: "{{ extension_map[item].repo.repo }}"
+        filename: "{{ extension_map[item].repo.name | default(item) }}"
+        state: present
+        update_cache: false
+      register: apt_repos_changed
   loop: "{{ extensions_needing_repos }}"
-  register: apt_repos_changed
+  when:
+    - extension_map[item].repo.script is not defined
+    - extension_map[item].repo.key_url is defined
+    - extension_map[item].repo.repo is defined
 
 - name: Update apt cache after adding repositories
   ansible.builtin.apt:
     update_cache: true
-  when: apt_repos_changed.changed | default(false)
