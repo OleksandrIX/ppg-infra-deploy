@@ -47,7 +47,7 @@
 
 - name: Build package list required by all extensions in extension_map
   ansible.builtin.set_fact:
-    extension_packages: "{{ extension_map.values() | map(attribute='packages') | list | flatten | unique }}"
+    extension_packages: "{{ extension_map.values() | selectattr('packages', 'defined') | map(attribute='packages') | list | flatten | unique }}"
 
 - name: Install extension packages
   ansible.builtin.package:
