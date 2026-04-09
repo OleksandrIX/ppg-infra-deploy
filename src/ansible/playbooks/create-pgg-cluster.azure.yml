@@ -53,7 +53,7 @@
   hosts: "pg_nodes"
   become: true
   tags: ["post_init"]
+  when: query('fileglob', files_glob) | length > 0
   roles:
     - role: "pg_post_init"
       tags: ["pg_post_init"]
-      when: files_glob | default('') | length > 0
