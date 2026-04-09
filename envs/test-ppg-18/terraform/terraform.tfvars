@@ -1,8 +1,8 @@
 # Terraform variables for test-azure environment
-resource_group_name  = "rg-ppg-cluster-dev"
-environment          = "test-azure"
-virtual_network_name = "vnet-ppg-cluster"
-storage_account      = "ppgclusterpgbackrest2"
+resource_group_name  = "rg-test-ppg-18"
+environment          = "test-ppg-18"
+virtual_network_name = "vnet-test-ppg-18"
+storage_account      = "ppgclusterpgbackrest18"
 
 # Existing network values provided externally
 postgres_percona_subnet_name = "snet-database"
@@ -11,7 +11,7 @@ postgres_percona_subnet_name = "snet-database"
 postgres_percona_admin_username = "postgresadmin"
 
 # Key Vault name (created by foundation)
-postgres_percona_key_vault_name = "kv-ppg-cluster-dev"
+postgres_percona_key_vault_name = "kv-test-ppg-18"
 
 # Toggle Ansible execution on terraform apply
 postgres_percona_run_ansible_on_apply = true
@@ -47,7 +47,7 @@ postgres_percona_data_disks = [
 
 # Internal load balancer settings
 postgres_percona_lb = {
-  frontend_private_ip_address = "10.0.1.100"
+  frontend_private_ip_address = "10.18.1.100"
   frontend_configuration_name = "private-frontend"
   sku                         = "Standard"
 }
