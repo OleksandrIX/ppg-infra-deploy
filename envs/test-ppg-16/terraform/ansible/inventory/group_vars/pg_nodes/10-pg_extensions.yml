@@ -16,6 +16,7 @@ extension_map:
     install_script: |
       apt install -y make libhiredis-dev percona-postgresql-server-dev-{{ psql_version }} clang-18 git make gcc
       cd /tmp
+      rm -rf redis_fdw
       git clone https://github.com/pg-redis-fdw/redis_fdw.git -b REL_{{ psql_version }}_STABLE
       cd redis_fdw
       make USE_PGXS=1
