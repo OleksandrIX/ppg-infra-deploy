@@ -1,0 +1,7 @@
+# Hosts
+postgres_hosts: "{{ groups['pg_nodes'] }}"
+etcd_hosts: "{{ groups['pg_nodes'] }}"
+allow_connection_hosts: []
+
+# HAProxy + Keepalived deployment (disabled for Azure)
+haproxy_keepalived_enabled: false

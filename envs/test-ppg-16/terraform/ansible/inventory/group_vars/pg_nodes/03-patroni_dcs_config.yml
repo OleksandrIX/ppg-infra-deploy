@@ -1,3 +1,8 @@
+# Patroni configuration
+patroni_scope: "postgresql-cluster"
+patroni_namespace: "/service/"
+patroni_restapi_user: "admin"
+
 # Patroni DCS configuration
 patroni_dcs_config:
   postgresql:
