@@ -38,7 +38,10 @@ variables:
     ${{ if eq(parameters.environment, 'test-ppg-18') }}:
       value: "rg-test-ppg-18"
   - name: azureSubscription
-    value: "ARM-ServiceApp-rg-ppg-cluster-dev-Contributor"
+    ${{ if eq(parameters.environment, 'test-ppg-16') }}:
+      value: "ARM-ServiceApp-rg-test-ppg-16-Contributor"
+    ${{ if eq(parameters.environment, 'test-ppg-18') }}:
+      value: "ARM-ServiceApp-rg-test-ppg-18-Contributor"
 
 pool:
   name: Default
