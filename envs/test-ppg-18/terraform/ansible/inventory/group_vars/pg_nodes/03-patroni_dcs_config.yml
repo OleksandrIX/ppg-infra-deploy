@@ -11,6 +11,6 @@ patroni_dcs_config:
       autovacuum_max_workers: 3
       autovacuum_naptime: "10s"
       default_statistics_target: 100
-      shared_preload_libraries: "pg_stat_statements,timescaledb,pg_cron"
+      shared_preload_libraries: ""
       checkpoint_completion_target: 0.9
       max_locks_per_transaction: 64
