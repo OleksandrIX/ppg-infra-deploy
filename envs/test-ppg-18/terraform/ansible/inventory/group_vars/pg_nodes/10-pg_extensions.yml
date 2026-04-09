@@ -14,7 +14,7 @@ extension_map:
       - "postgresql-{{ psql_version }}-cron"
   redis_fdw:
     install_script: |
-      apt install -y libhiredis-dev percona-postgresql-server-dev-{{ psql_version }} clang-18 git
+      apt install -y libhiredis-dev percona-postgresql-server-dev-{{ psql_version }} clang-18 git make gcc
       cd /tmp
       git clone https://github.com/pg-redis-fdw/redis_fdw.git -b REL_{{ psql_version }}_STABLE
       cd redis_fdw
