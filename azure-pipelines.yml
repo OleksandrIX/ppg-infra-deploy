@@ -25,7 +25,6 @@ parameters:
       - plan-refresh-only
 
 variables:
-  - group: ${{ parameters.environment }}
   - name: containerName
     value: "tfstate"
   - name: storageAccount
