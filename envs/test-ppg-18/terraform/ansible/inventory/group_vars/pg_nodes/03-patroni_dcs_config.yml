@@ -1,3 +1,8 @@
+# Patroni configuration
+patroni_scope: "postgresql-cluster"
+patroni_namespace: "/service/"
+patroni_restapi_user: "admin"
+
 # Patroni DCS configuration
 patroni_dcs_config:
   postgresql:
@@ -6,6 +11,6 @@ patroni_dcs_config:
       autovacuum_max_workers: 3
       autovacuum_naptime: "10s"
       default_statistics_target: 100
-      shared_preload_libraries: "pg_stat_statements"
+      shared_preload_libraries: "pg_stat_statements,timescaledb,pg_cron"
       checkpoint_completion_target: 0.9
       max_locks_per_transaction: 64

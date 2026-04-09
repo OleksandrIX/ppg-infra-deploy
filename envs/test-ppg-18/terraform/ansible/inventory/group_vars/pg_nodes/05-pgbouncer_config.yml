@@ -1,3 +1,6 @@
+pgbouncer_auth_user: "pgbouncer_auth"
+postgres_monitoring_user: "exporter"
+
 # PgBouncer databases configuration
 pgbouncer_databases: {}
 
