@@ -20,6 +20,15 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
+export DEBIAN_FRONTEND=noninteractive
+sudo apt-get update
+sudo apt-get install -y software-properties-common
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+sudo apt-get install -y ansible xz-utils
+
+mkdir -p "$${ANSIBLE_HOME}"
+chown -R ${admin_username}:${admin_username} "$${ANSIBLE_HOME}"
+
 echo "Ansible bundle hash: $${BUNDLE_HASH}"
 
 if command -v cloud-init >/dev/null 2>&1; then

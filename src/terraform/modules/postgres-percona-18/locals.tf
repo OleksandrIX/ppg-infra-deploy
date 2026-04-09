@@ -34,10 +34,6 @@ locals {
     }
   }
 
-  ansible_host_cloud_init = templatefile("${path.module}/templates/ansible-host-cloud-init.sh.tftpl", {
-    admin_username = var.admin_username
-  })
-
   vm_details_map = {
     for i in range(var.cluster_vm.count) :
     azurerm_linux_virtual_machine.vm[i].name => {

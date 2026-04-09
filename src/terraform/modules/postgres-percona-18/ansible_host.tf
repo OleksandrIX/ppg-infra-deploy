@@ -19,7 +19,6 @@ resource "azurerm_linux_virtual_machine" "ansible_host" {
   location            = var.location
   size                = var.ansible_host.vm_size
   admin_username      = var.admin_username
-  custom_data         = base64encode(local.ansible_host_cloud_init)
 
   network_interface_ids = [
     azurerm_network_interface.ansible_host_nic[0].id,
