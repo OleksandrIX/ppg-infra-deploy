@@ -9,7 +9,7 @@ parameters:
   - name: environment
     displayName: Target environment
     type: string
-    default: test-azure
+    default: test-ppg-16
     values:
       - test-ppg-16
       - test-ppg-18
