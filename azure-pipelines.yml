@@ -11,7 +11,8 @@ parameters:
     type: string
     default: test-azure
     values:
-      - test-azure
+      - test-ppg-16
+      - test-ppg-18
   - name: action
     displayName: Desired Action
     type: string
@@ -28,14 +29,17 @@ variables:
   - name: containerName
     value: "tfstate"
   - name: storageAccount
-    ${{ if eq(parameters.environment, 'test-azure') }}:
-      value: "ppgclusterpgbackrest2"
+    ${{ if eq(parameters.environment, 'test-ppg-16') }}:
+      value: "ppgclusterpgbackrest16"
+    ${{ if eq(parameters.environment, 'test-ppg-18') }}:
+      value: "ppgclusterpgbackrest18"
   - name: resourceGroup
-    ${{ if eq(parameters.environment, 'test-azure') }}:
-      value: "rg-ppg-cluster-dev"
+    ${{ if eq(parameters.environment, 'test-ppg-16') }}:
+      value: "rg-test-ppg-16"
+    ${{ if eq(parameters.environment, 'test-ppg-18') }}:
+      value: "rg-test-ppg-18"
   - name: azureSubscription
-    ${{ if eq(parameters.environment, 'test-azure') }}:
-      value: "ARM-ServiceApp-rg-ppg-cluster-dev-Contributor"
+    value: "ARM-ServiceApp-rg-ppg-cluster-dev-Contributor"
 
 pool:
   name: Default

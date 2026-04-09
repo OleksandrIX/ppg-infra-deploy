@@ -27,10 +27,10 @@ terraform {
   }
 
   backend "azurerm" {
-    resource_group_name  = "rg-ppg-cluster-dev"
-    storage_account_name = "ppgclusterpgbackrest2"
+    resource_group_name  = "rg-test-ppg-16"
+    storage_account_name = "ppgclusterpgbackrest16"
     container_name       = "tfstate"
-    key                  = "test-azure/terraform.tfstate"
+    key                  = "test-ppg-16/terraform.tfstate"
   }
 }
 
