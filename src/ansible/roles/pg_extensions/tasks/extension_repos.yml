@@ -1,32 +1,31 @@
----
-- name: Set up extension repository via script
-  block:
-    - name: Run repository setup script if defined
-      ansible.builtin.shell: |
-        set -e
-        {{ extension_map[item].repo.script }}
-      args:
-        executable: /bin/bash
+- name: Run repository setup script if defined
+  ansible.builtin.shell: |
+    set -e
+    {{ extension_map[item].repo.script }}
+  args:
+    executable: /bin/bash
   loop: "{{ extensions_needing_repos }}"
   when:
     - extension_map[item].repo.script is defined
     - extension_map[item].repo.key_url is not defined
     - extension_map[item].repo.repo is not defined
 
-- name: Set up extension repository via key+repo
-  block:
-    - name: Add apt GPG key if defined
-      ansible.builtin.apt_key:
-        url: "{{ extension_map[item].repo.key_url }}"
-        state: present
+- name: Add apt GPG key if defined
+  ansible.builtin.apt_key:
+    url: "{{ extension_map[item].repo.key_url }}"
+    state: present
+  loop: "{{ extensions_needing_repos }}"
+  when:
+    - extension_map[item].repo.script is not defined
+    - extension_map[item].repo.key_url is defined
+    - extension_map[item].repo.repo is defined
 
-    - name: Add apt repository if defined
-      ansible.builtin.apt_repository:
-        repo: "{{ extension_map[item].repo.repo }}"
-        filename: "{{ extension_map[item].repo.name | default(item) }}"
-        state: present
-        update_cache: false
-      register: apt_repos_changed
+- name: Add apt repository if defined
+  ansible.builtin.apt_repository:
+    repo: "{{ extension_map[item].repo.repo }}"
+    filename: "{{ extension_map[item].repo.name | default(item) }}"
+    state: present
+    update_cache: false
   loop: "{{ extensions_needing_repos }}"
   when:
     - extension_map[item].repo.script is not defined
