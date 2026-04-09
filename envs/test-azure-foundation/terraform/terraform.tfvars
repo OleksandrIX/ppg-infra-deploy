@@ -1,31 +1,44 @@
-# Common settings
-resource_group_name = "rg-ppg-cluster-dev"
-location            = "polandcentral"
+location = "polandcentral"
 
-# VNET settings
-vnet      = ["10.0.0.0/16"]
-vnet_name = "vnet-ppg-cluster"
+clusters = {
+  pg16 = {
+    resource_group_name = "rg-test-ppg-16"
 
-# Subnet settings
-database_subnet      = ["10.0.1.0/24"]
-database_subnet_name = "snet-database"
+    vnet_name                = "vnet-test-ppg-16"
+    vnet_address_space       = ["10.16.0.0/16"]
+    database_subnet_name     = "snet-database"
+    database_subnet_prefixes = ["10.16.1.0/24"]
+    bastion_subnet_prefixes  = ["10.16.2.0/26"]
 
-# Storage settings
-storage_account_name             = "ppgclusterpgbackrest2"
-pgbackrest_container_name        = "pgbackrest-repo"
-pgbackrest_container_access_type = "private"
-tfstate_container_name           = "tfstate"
-tfstate_container_access_type    = "private"
-account_tier                     = "Standard"
-replication_type                 = "LRS"
-public_network_access_enabled    = true
-allow_nested_items_to_be_public  = false
-min_tls_version                  = "TLS1_2"
+    nat_public_ip_name = "pip-natgw-ppg-16"
+    nat_gateway_name = "natgw-ppg-16"
+    bastion_public_ip_name = "pip-bastion-ppg-16"
+    bastion_host_name = "bastion-ppg-16"
 
-# Key Vault settings
-key_vault_name = "kv-ppg-cluster-dev"
-key_vault_sku  = "standard"
+    storage_account_name = "ppgclusterpgbackrest16"
+    key_vault_name       = "kv-test-ppg-16"
+  }
 
+  pg18 = {
+    resource_group_name = "rg-test-ppg-18"
+
+    vnet_name                = "vnet-test-ppg-18"
+    vnet_address_space       = ["10.18.0.0/16"]
+    database_subnet_name     = "snet-database"
+    database_subnet_prefixes = ["10.18.1.0/24"]
+    bastion_subnet_prefixes  = ["10.18.2.0/26"]
+
+    nat_public_ip_name = "pip-natgw-ppg-18"
+    nat_gateway_name = "natgw-ppg-18"
+    bastion_public_ip_name = "pip-bastion-ppg-18"
+    bastion_host_name = "bastion-ppg-18"
+
+    storage_account_name = "ppgclusterpgbackrest18"
+    key_vault_name       = "kv-test-ppg-18"
+  }
+}
+
+# Access policies for Key Vault
 additional_key_vault_object_ids = [
   "8ad51a80-413d-46f2-8eec-40f2befe3739",
 ]
