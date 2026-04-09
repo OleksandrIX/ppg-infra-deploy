@@ -57,6 +57,15 @@
     - extension_packages is defined
     - extension_packages | length > 0
 
+- name: Run custom install script for extensions
+  ansible.builtin.shell: |
+    set -e
+    {{ extension_map[item].install_script }}
+  args:
+    executable: /bin/bash
+  loop: "{{ extension_map.keys() | list }}"
+  when: extension_map[item].install_script is defined
+
 - name: Re-read available PostgreSQL extensions after package installation
   ansible.builtin.command: psql -U postgres -tAc "SELECT name FROM pg_available_extensions;"
   become_user: postgres
