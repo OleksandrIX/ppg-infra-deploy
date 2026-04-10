@@ -10,8 +10,11 @@ extension_map:
       name: "timescaledb"
       script: "curl -s https://packagecloud.io/install/repositories/timescale/timescaledb/script.deb.sh | sudo bash"
   pg_cron:
-    packages:
-      - "postgresql-{{ psql_version }}-cron"
+    install_script: |
+      apt install -y postgresql-common
+      bash /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+      apt update
+      apt install postgresql-18-cron
   redis_fdw:
     install_script: |
       apt install -y libhiredis-dev percona-postgresql-server-dev-{{ psql_version }} clang-18 git make gcc
