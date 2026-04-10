@@ -171,3 +171,23 @@ resource "azurerm_role_assignment" "me_kv_admin" {
   role_definition_name = "Key Vault Administrator"
   principal_id         = data.azurerm_client_config.current.object_id
 }
+
+resource "azurerm_virtual_network_peering" "ppg16_to_ppg18" {
+  name                      = "ppg16-to-ppg18"
+  resource_group_name       = azurerm_resource_group.rg["pg16"].name
+  virtual_network_name      = azurerm_virtual_network.vnet["pg16"].name
+  remote_virtual_network_id = azurerm_virtual_network.vnet["pg18"].id
+  allow_forwarded_traffic   = true
+  allow_gateway_transit     = false
+  use_remote_gateways       = false
+}
+
+resource "azurerm_virtual_network_peering" "ppg18_to_ppg16" {
+  name                      = "ppg18-to-ppg16"
+  resource_group_name       = azurerm_resource_group.rg["pg18"].name
+  virtual_network_name      = azurerm_virtual_network.vnet["pg18"].name
+  remote_virtual_network_id = azurerm_virtual_network.vnet["pg16"].id
+  allow_forwarded_traffic   = true
+  allow_gateway_transit     = false
+  use_remote_gateways       = false
+}
