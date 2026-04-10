@@ -14,3 +14,4 @@ patroni_dcs_config:
       shared_preload_libraries: ""
       checkpoint_completion_target: 0.9
       max_locks_per_transaction: 64
+      wal_level: "logical"
