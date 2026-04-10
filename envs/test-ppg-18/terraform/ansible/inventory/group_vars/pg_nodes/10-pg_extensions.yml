@@ -12,9 +12,9 @@ extension_map:
   pg_cron:
     install_script: |
       apt install -y postgresql-common
-      bash /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+      bash /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
       apt update
-      apt install postgresql-18-cron
+      apt install -y postgresql-18-cron
   redis_fdw:
     install_script: |
       apt install -y libhiredis-dev percona-postgresql-server-dev-{{ psql_version }} clang-18 git make gcc
