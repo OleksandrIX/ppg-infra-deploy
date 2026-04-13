@@ -55,7 +55,14 @@
 
 - name: Build package list required by all extensions in extension_map
   ansible.builtin.set_fact:
-    extension_packages: "{{ extension_map.values() | selectattr('packages', 'defined') | map(attribute='packages') | list | flatten | unique }}"
+    extension_packages: >-
+      {{
+        extension_map | dict2items
+        | selectattr('key', 'in', missing_extensions)
+        | selectattr('value.packages', 'defined')
+        | map(attribute='value.packages')
+        | flatten | unique | list
+      }}
 
 - name: Install extension packages
   ansible.builtin.package:
@@ -65,14 +72,16 @@
     - extension_packages is defined
     - extension_packages | length > 0
 
-- name: Run custom install script for extensions
+- name: Run custom install script for missing extensions
   ansible.builtin.shell: |
     set -e
     {{ extension_map[item].install_script }}
   args:
     executable: /bin/bash
-  loop: "{{ extension_map.keys() | list }}"
-  when: extension_map[item].install_script is defined
+  loop: "{{ missing_extensions }}"
+  when:
+    - extension_map[item] is defined
+    - extension_map[item].install_script is defined
 
 - name: Re-read available PostgreSQL extensions after package installation
   ansible.builtin.command: psql -U postgres -tAc "SELECT name FROM pg_available_extensions;"
