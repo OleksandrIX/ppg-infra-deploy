@@ -15,6 +15,13 @@
       when: pv_devices is defined and (pv_devices | length) > 0
       tags: ["lvm"]
 
+- name: "Ensure PostgreSQL Extensions (before cluster)"
+  hosts: "pg_nodes"
+  become: true
+  tags: ["pg_extensions", "pre_cluster"]
+  roles:
+    - { role: "pg_extensions" }
+
 - name: "Configure pgBackRest Repository"
   hosts: "pg_nodes"
   become: true
@@ -42,10 +49,10 @@
         name: "pgbackrest"
         tasks_from: "stanza.yml"
 
-- name: "Ensure PostgreSQL Extensions"
+- name: "Ensure PostgreSQL Extensions (after cluster)"
   hosts: "pg_nodes"
   become: true
-  tags: ["pg_extensions"]
+  tags: ["pg_extensions", "post_cluster"]
   roles:
     - { role: "pg_extensions" }
 

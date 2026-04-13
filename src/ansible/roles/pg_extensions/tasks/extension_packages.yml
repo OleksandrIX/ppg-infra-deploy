@@ -10,15 +10,23 @@
     fail_msg: "extension_map must be a mapping (dictionary), for example: {postgis: {packages: [percona-postgresql-{{ psql_version }}-postgis-3]}}"
     quiet: true
 
+- name: Check if PostgreSQL is accessible
+  ansible.builtin.command: psql -U postgres -tAc "SELECT 1;"
+  become_user: postgres
+  register: psql_check
+  changed_when: false
+  failed_when: false
+
 - name: Read currently available PostgreSQL extensions on node
   ansible.builtin.command: psql -U postgres -tAc "SELECT name FROM pg_available_extensions;"
   become_user: postgres
   register: available_extensions_query
   changed_when: false
+  when: psql_check.rc == 0
 
 - name: Build list of currently available extension names
   ansible.builtin.set_fact:
-    available_extensions: "{{ available_extensions_query.stdout_lines | map('trim') | reject('equalto', '') | list }}"
+    available_extensions: "{{ available_extensions_query.stdout_lines | map('trim') | reject('equalto', '') | list if psql_check.rc == 0 else [] }}"
 
 - name: Build list of unmapped extensions from db specs
   ansible.builtin.set_fact:
@@ -71,6 +79,7 @@
   become_user: postgres
   register: available_extensions_query_after
   changed_when: false
+  when: psql_check.rc == 0
 
 - name: Validate all extensions from db specs and extension_map are available on node
   ansible.builtin.assert:
@@ -81,4 +90,5 @@
       {{ (declared_extensions | union(extension_map.keys() | list) | difference(available_extensions_after)) | join(', ') }}.
     quiet: true
   vars:
-    available_extensions_after: "{{ available_extensions_query_after.stdout_lines | map('trim') | reject('equalto', '') | list }}"
+    available_extensions_after: "{{ available_extensions_query_after.stdout_lines | map('trim') | reject('equalto', '') | list if psql_check.rc == 0 else [] }}"
+  when: psql_check.rc == 0
