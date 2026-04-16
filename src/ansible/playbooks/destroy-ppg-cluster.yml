@@ -16,6 +16,8 @@
         - patroni
         - postgresql
         - etcd
+        - haproxy
+        - keepalived
       ignore_errors: yes
 
     - name: Check if pgBackRest stanza exists before destroy
@@ -29,6 +31,17 @@
       when:
         - pgbackrest_delete_stanza_on_destroy | bool
         - pgbackrest_stanza is defined
+
+    - name: Stop pgbackrest stanza
+      ansible.builtin.command:
+        cmd: "pgbackrest --stanza={{ pgbackrest_stanza }} stop"
+      become_user: "postgres"
+      run_once: true
+      when:
+        - pgbackrest_delete_stanza_on_destroy | bool
+        - pgbackrest_stanza is defined
+        - pgbackrest_stanza_check is defined
+        - pgbackrest_stanza_check.rc == 0
 
     - name: Delete pgBackRest stanza on destroy
       ansible.builtin.command:
@@ -57,6 +70,8 @@
           - python3-yaml
           - pgbackrest
           - percona-pgbackrest
+          - percona-haproxy
+          - keepalived
         state: absent
         autoremove: yes
         purge: yes
@@ -110,9 +125,16 @@
         - /etc/apt/sources.list.d/percona-telemetry-release.list.bak
         - /etc/apt/sources.list.d/percona-pmm2-client-release.list
         - /etc/apt/sources.list.d/percona-pmm2-client-release.list.bak
+        # --- HAProxy & Keepalived ---
+        - /etc/haproxy
+        - /var/log/haproxy
+        - /etc/logrotate.d/haproxy
+        - /etc/keepalived
+        - /var/log/keepalived
+        - /etc/logrotate.d/keepalived
       ignore_errors: yes
 
-    - name: Remove system users (etcd, postgres)
+    - name: Remove system users (etcd, postgres, haproxy)
       ansible.builtin.user:
         name: "{{ item }}"
         state: absent
@@ -121,6 +143,7 @@
         - etcd
         - postgres
         - pgbackrest
+        - haproxy
       ignore_errors: yes
 
     - name: Reload systemd daemon
