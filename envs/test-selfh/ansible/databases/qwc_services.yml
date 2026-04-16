@@ -1,0 +1,38 @@
+database_spec:
+  name: "qwc_services"
+  owner: "qwc_admin"
+  encoding: "UTF8"
+  comment: "DB for qwc-services"
+
+  schemas:
+    - name: "qwc_config"
+      owner: "qwc_admin"
+      comment: "ConfigDB for qwc-services"
+
+  users:
+    - name: "qwc_admin"
+      password: "superpassword"
+      role_attr_flags: "LOGIN"
+      grants:
+        - type: "database"
+          privs: "ALL"
+          grant_option: true
+
+    - name: "qwc_service"
+      password: "superpassword"
+      role_attr_flags: "LOGIN"
+      grants:
+        - type: "database"
+          privs: "ALL"
+          grant_option: true
+
+    - name: "qwc_service_write"
+      password: "superpassword"
+      role_attr_flags: "LOGIN"
+      grants:
+        - type: "database"
+          privs: "ALL"
+          grant_option: true
+
+  extensions:
+    - "postgis"
