@@ -2,7 +2,7 @@
 postgres_hosts: "{{ groups['pg_nodes'] }}"
 
 # PostgreSQL configuration
-psql_version: "17"
+psql_version: "18"
 psql_data_dir: "/var/lib/postgresql/data"
 
 # pgBackRest configuration

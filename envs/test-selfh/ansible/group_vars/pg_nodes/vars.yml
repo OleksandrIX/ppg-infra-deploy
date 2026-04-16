@@ -42,3 +42,5 @@ keepalived_primary_weight: 20
 keepalived_check_interval: 2
 keepalived_check_fall: 2
 keepalived_check_rise: 2
+
+files_glob: "/home/oleksandrix/projects/ppg-infra-deploy/envs/test-selfh/ansible/databases"
