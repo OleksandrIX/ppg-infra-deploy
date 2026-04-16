@@ -1,4 +1,5 @@
 # HAProxy configuration
+haproxy_keepalived_enabled: true
 haproxy_vip: "10.30.24.49"
 haproxy_vip_interface: "ens160"
 haproxy_vip_cidr: 24
