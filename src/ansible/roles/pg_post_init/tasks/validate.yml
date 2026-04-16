@@ -48,8 +48,8 @@
     that:
       - db_user.name is defined
       - db_user.name | length > 0
-      - db_user.password is defined
-      - db_user.password | length > 0
+      - db_user.password is defined or db_user.name | upper == 'PUBLIC'
+      - db_user.password | length > 0 or db_user.name | upper == 'PUBLIC'
       - db_user.grants is defined
       - db_user.grants is iterable
       - db_user.grants | length > 0

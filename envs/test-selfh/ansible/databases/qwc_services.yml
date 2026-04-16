@@ -34,5 +34,12 @@ database_spec:
           privs: "ALL"
           grant_option: true
 
+    - name: "PUBLIC"
+      grants:
+        - type: "table"
+          objs: "geometry_columns,geography_columns,spatial_ref_sys"
+          schema: "public"
+          privs: "SELECT"
+
   extensions:
     - "postgis"

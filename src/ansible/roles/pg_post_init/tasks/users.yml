@@ -12,4 +12,6 @@
   loop_control:
     loop_var: db_user
     label: "{{ db_user.name }}"
-  when: is_primary | default(false)
+  when:
+    - is_primary | default(false)
+    - db_user.name | upper != 'PUBLIC'
