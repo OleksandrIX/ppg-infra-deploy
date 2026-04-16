@@ -17,8 +17,8 @@
 - name: "Ensure PostgreSQL schemas"
   include_tasks: schemas.yml
 
-- name: "Ensure PostgreSQL grants"
-  include_tasks: grants.yml
-
 - name: "Ensure PostgreSQL extensions"
   include_tasks: extensions.yml
+
+- name: "Ensure PostgreSQL grants"
+  include_tasks: grants.yml
