@@ -4,17 +4,23 @@ extension_map:
     packages:
       - "percona-postgresql-{{ psql_version }}-postgis-3"
   timescaledb:
-    packages:
-      - "timescaledb-2-postgresql-{{ psql_version }}"
-    repo:
-      name: "timescaledb"
-      script: "curl -s https://packagecloud.io/install/repositories/timescale/timescaledb/script.deb.sh | sudo bash"
+    install_script: |
+      curl -s https://packagecloud.io/install/repositories/timescale/timescaledb/script.deb.sh | sudo bash
+      apt install -y timescaledb-2-loader-postgresql-{{ psql_version }}=2.23.0~ubuntu24.04
+      apt install -y timescaledb-2-postgresql-{{ psql_version }}=2.23.0~ubuntu24.04
+      apt-mark hold timescaledb-2-loader-postgresql-{{ psql_version }}
+      apt-mark hold timescaledb-2-postgresql-{{ psql_version }}
+    # packages:
+    #   - "timescaledb-2-postgresql-{{ psql_version }}"
+    # repo:
+    #   name: "timescaledb"
+    #   script: "curl -s https://packagecloud.io/install/repositories/timescale/timescaledb/script.deb.sh | sudo bash"
   pg_cron:
     install_script: |
       apt install -y postgresql-common
       bash /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
       apt update
-      apt install -y postgresql-18-cron
+      apt install -y postgresql-{{ psql_version }}-cron
   redis_fdw:
     install_script: |
       apt install -y libhiredis-dev percona-postgresql-server-dev-{{ psql_version }} clang-18 git make gcc
