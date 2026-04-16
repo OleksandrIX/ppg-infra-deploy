@@ -1,0 +1,5 @@
+# Hosts
+etcd_hosts: "{{ groups['pg_nodes'] }}"
+allow_connection_hosts: []
+
+files_glob: "/home/oleksandrix/projects/ppg-infra-deploy/envs/test-selfh/ansible/databases"

@@ -1,0 +1,12 @@
+postgres_monitoring_user: "exporter"
+
+# PgBouncer databases configuration
+pgbouncer_databases: {}
+
+# PgBouncer users configuration
+pgbouncer_users: {}
+
+# PgBouncer configuration
+pgbouncer_config:
+  max_client_conn: 50
+  client_idle_timeout: 300

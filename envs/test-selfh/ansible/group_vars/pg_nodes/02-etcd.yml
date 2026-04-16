@@ -1,0 +1,4 @@
+# etcd configuration
+etcd_version: "v3.6.9"
+etcd_cluster_token: "ppg-cluster-dev-token"
+etcd_data_dir: "/var/lib/etcd/postgresql"

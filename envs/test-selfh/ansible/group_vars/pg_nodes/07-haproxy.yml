@@ -1,0 +1,12 @@
+# HAProxy configuration
+haproxy_vip: "10.30.24.49"
+haproxy_vip_interface: "ens160"
+haproxy_vip_cidr: 24
+
+# Keepalived configuration
+keepalived_vrrp_id: 51
+keepalived_base_priority: 100
+keepalived_primary_weight: 20
+keepalived_check_interval: 2
+keepalived_check_fall: 2
+keepalived_check_rise: 2

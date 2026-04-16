@@ -1,0 +1,4 @@
+# PostgreSQL configuration
+psql_home_dir: "/var/lib/postgresql"
+psql_bin_dir: "/usr/lib/postgresql/{{ psql_version }}/bin"
+psql_password_encryption: "scram-sha-256"

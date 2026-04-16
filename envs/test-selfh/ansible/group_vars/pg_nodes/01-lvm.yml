@@ -1,0 +1,6 @@
+# LVM configuration for PostgreSQL data storage
+pv_devices: ["/dev/sdb"]
+vg_name: "vg_pgdata"
+lv_name: "lv_pgdata"
+fs_type: "xfs"
+mount_path: "/var/lib/postgresql"

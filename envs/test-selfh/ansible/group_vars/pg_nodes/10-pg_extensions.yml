@@ -1,0 +1,5 @@
+# PostgreSQL extensions configuration
+extension_map:
+  postgis:
+    packages:
+      - "percona-postgresql-{{ psql_version }}-postgis-3"
