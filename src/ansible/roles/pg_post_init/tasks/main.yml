@@ -14,6 +14,9 @@
 - name: "Ensure PostgreSQL databases"
   include_tasks: databases.yml
 
+- name: "Ensure PostgreSQL schemas"
+  include_tasks: schemas.yml
+
 - name: "Ensure PostgreSQL grants"
   include_tasks: grants.yml
 

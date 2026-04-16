@@ -79,6 +79,52 @@
     quiet: true
   run_once: true
 
+- name: Validate schema definitions in database specs
+  ansible.builtin.assert:
+    that:
+      - schema_item.name is defined
+      - schema_item.name | length > 0
+    fail_msg: "Invalid schema definition in {{ item.0.__source_file }} for database {{ item.0.name }}"
+    quiet: true
+  loop: "{{ databases | subelements('schemas', skip_missing=True) }}"
+  loop_control:
+    loop_var: item
+    label: "{{ item.0.name }} -> {{ schema_item.name | default('undefined') }}"
+  vars:
+    schema_item: "{{ item.1 }}"
+  run_once: true
+
+- name: Validate schema names are unique within a database
+  ansible.builtin.assert:
+    that:
+      - (item.schemas | map(attribute='name') | list | unique | length) == (item.schemas | length)
+    fail_msg: "Schema names must be unique within database {{ item.name }} in {{ item.__source_file }}"
+    quiet: true
+  loop: "{{ databases }}"
+  loop_control:
+    label: "{{ item.name | default(item.__source_file) }}"
+  when: item.schemas is defined and item.schemas is iterable
+  run_once: true
+
+- name: Validate schema explicit owner exists in users list
+  ansible.builtin.assert:
+    that:
+      - schema_item.owner in (item.0.users | map(attribute='name') | list)
+    fail_msg: >-
+      Invalid schema owner {{ schema_item.owner }} for schema {{ schema_item.name }}
+      in database {{ item.0.name }} ({{ item.0.__source_file }}). Owner must be defined in users list.
+    quiet: true
+  loop: "{{ databases | subelements('schemas', skip_missing=True) }}"
+  loop_control:
+    loop_var: item
+    label: "{{ item.0.name }} -> {{ schema_item.name }}"
+  vars:
+    schema_item: "{{ item.1 }}"
+  when:
+    - schema_item.owner is defined
+    - item.0.users is defined
+  run_once: true
+
 - name: Validate grant structure in user definitions
   ansible.builtin.assert:
     that:

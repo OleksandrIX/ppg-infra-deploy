@@ -1,0 +1,18 @@
+---
+- name: Create schemas for each database if defined
+  community.postgresql.postgresql_schema:
+    name: "{{ schema_item.name }}"
+    db: "{{ db_spec.name }}"
+    owner: "{{ schema_item.owner | default(db_spec.owner) }}"
+    comment: "{{ schema_item.comment | default(omit) }}"
+    state: present
+    login_unix_socket: "/var/run/postgresql"
+  become_user: postgres
+  loop: "{{ databases | subelements('schemas', skip_missing=True) }}"
+  loop_control:
+    loop_var: schema_item
+    label: "{{ schema_item.0.name }} -> {{ schema_item.1.name }}"
+  vars:
+    db_spec: "{{ schema_item.0 }}"
+    schema_item: "{{ schema_item.1 }}"
+  when: is_primary | default(false)

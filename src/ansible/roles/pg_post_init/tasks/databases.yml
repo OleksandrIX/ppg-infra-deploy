@@ -5,6 +5,7 @@
     owner: "{{ db_spec.owner }}"
     encoding: "{{ db_spec.encoding | default(omit) }}"
     template: "{{ db_spec.template | default(omit) }}"
+    comment: "{{ db_spec.comment | default(omit) }}"
     state: present
     login_unix_socket: "/var/run/postgresql"
   become_user: postgres
