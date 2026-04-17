@@ -10,6 +10,7 @@
   loop: "{{ databases }}"
   loop_control:
     label: "{{ item.name | default(item.__source_file) }}"
+  no_log: true
   run_once: true
 
 - name: Validate owner/users presence when relational config is provided
@@ -28,6 +29,7 @@
   loop_control:
     label: "{{ item.name | default(item.__source_file) }}"
   when: item.owner is defined or item.users is defined
+  no_log: true
   run_once: true
 
 - name: Validate owner is declared in users list for each database
@@ -41,6 +43,7 @@
   loop_control:
     label: "{{ item.name | default(item.__source_file) }}"
   when: item.owner is defined and item.users is defined
+  no_log: true
   run_once: true
 
 - name: Validate user definitions in database specs
@@ -61,6 +64,7 @@
     label: "{{ item.0.name }} -> {{ db_user.name | default('undefined') }}"
   vars:
     db_user: "{{ item.1 }}"
+  no_log: true
   run_once: true
 
 - name: Validate database names are unique
@@ -69,6 +73,7 @@
       - (databases | map(attribute='name') | list | unique | length) == (databases | length)
     fail_msg: "Database names must be unique across files in {{ inventory_dir }}/databases"
     quiet: true
+  no_log: true
   run_once: true
 
 - name: Validate user names are unique across all database files
@@ -77,6 +82,7 @@
       - (all_users | default([]) | map(attribute='name') | list | unique | length) == (all_users | default([]) | length)
     fail_msg: "User names must be unique across all database files"
     quiet: true
+  no_log: true
   run_once: true
 
 - name: Validate schema definitions in database specs
@@ -92,6 +98,7 @@
     label: "{{ item.0.name }} -> {{ schema_item.name | default('undefined') }}"
   vars:
     schema_item: "{{ item.1 }}"
+  no_log: true
   run_once: true
 
 - name: Validate schema names are unique within a database
@@ -104,6 +111,7 @@
   loop_control:
     label: "{{ item.name | default(item.__source_file) }}"
   when: item.schemas is defined and item.schemas is iterable
+  no_log: true
   run_once: true
 
 - name: Validate schema explicit owner exists in users list
@@ -123,6 +131,7 @@
   when:
     - schema_item.owner is defined
     - item.0.users is defined
+  no_log: true
   run_once: true
 
 - name: Validate grant structure in user definitions
@@ -176,4 +185,5 @@
   loop_control:
     label: "{{ item.name | default(item.__source_file) }}"
   when: item.owner is defined and item.users is defined
+  no_log: true
   run_once: true
