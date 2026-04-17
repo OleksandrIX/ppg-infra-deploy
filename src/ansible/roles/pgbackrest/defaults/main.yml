@@ -8,6 +8,7 @@ psql_data_dir: "/var/lib/postgresql/data"
 
 # For POSIX storage configuration
 pgbackrest_repo_host: "pgbackrest-repo-host"
+pgbackrest_repo_host_fqdn: ""
 pgbackrest_repo_path: "/var/lib/pgbackrest"
 
 # For Azure storage configuration

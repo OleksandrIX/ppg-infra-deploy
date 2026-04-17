@@ -11,7 +11,7 @@ repo1-type=posix
 repo1-path={{ pgbackrest_repo_path }}
 
 {% if pgbackrest_repo_host != inventory_hostname %}
-repo1-host={{ hostvars[pgbackrest_repo_host]['ansible_default_ipv4']['address'] }}
+repo1-host={{ pgbackrest_repo_host_fqdn | default(hostvars[pgbackrest_repo_host]['ansible_default_ipv4']['address'], true) }}
 repo1-host-user=postgres
 {% endif %}
 
