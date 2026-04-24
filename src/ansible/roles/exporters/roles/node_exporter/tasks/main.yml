@@ -1,0 +1,11 @@
+---
+# Tasks for Node Exporter installation and configuration
+
+- name: Prepare environment
+  ansible.builtin.include_tasks: prepare.yml
+
+- name: Install node_exporter binary
+  ansible.builtin.include_tasks: install.yml
+
+- name: Configure and verify node_exporter
+  ansible.builtin.include_tasks: config.yml

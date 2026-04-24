@@ -1,0 +1,22 @@
+---
+# Prepare environment for Node Exporter installation
+
+- name: Create node_exporter user
+  ansible.builtin.user:
+    name: "{{ node_exporter_user }}"
+    shell: /usr/sbin/nologin
+    home: /var/lib/node_exporter
+    createhome: yes
+    state: present
+
+- name: Create node_exporter home directory
+  ansible.builtin.file:
+    path: /var/lib/node_exporter
+    state: directory
+    owner: "{{ node_exporter_user }}"
+    group: "{{ node_exporter_group }}"
+    mode: '0755'
+
+- name: Detect system architecture
+  ansible.builtin.set_fact:
+    node_exporter_arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}"

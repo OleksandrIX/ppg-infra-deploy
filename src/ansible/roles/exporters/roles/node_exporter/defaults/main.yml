@@ -1,0 +1,13 @@
+---
+# Default variables for Node Exporter
+node_exporter_enabled: true
+
+node_exporter_version: "1.11.1"
+node_exporter_port: 9100
+
+# Node exporter service settings
+node_exporter_user: node_exporter
+node_exporter_group: node_exporter
+
+# Additional command line options
+node_exporter_additional_options: ""

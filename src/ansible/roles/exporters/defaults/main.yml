@@ -1,0 +1,5 @@
+---
+# Default variables for exporters role
+
+# Enable/disable individual exporters
+exporters_node_exporter_enabled: true
