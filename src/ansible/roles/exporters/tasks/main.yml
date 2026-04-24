@@ -1,7 +1,6 @@
 ---
 # Tasks for exporters role
-
 - name: Configure Node Exporter
   ansible.builtin.include_role:
-    name: exporters/node_exporter
+    name: exporters/roles/node_exporter
   when: exporters_node_exporter_enabled

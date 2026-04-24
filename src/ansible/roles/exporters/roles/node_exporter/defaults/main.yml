@@ -1,7 +1,5 @@
 ---
 # Default variables for Node Exporter
-node_exporter_enabled: true
-
 node_exporter_version: "1.11.1"
 node_exporter_port: 9100
 
