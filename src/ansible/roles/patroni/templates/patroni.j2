@@ -81,7 +81,7 @@ bootstrap:
         - {{ line }}
 {% endfor %}
 {% for host in allow_connection_hosts %}
-        - host all all {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 {{ psql_password_encryption }}
+        - host all all {{ host }} {{ psql_password_encryption }}
 {% endfor %}
 {% if merged_patroni_dcs_config.slots %}
       slots:
