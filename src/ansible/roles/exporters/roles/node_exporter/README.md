@@ -9,6 +9,13 @@ Installs and configures Prometheus Node Exporter for collecting system metrics.
 - Creates dedicated system user and service directories
 - Deploys systemd service with security hardening
 - Verifies service health after installation
+- Modular task structure (prepare, install, config)
+
+## Task Structure
+
+- `prepare.yml` - Creates user, directories, and detects system architecture
+- `install.yml` - Downloads, extracts, and installs the node_exporter binary
+- `config.yml` - Configures systemd service and verifies functionality
 
 ## Variables
 
@@ -51,9 +58,24 @@ Node Exporter provides system metrics including:
 - Network interface statistics
 - File descriptor usage
 - System uptime
-- Custom metrics from textfile collector
 
 ## Dependencies
 
 None - role is self-contained and handles all dependencies.
+E
+## Requirements
+
+- Linux system (Debian, RHEL, Ubuntu, CentOS, etc.)
+- Systemd support
+- Internet access to download node_exporter binary
+- Root or sudo privileges
+
+## Service Details
+
+- **Service Name**: node_exporter
+- **Executable Path**: `/usr/local/bin/node_exporter`
+- **User**: node_exporter (unprivileged)
+- **Default Port**: 9100
+- **Metrics Endpoint**: `http://localhost:9100/metrics`
+
 
