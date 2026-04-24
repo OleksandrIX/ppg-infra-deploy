@@ -1,4 +1,6 @@
+# Exporters configuration
+exporters_node_exporter_enabled: true
+
 # Node Exporter configuration for pg_nodes group
-node_exporter_enabled: true
 node_exporter_version: "1.11.1"
 node_exporter_additional_options: ""

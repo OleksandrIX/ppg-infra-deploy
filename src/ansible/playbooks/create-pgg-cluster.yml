@@ -68,3 +68,11 @@
     - role: "pg_post_init"
       tags: ["pg_post_init"]
       when: query('fileglob', files_glob | default('')) | length > 0
+
+- name: "Configure Exporters"
+  hosts: "pg_nodes"
+  become: true
+  tags: ["exporters"]
+  roles:
+    - role: "exporters"
+      tags: ["exporters"]
