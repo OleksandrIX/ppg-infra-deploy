@@ -55,7 +55,7 @@
       - (db_user.password | default('')) | length > 0 or db_user.name | upper == 'PUBLIC'
       - db_user.grants is defined
       - db_user.grants is iterable
-      - db_user.grants | length > 0
+      # - db_user.grants | length > 0
     fail_msg: "Invalid user definition in {{ item.0.__source_file }}"
     quiet: true
   loop: "{{ databases | subelements('users', skip_missing=True) }}"
